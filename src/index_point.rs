@@ -8,8 +8,8 @@ pub struct IndexPoint {
 
 impl IndexPoint {
 
-    pub fn new(index: int, point: FixVec) {
-        IndexPoint {index, point}
+    pub fn new(index: i64, point: FixVec) -> IndexPoint {
+        IndexPoint { index, point }
     }
 
 }

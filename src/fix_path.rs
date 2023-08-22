@@ -18,7 +18,7 @@ impl FixPathExtension for FixPath {
         let mut area: i64 = 0;
         
         for p1 in self.iter() {
-            area += p1.unsafe_cross_product(&p0);
+            area += p1.unsafe_cross_product(p0);
             p0 = *p1;
         }
         
@@ -85,7 +85,7 @@ fn has_degenerates(path: &FixPath) -> bool {
     
     for pi in path.iter() {
         let vi = *pi - p0;
-        let prod = vi.unsafe_cross_product(&v0);
+        let prod = vi.unsafe_cross_product(v0);
         if prod == 0 {
             return true
         }
@@ -122,7 +122,7 @@ fn filter(path: &FixPath) -> FixPath {
         let p1 = path[node.index];
         let p2 = path[node.next];
 
-        if (p1 - p0).unsafe_cross_product(&(p2 - p1)) == 0 {
+        if (p1 - p0).unsafe_cross_product(p2 - p1) == 0 {
             n -= 1;
             if n < 3 {
                 return vec![FixVec::ZERO; 0]

@@ -7,7 +7,7 @@ pub struct Triangle;
 impl Triangle {
     
     pub fn unsafe_area_two(p0: FixVec, p1: FixVec, p2: FixVec) -> i64 {
-        (p1 - p0).unsafe_cross_product(&(p1 - p2))
+        (p1 - p0).unsafe_cross_product(p1 - p2)
     }
 
     pub fn unsafe_area(p0: FixVec, p1: FixVec, p2: FixVec) -> i64 {
@@ -15,7 +15,7 @@ impl Triangle {
     }
 
     pub fn fix_area(p0: FixVec, p1: FixVec, p2: FixVec) -> FixFloat {
-        FixFloat::new_i64((p1 - p0).cross_product(&(p1 - p2)).value() / 2)
+        FixFloat::new_i64((p1 - p0).cross_product(p1 - p2).value() / 2)
     }
 
     pub fn is_clockwise(p0: FixVec, p1: FixVec, p2: FixVec) -> bool {
@@ -42,9 +42,9 @@ impl Triangle {
     }
 
     pub fn is_contain(p: FixVec, p0: FixVec, p1: FixVec, p2: FixVec) -> bool {
-        let q0 = (p - p1).unsafe_cross_product(&(p0 - p1));
-        let q1 = (p - p2).unsafe_cross_product(&(p1 - p2));
-        let q2 = (p - p0).unsafe_cross_product(&(p2 - p0));
+        let q0 = (p - p1).unsafe_cross_product(p0 - p1);
+        let q1 = (p - p2).unsafe_cross_product(p1 - p2);
+        let q2 = (p - p0).unsafe_cross_product(p2 - p0);
         
         let has_neg = q0 < 0 || q1 < 0 || q2 < 0;
         let has_pos = q0 > 0 || q1 > 0 || q2 > 0;
@@ -53,9 +53,9 @@ impl Triangle {
     }
 
     pub fn is_not_contain(p: FixVec, p0: FixVec, p1: FixVec, p2: FixVec) -> bool {
-        let q0 = (p - p1).unsafe_cross_product(&(p0 - p1));
-        let q1 = (p - p2).unsafe_cross_product(&(p1 - p2));
-        let q2 = (p - p0).unsafe_cross_product(&(p2 - p0));
+        let q0 = (p - p1).unsafe_cross_product(p0 - p1);
+        let q1 = (p - p2).unsafe_cross_product(p1 - p2);
+        let q2 = (p - p0).unsafe_cross_product(p2 - p0);
         
         let has_neg = q0 <= 0 || q1 <= 0 || q2 <= 0;
         let has_pos = q0 >= 0 || q1 >= 0 || q2 >= 0;
