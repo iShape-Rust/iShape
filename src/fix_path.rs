@@ -4,7 +4,7 @@ use i_float::fix_vec::FixVec;
 pub type FixPath = Vec<FixVec>;
 
 pub trait FixPathExtension {
-    fn area(&self) -> FixFloat;
+    fn area(&self) -> i64;
     fn contains(&self, point: FixVec) -> bool;
     fn remove_degenerates(&mut self);
     fn removed_degenerates(&self) -> FixPath;
@@ -12,7 +12,7 @@ pub trait FixPathExtension {
 
 impl FixPathExtension for FixPath {
     
-    fn area(&self) -> FixFloat {
+    fn area(&self) -> i64 {
         let n = self.len();
         let mut p0 = self[n - 1];
         let mut area: i64 = 0;
@@ -22,7 +22,7 @@ impl FixPathExtension for FixPath {
             p0 = *p1;
         }
         
-        FixFloat::new_i64(area >> (FixFloat::FRACTION_BITS + 1))
+        area >> (FixFloat::FRACTION_BITS + 1)
     }
     
     fn contains(&self, point: FixVec) -> bool {
