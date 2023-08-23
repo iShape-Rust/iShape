@@ -11,7 +11,7 @@ pub struct EdgeCross {
 
 impl EdgeCross {
 
-    const NOT_CROSS: EdgeCross = EdgeCross {
+    pub const NOT_CROSS: EdgeCross = EdgeCross {
         nature: EdgeCrossType::NotCross,
         point: FixVec::ZERO,
         second: FixVec::ZERO,
