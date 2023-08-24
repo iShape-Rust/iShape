@@ -12,15 +12,15 @@ impl FixBnd {
 
     pub const ZERO: Self = FixBnd { min: FixVec::ZERO, max: FixVec::ZERO };
 
-    pub fn new_min_max(min: FixVec, max: FixVec) -> Self {
+    pub fn from_min_max(min: FixVec, max: FixVec) -> Self {
         Self { min, max }
     }
 
-    pub fn new_radius(radius: FixFloat) -> Self {
+    pub fn from_radius(radius: FixFloat) -> Self {
         Self { min: FixVec::new_fix(-radius, -radius), max: FixVec::new_fix(radius, radius) }
     }
 
-    pub fn new_poitns(points: &[FixVec]) -> Self {
+    pub fn from_poitns(points: &[FixVec]) -> Self {
         let p0 = points[0];
         let mut min_x = p0.x;
         let mut max_x = p0.x;
