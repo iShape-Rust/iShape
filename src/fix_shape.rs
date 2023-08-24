@@ -6,6 +6,17 @@ pub struct FixShape {
 }
 
 impl FixShape {
+
+    /// Returns the paths length
+    pub fn count(&self) -> usize {
+        self.paths.len()
+    }
+
+    /// Returns all paths
+    pub fn paths(&self) -> &Vec<FixPath> {
+        &self.paths
+    }
+
     /// Returns the contour defining the outer boundary of the shape.
     pub fn contour(&self) -> &FixPath {
         &self.paths[0]
