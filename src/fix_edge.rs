@@ -89,7 +89,7 @@ impl FixEdge {
         let b0_area = Triangle::unsafe_area_two(a0, b0, a1);
 
         if b0_area == 0 {
-            if other.is_box_contain(b0) {
+            if self.is_box_contain(b0) {
                 return EdgeCross { nature: EdgeCrossType::EndB, point: b0, second: FixVec::ZERO }
             } else {
                 return EdgeCross::NOT_CROSS
@@ -99,7 +99,7 @@ impl FixEdge {
         let b1_area = Triangle::unsafe_area_two(a0, b1, a1);
 
         if b1_area == 0 {
-            if other.is_box_contain(b1) {
+            if self.is_box_contain(b1) {
                 return EdgeCross { nature: EdgeCrossType::EndB, point: b1, second: FixVec::ZERO }
             } else {
                 return EdgeCross::NOT_CROSS
