@@ -1,10 +1,11 @@
 [package]
 name = "i_shape"
 version = "0.1.0"
-edition = "2021"
 authors = ["Nail Sharipov <nailxsharipov@gmail.com>"]
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+edition = "2021"
+description = "iShape is a compact and efficient library specifically designed for representing 2D data structures using FixVec."
+license = "MIT"
+repository = "https://github.com/iShape-Rust/i_shape"
 
 [dependencies]
-i_float = { path = "../i_float" }
+i_float = "^0.1.0"
