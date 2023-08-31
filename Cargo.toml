@@ -5,7 +5,7 @@ authors = ["Nail Sharipov <nailxsharipov@gmail.com>"]
 edition = "2021"
 description = "iShape is a compact and efficient library specifically designed for representing 2D data structures using FixVec."
 license = "MIT"
-repository = "https://github.com/iShape-Rust/i_shape"
+repository = "https://github.com/iShape-Rust/iShape"
 
 [dependencies]
 i_float = "^0.1.0"
