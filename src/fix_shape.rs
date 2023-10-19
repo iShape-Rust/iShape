@@ -1,8 +1,9 @@
 use crate::fix_path::{FixPath, FixPathExtension };
 
 /// Represents a fixed geometric shape with contour and holes.
+#[derive(Clone)]
 pub struct FixShape {
-    paths: Vec<FixPath>,
+    paths: Vec<FixPath>
 }
 
 impl FixShape {
