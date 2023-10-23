@@ -20,7 +20,7 @@ impl FixBnd {
         Self { min: FixVec::new_fix(-radius, -radius), max: FixVec::new_fix(radius, radius) }
     }
 
-    pub fn from_poitns(points: &[FixVec]) -> Self {
+    pub fn from_points(points: &[FixVec]) -> Self {
         let p0 = points[0];
         let mut min_x = p0.x;
         let mut max_x = p0.x;
