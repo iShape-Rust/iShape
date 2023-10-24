@@ -8,6 +8,11 @@ pub struct FixShape {
 
 impl FixShape {
 
+    /// Convert into paths
+    pub fn into_paths(self) -> Vec<FixPath> {
+        self.paths
+    }
+
     /// Returns the paths length
     pub fn paths_count(&self) -> usize {
         self.paths.len()
@@ -31,6 +36,11 @@ impl FixShape {
     /// Returns the array of holes defining the inner boundaries of the shape.
     pub fn holes(&self) -> &[FixPath] {
         &self.paths[1..]
+    }
+
+    /// Initializes a new shape with the specified contour.
+    pub fn new_with_contour(contour: FixPath) -> Self {
+        Self { paths: [contour].to_vec() }
     }
 
     /// Initializes a new shape with the specified contour and holes.
