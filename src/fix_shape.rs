@@ -1,12 +1,17 @@
 use crate::fix_path::{FixPath, FixPathExtension };
 
 /// Represents a fixed geometric shape with contour and holes.
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct FixShape {
     paths: Vec<FixPath>
 }
 
 impl FixShape {
+
+    /// Is shape represent convex polygon
+    pub fn is_convex_polygon(&self) -> bool {
+        self.paths.len() == 1 && self.contour().is_convex()
+    }
 
     /// Convert into paths
     pub fn into_paths(self) -> Vec<FixPath> {
