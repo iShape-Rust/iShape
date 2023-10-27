@@ -41,10 +41,17 @@ impl FixPathExtension for FixPath {
             let p2 = *p;
             let e1 = p2 - p1;
             let cross = e1.unsafe_cross_product(e0).signum();
-            if sign == 0 {
-                sign = cross;
-            } else if sign != cross && cross != 0 {
-                return false;
+            if cross == 0 {
+                let dot = e1.unsafe_dot_product(e0);
+                if dot == -1 {
+                    return false
+                }
+            } else {
+                if sign == 0 {
+                    sign = cross
+                } else if sign != cross {
+                    return false
+                }
             }
 
             e0 = e1;
