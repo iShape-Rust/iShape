@@ -3,7 +3,6 @@ use i_float::fix_vec::FixVec;
 
 #[cfg(test)]
 mod tests {
-    use std::path::Path;
     use i_shape::fix_path::FixPathExtension;
 
     use super::*;
