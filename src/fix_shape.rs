@@ -1,7 +1,8 @@
+use serde::{Serialize, Deserialize};
 use crate::fix_path::{FixPath, FixPathExtension };
 
 /// Represents a fixed geometric shape with contour and holes.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone,PartialEq, Eq, Deserialize, Serialize)]
 pub struct FixShape {
     paths: Vec<FixPath>
 }
