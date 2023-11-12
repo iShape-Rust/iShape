@@ -29,6 +29,11 @@ impl FixShape {
         &self.paths
     }
 
+    /// Returns all paths
+    pub fn mut_paths(&mut self) -> &mut Vec<FixPath> {
+        &mut self.paths
+    }
+
     /// Returns specific path
     pub fn path_at_index(&self, index: usize) -> &FixPath {
         &self.paths[index]
