@@ -4,7 +4,7 @@ use crate::fix_path::{FixPath, FixPathExtension };
 /// Represents a fixed geometric shape with contour and holes.
 #[derive(Debug, Clone,PartialEq, Eq, Deserialize, Serialize)]
 pub struct FixShape {
-    paths: Vec<FixPath>
+    pub paths: Vec<FixPath>
 }
 
 impl FixShape {
@@ -12,31 +12,6 @@ impl FixShape {
     /// Is shape represent convex polygon
     pub fn is_convex_polygon(&self) -> bool {
         self.paths.len() == 1 && self.contour().is_convex()
-    }
-
-    /// Convert into paths
-    pub fn into_paths(self) -> Vec<FixPath> {
-        self.paths
-    }
-
-    /// Returns the paths length
-    pub fn paths_count(&self) -> usize {
-        self.paths.len()
-    }
-
-    /// Returns all paths
-    pub fn paths(&self) -> &Vec<FixPath> {
-        &self.paths
-    }
-
-    /// Returns all paths
-    pub fn mut_paths(&mut self) -> &mut Vec<FixPath> {
-        &mut self.paths
-    }
-
-    /// Returns specific path
-    pub fn path_at_index(&self, index: usize) -> &FixPath {
-        &self.paths[index]
     }
 
     /// Returns the contour defining the outer boundary of the shape.
