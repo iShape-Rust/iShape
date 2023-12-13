@@ -9,15 +9,6 @@ pub struct EdgeCross {
     pub second: FixVec,
 }
 
-impl EdgeCross {
-
-    pub const NOT_CROSS: EdgeCross = EdgeCross {
-        nature: EdgeCrossType::NotCross,
-        point: FixVec::ZERO,
-        second: FixVec::ZERO,
-    };
-}
-
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum EdgeCrossType {
     NotCross, 
@@ -46,7 +37,7 @@ impl FixEdge {
         Self { e0, e1 }
     }
 
-    pub fn cross(&self, other: FixEdge) -> EdgeCross {
+    pub fn cross(&self, other: FixEdge) -> Option<EdgeCross> {
         let a0 = self.e0;
         let a1 = self.e1;
 
@@ -67,22 +58,22 @@ impl FixEdge {
         let has_same_end = com_a0 || com_a1;
 
         if has_same_end {
-            return EdgeCross::NOT_CROSS
+            return None;
         }
 
         if a0_area == 0 {
             if other.is_box_contain(a0) {
-                return EdgeCross { nature: EdgeCrossType::EndA, point: a0, second: FixVec::ZERO }
+                return Some(EdgeCross { nature: EdgeCrossType::EndA, point: a0, second: FixVec::ZERO });
             } else {
-                return EdgeCross::NOT_CROSS
+                return None;
             }
         }
 
         if a1_area == 0 {
             if other.is_box_contain(a1) {
-                return EdgeCross { nature: EdgeCrossType::EndA, point: a1, second: FixVec::ZERO }
+                return Some(EdgeCross { nature: EdgeCrossType::EndA, point: a1, second: FixVec::ZERO });
             } else {
-                return EdgeCross::NOT_CROSS
+                return None;
             }
         }
 
@@ -90,9 +81,9 @@ impl FixEdge {
 
         if b0_area == 0 {
             if self.is_box_contain(b0) {
-                return EdgeCross { nature: EdgeCrossType::EndB, point: b0, second: FixVec::ZERO }
+                return Some(EdgeCross { nature: EdgeCrossType::EndB, point: b0, second: FixVec::ZERO });
             } else {
-                return EdgeCross::NOT_CROSS
+                return None;
             }
         }
 
@@ -100,9 +91,9 @@ impl FixEdge {
 
         if b1_area == 0 {
             if self.is_box_contain(b1) {
-                return EdgeCross { nature: EdgeCrossType::EndB, point: b1, second: FixVec::ZERO }
+                return Some(EdgeCross { nature: EdgeCrossType::EndB, point: b1, second: FixVec::ZERO });
             } else {
-                return EdgeCross::NOT_CROSS
+                return None;
             }
         }
 
@@ -111,7 +102,7 @@ impl FixEdge {
         let area_b = b0_area > 0 && b1_area < 0 || b0_area < 0 && b1_area > 0;
 
         if !(area_a && area_b) {
-            return EdgeCross::NOT_CROSS
+            return None;
         }
 
         let p = FixEdge::cross_point(a0, a1, b0, b1);
@@ -132,7 +123,7 @@ impl FixEdge {
             panic!("Impossible");
         }
 
-        return EdgeCross { nature: edge_type, point: p, second: FixVec::ZERO }
+        return Some(EdgeCross { nature: edge_type, point: p, second: FixVec::ZERO });
     }
 
     fn cross_point(a0: FixVec, a1: FixVec, b0: FixVec, b1: FixVec) -> FixVec {
