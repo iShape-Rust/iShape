@@ -12,7 +12,7 @@ mod tests {
         let ea = FixEdge::new(FixVec::new_i64(-s, 0), FixVec::new_i64(s, 0));
         let eb = FixEdge::new(FixVec::new_i64(0, -s), FixVec::new_i64(0, s));
         
-        let result = ea.cross(eb);
+        let result = ea.cross(eb).unwrap();
         
         assert_eq!(EdgeCrossType::Pure, result.nature);
         assert_eq!(FixVec::ZERO, result.point);
@@ -25,7 +25,7 @@ mod tests {
         let ea = FixEdge::new(FixVec::new_i64(-s, 0), FixVec::new_i64(s, 0));
         let eb = FixEdge::new(FixVec::new_i64(0, -s), FixVec::new_i64(0, s));
         
-        let result = ea.cross(eb);
+        let result = ea.cross(eb).unwrap();
         
         assert_eq!(EdgeCrossType::Pure, result.nature);
         assert_eq!(FixVec::ZERO, result.point);
@@ -38,7 +38,7 @@ mod tests {
         let ea = FixEdge::new(FixVec::new_i64(-s, 0), FixVec::new_i64(s, 0));
         let eb = FixEdge::new(FixVec::new_i64(1024, -s), FixVec::new_i64(1024, s));
         
-        let result = ea.cross(eb);
+        let result = ea.cross(eb).unwrap();
         
         assert_eq!(EdgeCrossType::Pure, result.nature);
         assert_eq!(FixVec::new_i64(1024, 0), result.point);
@@ -52,7 +52,7 @@ mod tests {
         let ea = FixEdge::new(FixVec::new_i64(-s, -s), FixVec::new_i64(s, s));
         let eb = FixEdge::new(FixVec::new_i64(q, -s), FixVec::new_i64(q, s));
         
-        let result = ea.cross(eb);
+        let result = ea.cross(eb).unwrap();
         
         assert_eq!(EdgeCrossType::Pure, result.nature);
         assert_eq!(FixVec::new_i64(512_000_000, 512_000_000), result.point);
@@ -65,7 +65,7 @@ mod tests {
         let ea = FixEdge::new(FixVec::new_i64(-s, 0), FixVec::new_i64(s, 0));
         let eb = FixEdge::new(FixVec::new_i64(-s, -s), FixVec::new_i64(-s, s));
         
-        let result = ea.cross(eb);
+        let result = ea.cross(eb).unwrap();
         
         assert_eq!(EdgeCrossType::EndA, result.nature);
         assert_eq!(FixVec::new_i64(-s, 0), result.point);
@@ -78,7 +78,7 @@ mod tests {
         let ea = FixEdge::new(FixVec::new_i64(-s, 0), FixVec::new_i64(s, 0));
         let eb = FixEdge::new(FixVec::new_i64(s, -s), FixVec::new_i64(s, s));
         
-        let result = ea.cross(eb);
+        let result = ea.cross(eb).unwrap();
         
         assert_eq!(EdgeCrossType::EndA, result.nature);
         assert_eq!(FixVec::new_i64(s, 0), result.point);
@@ -92,9 +92,7 @@ mod tests {
         let eb = FixEdge::new(FixVec::new_i64(-s, s), FixVec::new_i64(-s, -s));
         
         let result = ea.cross(eb);
-        
-        assert_eq!(EdgeCrossType::NotCross, result.nature);
-        assert_eq!(FixVec::ZERO, result.point);
+        assert!(result.is_none());
     }
 
     #[test]
@@ -102,7 +100,7 @@ mod tests {
         let ea = FixEdge::new(FixVec::new_i64(7256, -14637), FixVec::new_i64(7454, -15045));
         let eb = FixEdge::new(FixVec::new_i64(7343, -14833), FixVec::new_i64(7506, -15144));
         
-        let result = ea.cross(eb);
+        let result = ea.cross(eb).unwrap();
         
         assert!(ea.is_box_contain(result.point));
         assert!(eb.is_box_contain(result.point));
@@ -115,7 +113,7 @@ mod tests {
         let ea = FixEdge::new(FixVec::new_i64(-8555798, -1599355), FixVec::new_i64(-1024000, 0));
         let eb = FixEdge::new(FixVec::new_i64(-8571363, 1513719), FixVec::new_i64(-1023948, -10239));
         
-        let result = ea.cross(eb);
+        let result = ea.cross(eb).unwrap();
         
         assert_eq!(EdgeCrossType::Pure, result.nature);
         assert_eq!(FixVec::new_i64(-1048691, -5244), result.point);
@@ -127,8 +125,8 @@ mod tests {
         let eb = FixEdge::new(FixVec::new_i64(-8555798, -1599355), FixVec::new_i64(513224, -5243));
         
         let result = ea.cross(eb);
-        
-        assert_eq!(EdgeCrossType::NotCross, result.nature);
+
+        assert!(result.is_none());
     }
 
     #[test]
@@ -138,7 +136,7 @@ mod tests {
         let ea = FixEdge::new(FixVec::new_i64(-s, 0), FixVec::new_i64(s / 2, 0));
         let eb = FixEdge::new(FixVec::new_i64(0, 0), FixVec::new_i64(s, 0));
         
-        let result = ea.cross(eb);
+        let result = ea.cross(eb).unwrap();
         
         assert_eq!(EdgeCrossType::Penetrate, result.nature);
         assert_eq!(FixVec::ZERO, result.point);
@@ -150,7 +148,7 @@ mod tests {
         let ea = FixEdge::new(FixVec::new_i64(-2, 0), FixVec::new_i64(2, 0));
         let eb = FixEdge::new(FixVec::new_i64(-1, 0), FixVec::new_i64(1, 0));
         
-        let result = ea.cross(eb);
+        let result = ea.cross(eb).unwrap();
         
         assert_eq!(EdgeCrossType::OverlayB, result.nature);
     }

@@ -11,13 +11,12 @@ pub struct EdgeCross {
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum EdgeCrossType {
-    NotCross,
     Pure,
     OverlayA,
     OverlayB,
     Penetrate,
     EndA,
-    EndB,
+    EndB
 }
 
 #[derive(Debug, Clone, Copy)]
