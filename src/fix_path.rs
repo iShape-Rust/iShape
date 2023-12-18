@@ -5,6 +5,7 @@ pub type FixPath = Vec<FixVec>;
 
 pub trait FixPathExtension {
     fn area(&self) -> i64;
+    fn unsafe_area(&self) -> i64;
     fn is_convex(&self) -> bool;
     fn contains(&self, point: FixVec) -> bool;
     fn remove_degenerates(&mut self);
@@ -12,18 +13,22 @@ pub trait FixPathExtension {
 }
 
 impl FixPathExtension for FixPath {
-    
+
     fn area(&self) -> i64 {
+        self.unsafe_area() >> (FixFloat::FRACTION_BITS + 1)
+    }
+
+    fn unsafe_area(&self) -> i64 {
         let n = self.len();
         let mut p0 = self[n - 1];
         let mut area: i64 = 0;
-        
+
         for p1 in self.iter() {
             area += p1.unsafe_cross_product(p0);
             p0 = *p1;
         }
-        
-        area >> (FixFloat::FRACTION_BITS + 1)
+
+        area
     }
 
     fn is_convex(&self) -> bool {
