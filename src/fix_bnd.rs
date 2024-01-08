@@ -94,7 +94,7 @@ impl FixBnd {
         let cx = std::cmp::max(self.min.x, std::cmp::min(center.x, self.max.x));
         let cy = std::cmp::max(self.min.y, std::cmp::min(center.y, self.max.y));
 
-        let sqr_dist = FixVec::new(cx, cy).sqr_distance(center);
+        let sqr_dist = FixVec::new(cx, cy).fix_sqr_distance(center);
 
         sqr_dist <= radius.fix_sqr()
     }
