@@ -26,10 +26,10 @@ mod tests {
         let mut holes = Vec::with_capacity(1);
         holes.push(hole.to_vec());
 
-        let shpae = FixShape::new_with_contour_and_holes(body.to_vec(), holes);
+        let shape = FixShape::new_with_contour_and_holes(body.to_vec(), holes);
         
-        assert_eq!(shpae.contour().as_slice(), body.as_ref());
-        assert_eq!(shpae.holes()[0].as_slice(), hole.as_ref());
+        assert_eq!(shape.contour().as_slice(), body.as_ref());
+        assert_eq!(shape.holes()[0].as_slice(), hole.as_ref());
     }
 
     #[test]

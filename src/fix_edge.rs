@@ -157,18 +157,18 @@ impl FixEdge {
 
         // move a0.x to 0
         // move all by a0.x
-        let a0x = a0.x.value();
-        let a0y = a0.y.value();
+        let a0x = a0.x;
+        let a0y = a0.y;
 
-        let a1x = a1.x.value() - a0x;
-        let b0x = b0.x.value() - a0x;
-        let b1x = b1.x.value() - a0x;
+        let a1x = a1.x - a0x;
+        let b0x = b0.x - a0x;
+        let b1x = b1.x - a0x;
 
         // move a0.y to 0
         // move all by a0.y
-        let a1y = a1.y.value() - a0y;
-        let b0y = b0.y.value() - a0y;
-        let b1y = b1.y.value() - a0y;
+        let a1y = a1.y - a0y;
+        let b0y = b0.y - a0y;
+        let b1y = b1.y - a0y;
 
         let dy_b = b0y - b1y;
         let dx_b = b0x - b1x;
@@ -205,7 +205,7 @@ impl FixEdge {
         let x = x0 + a0x;
         let y = y0 + a0y;
 
-        FixVec::new_i64(x, y)
+        FixVec::new(x, y)
     }
 
     pub fn is_box_contain(&self, p: FixVec) -> bool {

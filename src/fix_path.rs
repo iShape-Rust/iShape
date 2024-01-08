@@ -1,4 +1,4 @@
-use i_float::fix_float::FixFloat;
+use i_float::fix_float::FIX_FRACTION_BITS;
 use i_float::fix_vec::FixVec;
 
 pub type FixPath = Vec<FixVec>;
@@ -15,7 +15,7 @@ pub trait FixPathExtension {
 impl FixPathExtension for FixPath {
 
     fn area(&self) -> i64 {
-        self.unsafe_area() >> (FixFloat::FRACTION_BITS + 1)
+        self.unsafe_area() >> (FIX_FRACTION_BITS + 1)
     }
 
     fn unsafe_area(&self) -> i64 {

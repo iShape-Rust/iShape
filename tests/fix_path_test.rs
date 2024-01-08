@@ -36,7 +36,7 @@ mod tests {
             FixVec::new_number(0, 0),
             FixVec::new_number(0, 1),
             FixVec::new_number(0, 1),
-            FixVec::new_i64(512, 1024),
+            FixVec::new(512, 1024),
             FixVec::new_number(1, 1),
             FixVec::new_number(1, 1),
             FixVec::new_number(1, 0)
@@ -53,7 +53,7 @@ mod tests {
     fn test_degenerates_empty() {
         let incorrect = [
             FixVec::new_number(0, 0),
-            FixVec::new_i64(0, 512),
+            FixVec::new(0, 512),
             FixVec::new_number(0, 1)
         ];
 

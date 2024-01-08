@@ -15,7 +15,7 @@ impl Triangle {
     }
 
     pub fn fix_area(p0: FixVec, p1: FixVec, p2: FixVec) -> FixFloat {
-        FixFloat::new_i64((p1 - p0).cross_product(p1 - p2).value() / 2)
+        (p1 - p0).cross_product(p1 - p2) / 2
     }
 
     pub fn is_clockwise(p0: FixVec, p1: FixVec, p2: FixVec) -> bool {

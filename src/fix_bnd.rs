@@ -1,4 +1,4 @@
-use i_float::fix_float::FixFloat;
+use i_float::fix_float::{FixFloat, FixMath};
 use i_float::fix_vec::FixVec;
 
 
@@ -17,7 +17,7 @@ impl FixBnd {
     }
 
     pub fn from_radius(radius: FixFloat) -> Self {
-        Self { min: FixVec::new_fix(-radius, -radius), max: FixVec::new_fix(radius, radius) }
+        Self { min: FixVec::new(-radius, -radius), max: FixVec::new(radius, radius) }
     }
 
     pub fn from_points(points: &[FixVec]) -> Self {
@@ -38,8 +38,8 @@ impl FixBnd {
             max_y = std::cmp::max(max_y, p.y);
         }
         
-        let min = FixVec::new_fix(min_x, min_y);
-        let max = FixVec::new_fix(max_x, max_y);
+        let min = FixVec::new(min_x, min_y);
+        let max = FixVec::new(max_x, max_y);
         
         FixBnd { min, max }
     }
@@ -52,8 +52,8 @@ impl FixBnd {
         let xx = if p0.x < p1.x {(p0.x, p1.x)} else {(p1.x, p0.x)};
         let yy = if p0.y < p1.y {(p0.y, p1.y)} else {(p1.y, p0.y)};
         Self {
-            min: FixVec::new_fix(xx.0, yy.0),
-            max: FixVec::new_fix(xx.1, yy.1),
+            min: FixVec::new(xx.0, yy.0),
+            max: FixVec::new(xx.1, yy.1),
         }
     }
 
@@ -63,7 +63,7 @@ impl FixBnd {
         let max_x = std::cmp::max(self.max.x, b.max.x);
         let max_y = std::cmp::max(self.max.y, b.max.y);
 
-        Self { min: FixVec::new_fix(min_x, min_y), max: FixVec::new_fix(max_x, max_y) }
+        Self { min: FixVec::new(min_x, min_y), max: FixVec::new(max_x, max_y) }
     }
 
     pub fn is_collide(self, b: FixBnd) -> bool {
@@ -94,9 +94,9 @@ impl FixBnd {
         let cx = std::cmp::max(self.min.x, std::cmp::min(center.x, self.max.x));
         let cy = std::cmp::max(self.min.y, std::cmp::min(center.y, self.max.y));
 
-        let sqr_dist = FixVec::new_fix(cx, cy).sqr_distance(center);
+        let sqr_dist = FixVec::new(cx, cy).sqr_distance(center);
 
-        sqr_dist <= radius.sqr()
+        sqr_dist <= radius.fix_sqr()
     }
 
 }
