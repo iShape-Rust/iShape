@@ -84,7 +84,7 @@ mod tests {
 
     #[test]
     fn test_order_00() {
-        let mut path = [
+        let path = [
             FixVec::new_number(-10, -10),
             FixVec::new_number(-10, 10),
             FixVec::new_number(10, 10),
@@ -96,7 +96,7 @@ mod tests {
 
     #[test]
     fn test_order_01() {
-        let mut path = [
+        let path = [
             FixVec::new_number(-10, -10),
             FixVec::new_number(10, -10),
             FixVec::new_number(10, 10),
