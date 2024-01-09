@@ -26,14 +26,32 @@ impl FixShape {
 
     /// Initializes a new shape with the specified contour.
     pub fn new_with_contour(contour: FixPath) -> Self {
-        Self { paths: [contour].to_vec() }
+        let is_contour_clockwise = contour.is_clockwise_ordered();
+        let mut paths = [contour].to_vec();
+        if !is_contour_clockwise {
+            paths[0].reverse()
+        }
+
+        Self { paths }
     }
 
     /// Initializes a new shape with the specified contour and holes.
     pub fn new_with_contour_and_holes(contour: FixPath, holes: Vec<FixPath>) -> Self {
         let mut paths = Vec::with_capacity(holes.len() + 1);
+        let is_contour_clockwise = contour.is_clockwise_ordered();
         paths.push(contour);
-        paths.extend(holes);
+        if !is_contour_clockwise {
+            paths[0].reverse()
+        }
+
+        for hole in holes.into_iter() {
+            let is_clockwise = hole.is_clockwise_ordered();
+            paths.push(hole);
+            if is_clockwise {
+                paths.last_mut().unwrap().reverse()
+            }
+        }
+
         Self { paths }
     }
 
@@ -43,19 +61,12 @@ impl FixShape {
         Self { paths }
     }
 
-    /// Sets the direction of the contour and holes.
-    /// If the clockwise parameter is true, the contour and holes will be arranged in a clockwise direction.
-    /// If false, they will be arranged in a counter-clockwise direction.
-    pub fn set_direction(&mut self, clockwise: bool) {
-        for path in &mut self.paths {
-            if (path.area() < 0) == clockwise {
-                path.reverse();
-            }
-        }
-    }
-
     /// Adds a new hole to the shape.
     pub fn add_hole(&mut self, path: FixPath) {
+        let is_clockwise = path.is_clockwise_ordered();
         self.paths.push(path);
+        if is_clockwise {
+            self.paths.last_mut().unwrap().reverse()
+        }
     }
 }

@@ -42,8 +42,8 @@ impl FixEdge {
         let b0 = other.e0;
         let b1 = other.e1;
 
-        let a0_area = Triangle::unsafe_area_two(b0, a0, b1);
-        let a1_area = Triangle::unsafe_area_two(b0, a1, b1);
+        let a0_area = Triangle::area_two(b0, a0, b1);
+        let a1_area = Triangle::area_two(b0, a1, b1);
 
         if a0_area == 0 && a1_area == 0 {
             // same line
@@ -75,7 +75,7 @@ impl FixEdge {
             }
         }
 
-        let b0_area = Triangle::unsafe_area_two(a0, b0, a1);
+        let b0_area = Triangle::area_two(a0, b0, a1);
 
         if b0_area == 0 {
             if self.is_box_contain(b0) {
@@ -85,7 +85,7 @@ impl FixEdge {
             }
         }
 
-        let b1_area = Triangle::unsafe_area_two(a0, b1, a1);
+        let b1_area = Triangle::area_two(a0, b1, a1);
 
         if b1_area == 0 {
             if self.is_box_contain(b1) {

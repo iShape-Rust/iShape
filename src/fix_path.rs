@@ -5,8 +5,9 @@ pub type FixPath = Vec<FixVec>;
 
 pub trait FixPathExtension {
     fn area(&self) -> i64;
-    fn unsafe_area(&self) -> i64;
+    fn fix_area(&self) -> i64;
     fn is_convex(&self) -> bool;
+    fn is_clockwise_ordered(&self) -> bool;
     fn contains(&self, point: FixVec) -> bool;
     fn remove_degenerates(&mut self);
     fn removed_degenerates(&self) -> FixPath;
@@ -15,20 +16,24 @@ pub trait FixPathExtension {
 impl FixPathExtension for FixPath {
 
     fn area(&self) -> i64 {
-        self.unsafe_area() >> (FIX_FRACTION_BITS + 1)
-    }
-
-    fn unsafe_area(&self) -> i64 {
         let n = self.len();
         let mut p0 = self[n - 1];
         let mut area: i64 = 0;
 
         for p1 in self.iter() {
-            area += p1.unsafe_cross_product(p0);
+            area += p1.cross_product(p0);
             p0 = *p1;
         }
 
         area
+    }
+
+    fn fix_area(&self) -> i64 {
+        self.area() >> (FIX_FRACTION_BITS + 1)
+    }
+
+    fn is_clockwise_ordered(&self) -> bool {
+        self.area() >= 0
     }
 
     fn is_convex(&self) -> bool {
@@ -45,9 +50,9 @@ impl FixPathExtension for FixPath {
         for p in self.iter() {
             let p2 = *p;
             let e1 = p2 - p1;
-            let cross = e1.unsafe_cross_product(e0).signum();
+            let cross = e1.cross_product(e0).signum();
             if cross == 0 {
-                let dot = e1.unsafe_dot_product(e0);
+                let dot = e1.dot_product(e0);
                 if dot == -1 {
                     return false
                 }
@@ -126,7 +131,7 @@ fn has_degenerates(path: &FixPath) -> bool {
     
     for pi in path.iter() {
         let vi = *pi - p0;
-        let prod = vi.unsafe_cross_product(v0);
+        let prod = vi.cross_product(v0);
         if prod == 0 {
             return true
         }
@@ -163,7 +168,7 @@ fn filter(path: &FixPath) -> FixPath {
         let p1 = path[node.index];
         let p2 = path[node.next];
 
-        if (p1 - p0).unsafe_cross_product(p2 - p1) == 0 {
+        if (p1 - p0).cross_product(p2 - p1) == 0 {
             n -= 1;
             if n < 3 {
                 return vec![FixVec::ZERO; 0]
@@ -217,3 +222,5 @@ struct Node {
     index: usize,
     prev: usize
 }
+
+

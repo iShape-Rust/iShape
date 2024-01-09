@@ -18,9 +18,9 @@ mod tests {
 
         let hole = [
             FixVec::new_number(0, 0),
-            FixVec::new_number(0, 1),
+            FixVec::new_number(1, 0),
             FixVec::new_number(1, 1),
-            FixVec::new_number(1, 0)
+            FixVec::new_number(0, 1)
         ];
 
         let mut holes = Vec::with_capacity(1);
@@ -43,16 +43,16 @@ mod tests {
 
         let hole1 = vec![
             FixVec::new_number(0, 0),
-            FixVec::new_number(0, 1),
-            FixVec::new_number(1, 1),
             FixVec::new_number(1, 0),
+            FixVec::new_number(1, 1),
+            FixVec::new_number(0, 1),
         ];
 
         let hole2 = vec![
             FixVec::new_number(2, 2),
-            FixVec::new_number(2, 3),
+            FixVec::new_number(3, 2),
             FixVec::new_number(3, 3),
-            FixVec::new_number(3, 0),
+            FixVec::new_number(2, 3),
         ];
 
         let holes = vec![hole1.clone(), hole2.clone()];
@@ -62,23 +62,6 @@ mod tests {
         assert_eq!(shape.contour().as_slice(), body.as_slice());
         assert_eq!(shape.holes()[0].as_slice(), hole1.as_slice());
         assert_eq!(shape.holes()[1].as_slice(), hole2.as_slice());
-    }
-
-    #[test]
-    fn test_set_direction() {
-        let contour = vec![
-            FixVec::new_number(0, 0),
-            FixVec::new_number(1, 0),
-            FixVec::new_number(0, 1),
-        ];
-    
-        let mut shape = FixShape::new(vec![contour.clone()]); // Assuming a counter-clockwise contour
-    
-        shape.set_direction(true); 
-    
-        assert_eq!(shape.contour()[0], FixVec::new_number(0, 1));
-        assert_eq!(shape.contour()[1], FixVec::new_number(1, 0));
-        assert_eq!(shape.contour()[2], FixVec::new_number(0, 0));
     }
 
     #[test]
@@ -92,9 +75,9 @@ mod tests {
 
         let hole = vec![
             FixVec::new_number(0, 0),
-            FixVec::new_number(0, 1),
-            FixVec::new_number(1, 1),
             FixVec::new_number(1, 0),
+            FixVec::new_number(1, 1),
+            FixVec::new_number(0, 1),
         ];
 
         let mut shape = FixShape::new_with_contour_and_holes(body, Vec::new());

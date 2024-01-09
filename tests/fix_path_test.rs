@@ -73,13 +73,37 @@ mod tests {
             FixVec::new_number(1, 0)
         ];
 
-        let area_1 = path.to_vec().area();
+        let area_1 = path.to_vec().fix_area();
         path.reverse();
 
-        let area_2 = path.to_vec().area();
+        let area_2 = path.to_vec().fix_area();
 
         assert_eq!(area_1, 1024);
         assert_eq!(area_2, -1024);
+    }
+
+    #[test]
+    fn test_order_00() {
+        let mut path = [
+            FixVec::new_number(-10, -10),
+            FixVec::new_number(-10, 10),
+            FixVec::new_number(10, 10),
+            FixVec::new_number(10, -10)
+        ].to_vec();
+
+        assert_eq!(path.is_clockwise_ordered(), true);
+    }
+
+    #[test]
+    fn test_order_01() {
+        let mut path = [
+            FixVec::new_number(-10, -10),
+            FixVec::new_number(10, -10),
+            FixVec::new_number(10, 10),
+            FixVec::new_number(-10, 10)
+        ].to_vec();
+
+        assert_eq!(path.is_clockwise_ordered(), false);
     }
 
     #[test]
