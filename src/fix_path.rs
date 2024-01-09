@@ -11,6 +11,7 @@ pub trait FixPathExtension {
     fn contains(&self, point: FixVec) -> bool;
     fn remove_degenerates(&mut self);
     fn removed_degenerates(&self) -> FixPath;
+    fn into_reversed(self) -> FixPath;
 }
 
 impl FixPathExtension for FixPath {
@@ -30,10 +31,6 @@ impl FixPathExtension for FixPath {
 
     fn fix_area(&self) -> i64 {
         self.area() >> (FIX_FRACTION_BITS + 1)
-    }
-
-    fn is_clockwise_ordered(&self) -> bool {
-        self.area() >= 0
     }
 
     fn is_convex(&self) -> bool {
@@ -69,6 +66,10 @@ impl FixPathExtension for FixPath {
         }
 
         true
+    }
+
+    fn is_clockwise_ordered(&self) -> bool {
+        self.area() >= 0
     }
     
     fn contains(&self, point: FixVec) -> bool {
@@ -119,6 +120,11 @@ impl FixPathExtension for FixPath {
         filter(&self)
     }
 
+    fn into_reversed(self) -> FixPath {
+        let mut rev_path = self;
+        rev_path.reverse();
+        rev_path
+    }
 }
 
 fn has_degenerates(path: &FixPath) -> bool {
