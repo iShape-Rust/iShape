@@ -1,14 +1,18 @@
 use serde::{Serialize, Deserialize};
-use crate::fix_path::{FixPath, FixPathExtension };
+use crate::fix_path::{FixPath, FixPathExtension};
+use crate::fix_paths::FixPathsExtension;
 
 /// Represents a fixed geometric shape with contour and holes.
-#[derive(Debug, Clone,PartialEq, Eq, Deserialize, Serialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
 pub struct FixShape {
-    pub paths: Vec<FixPath>
+    pub paths: Vec<FixPath>,
 }
 
 impl FixShape {
 
+    pub fn points_count(&self) -> usize {
+        self.paths.points_count()
+    }
     /// Determines if the shape represents a convex polygon.
     ///
     /// # Returns

@@ -4,7 +4,7 @@ use i_float::fix_vec::FixVec;
 pub type FixPath = Vec<FixVec>;
 
 pub trait FixPathExtension {
-    fn area(&self) -> i64;
+    fn area_x2(&self) -> i64;
     fn fix_area(&self) -> i64;
     fn is_convex(&self) -> bool;
     fn is_clockwise_ordered(&self) -> bool;
@@ -16,7 +16,7 @@ pub trait FixPathExtension {
 
 impl FixPathExtension for FixPath {
 
-    fn area(&self) -> i64 {
+    fn area_x2(&self) -> i64 {
         let n = self.len();
         let mut p0 = self[n - 1];
         let mut area: i64 = 0;
@@ -30,7 +30,7 @@ impl FixPathExtension for FixPath {
     }
 
     fn fix_area(&self) -> i64 {
-        self.area() >> (FIX_FRACTION_BITS + 1)
+        self.area_x2() >> (FIX_FRACTION_BITS + 1)
     }
 
     fn is_convex(&self) -> bool {
@@ -69,7 +69,7 @@ impl FixPathExtension for FixPath {
     }
 
     fn is_clockwise_ordered(&self) -> bool {
-        self.area() >= 0
+        self.area_x2() >= 0
     }
     
     fn contains(&self, point: FixVec) -> bool {
