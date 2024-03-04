@@ -5,4 +5,3 @@ pub mod fix_shape;
 pub mod index_point;
 pub mod triangle;
 pub mod fix_shapes;
-

@@ -221,12 +221,9 @@ fn filter(path: &FixPath) -> FixPath {
     return buffer
 }
 
-
 #[derive(Clone, Copy)]
 struct Node {
     next: usize,
     index: usize,
     prev: usize
 }
-
-
