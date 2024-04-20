@@ -1,4 +1,4 @@
-use crate::fix_shape::FixShape;
+use crate::fix::shape::FixShape;
 
 pub type FixShapes = Vec<FixShape>;
 

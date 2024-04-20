@@ -1,4 +1,4 @@
-use crate::fix_path::FixPath;
+use crate::fix::path::FixPath;
 
 pub type FixPaths = Vec<FixPath>;
 
