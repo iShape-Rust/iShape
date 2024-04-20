@@ -1,3 +1,3 @@
 pub mod shape;
 pub mod adapter;
-mod rect;
+pub mod rect;

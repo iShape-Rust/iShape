@@ -30,7 +30,7 @@ impl F64Rect {
     }
 
     pub fn with_path(path: &[F64Point]) -> Self {
-        if !path.is_empty() {
+        if path.is_empty() {
             return Self {
                 x: 0.0,
                 y: 0.0,
@@ -55,7 +55,7 @@ impl F64Rect {
     }
 
     pub fn with_shape(shape: &[F64Path]) -> Self {
-        if !shape.is_empty() {
+        if shape.is_empty() {
             return Self {
                 x: 0.0,
                 y: 0.0,
@@ -82,7 +82,7 @@ impl F64Rect {
     }
 
     pub fn with_shapes(shapes: &[F64Shape]) -> Self {
-        if !shapes.is_empty() {
+        if shapes.is_empty() {
             return Self {
                 x: 0.0,
                 y: 0.0,
