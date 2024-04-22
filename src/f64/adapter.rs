@@ -23,7 +23,7 @@ impl PointAdapter {
 
         let max = a.max(b);
         let log2 = max.log2() as i32;
-        let e = 30 - log2;
+        let e = 29 - log2;
 
         let dir_scale = 2f64.powi(e);
         let inv_scale = 2f64.powi(-e);
