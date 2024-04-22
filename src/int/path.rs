@@ -13,19 +13,35 @@ pub trait PointPathExtension {
 }
 
 impl PointPathExtension for IntPath {
+
+    /// The area of the `Path`.
+    /// - Returns: A positive double area if path is clockwise and negative double area otherwise.
     fn unsafe_area(&self) -> i64 {
         let n = self.len();
         let mut p0 = self[n - 1];
         let mut area: i64 = 0;
 
-        for p1 in self.iter() {
-            area += p1.cross_product(p0);
-            p0 = *p1;
+        for &p1 in self.iter() {
+            let a = (p1.x as i64).wrapping_mul(p0.y as i64);
+            let b = (p1.y as i64).wrapping_mul(p0.x as i64);
+            area = area.wrapping_add(a).wrapping_sub(b);
+            p0 = p1;
         }
 
         area
     }
 
+    /// Determines if the `Path` is convex.
+    ///
+    /// A convex polygon is a simple polygon (not self-intersecting) in which
+    /// the line segment between any two points along the boundary never
+    /// goes outside the polygon. This method assumes that the points in `Path`
+    /// are ordered (either clockwise or counter-clockwise) and the path is not
+    /// self-intersecting.
+    ///
+    /// - Returns: A Boolean value indicating whether the path is convex.
+    ///   - Returns `true` if the path is convex.
+    ///   - Returns `false` otherwise.
     fn is_convex(&self) -> bool {
         let n = self.len();
         if n <= 2 {
@@ -37,8 +53,7 @@ impl PointPathExtension for IntPath {
         let mut e0 = p1.subtract(p0);
 
         let mut sign: i64 = 0;
-        for p in self.iter() {
-            let p2 = *p;
+        for &p2 in self.iter() {
             let e1 = p2.subtract(p1);
             let cross = e1.cross_product(e0).signum();
             if cross == 0 {
@@ -61,10 +76,17 @@ impl PointPathExtension for IntPath {
         true
     }
 
+    /// The wind direction of the `Path`.
+    /// - Returns: A Boolean value indicating whether the path is clockwise ordered.
+    ///  - Returns `true` if the path is clockwise ordered.
+    ///  - Returns `false` otherwise.
     fn is_clockwise_ordered(&self) -> bool {
         self.unsafe_area() >= 0
     }
 
+    /// Checks if a point is contained within the `Path`.
+    /// - Parameter p: The `IntPoint` point to check.
+    /// - Returns: A boolean value indicating whether the point is within the path.
     fn contains(&self, point: IntPoint) -> bool {
         let n = self.len();
         let mut is_contain = false;
@@ -85,6 +107,9 @@ impl PointPathExtension for IntPath {
         is_contain
     }
 
+    /// Removes any degenerate points from the `Path`.
+    /// Degenerate points are those that are collinear with their adjacent points.
+    /// After removal, the path must contain at least three non-degenerate points, or it will be cleared.
     fn remove_degenerates(&mut self) {
         if self.len() < 3 {
             self.clear();
@@ -100,6 +125,9 @@ impl PointPathExtension for IntPath {
         self.splice(.., clean);
     }
 
+    /// Creates a new path by removing degenerate points from the current `Path`.
+    /// Similar to `remove_degenerates`, but returns a new path rather than mutating the current one.
+    /// - Returns: A new `IntPoint` array with degenerates removed, or an empty array if there are fewer than three non-degenerate points.
     fn removed_degenerates(&self) -> IntPath {
         if self.len() < 3 {
             return vec![IntPoint::ZERO; 0];
