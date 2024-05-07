@@ -8,12 +8,14 @@ pub trait PointsCount {
 }
 
 impl PointsCount for [IntPath] {
+    #[inline(always)]
     fn points_count(&self) -> usize {
         self.iter().fold(0, |acc, path| acc + path.len())
     }
 }
 
 impl PointsCount for [IntShape] {
+    #[inline(always)]
     fn points_count(&self) -> usize {
         self.iter().fold(0, |acc, shape| acc + shape.points_count())
     }

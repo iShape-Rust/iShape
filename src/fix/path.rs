@@ -58,6 +58,7 @@ impl FixPathExtension for FixPath {
         true
     }
 
+    #[inline(always)]
     fn is_clockwise_ordered(&self) -> bool {
         self.area_x2() >= 0
     }

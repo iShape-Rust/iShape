@@ -10,6 +10,7 @@ pub struct FixShape {
 
 impl FixShape {
 
+    #[inline(always)]
     pub fn points_count(&self) -> usize {
         self.paths.points_count()
     }
@@ -17,6 +18,7 @@ impl FixShape {
     ///
     /// # Returns
     /// `true` if the shape is a convex polygon, `false` otherwise.
+    #[inline(always)]
     pub fn is_convex_polygon(&self) -> bool {
         self.paths.len() == 1 && self.contour().is_convex()
     }
@@ -26,6 +28,7 @@ impl FixShape {
     ///
     /// # Returns
     /// A reference to the `FixPath` representing the contour.
+    #[inline(always)]
     pub fn contour(&self) -> &FixPath {
         &self.paths[0]
     }
@@ -34,6 +37,7 @@ impl FixShape {
     ///
     /// # Returns
     /// A slice of `FixPath` representing the holes.
+    #[inline(always)]
     pub fn holes(&self) -> &[FixPath] {
         &self.paths[1..]
     }
@@ -47,6 +51,7 @@ impl FixShape {
     ///
     /// # Returns
     /// A new instance of `FixShape`.
+    #[inline(always)]
     pub fn new(paths: Vec<FixPath>) -> Self {
         Self { paths }
     }

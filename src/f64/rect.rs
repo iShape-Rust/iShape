@@ -15,6 +15,8 @@ struct Box {
 }
 
 impl Box {
+
+    #[inline(always)]
     fn new() -> Self {
         Box {
             min_x: f64::MAX,
@@ -23,7 +25,7 @@ impl Box {
             max_y: -f64::MAX,
         }
     }
-
+    #[inline]
     fn add(&mut self, point: &F64Point) {
         self.min_x = self.min_x.min(point.x);
         self.max_x = self.max_x.max(point.x);
@@ -31,6 +33,7 @@ impl Box {
         self.max_y = self.max_y.max(point.y);
     }
 
+    #[inline(always)]
     fn rect(&self) -> F64Rect {
         F64Rect::new(self.min_x, self.max_x, self.min_y, self.max_y)
     }

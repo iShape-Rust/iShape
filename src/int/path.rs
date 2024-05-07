@@ -80,6 +80,7 @@ impl PointPathExtension for IntPath {
     /// - Returns: A Boolean value indicating whether the path is clockwise ordered.
     ///  - Returns `true` if the path is clockwise ordered.
     ///  - Returns `false` otherwise.
+    #[inline(always)]
     fn is_clockwise_ordered(&self) -> bool {
         self.unsafe_area() >= 0
     }
@@ -128,6 +129,7 @@ impl PointPathExtension for IntPath {
     /// Creates a new path by removing degenerate points from the current `Path`.
     /// Similar to `remove_degenerates`, but returns a new path rather than mutating the current one.
     /// - Returns: A new `IntPoint` array with degenerates removed, or an empty array if there are fewer than three non-degenerate points.
+    #[inline]
     fn removed_degenerates(&self) -> IntPath {
         if self.len() < 3 {
             return vec![IntPoint::ZERO; 0];
@@ -140,6 +142,7 @@ impl PointPathExtension for IntPath {
         filter(&self)
     }
 
+    #[inline]
     fn into_reversed(self) -> IntPath {
         let mut rev_path = self;
         rev_path.reverse();
