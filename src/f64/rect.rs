@@ -1,3 +1,4 @@
+use i_float::f64_point::F64Point;
 use i_float::f64_rect::F64Rect;
 use crate::f64::shape::{F64Path, F64Shape};
 
@@ -6,28 +7,28 @@ pub trait RectInit {
     fn with_shapes(shapes: &[F64Shape]) -> Option<F64Rect>;
 }
 
+trait FirstPoint {
+    fn first_point(&self) -> Option<F64Point>;
+}
+
 impl RectInit for F64Rect {
     fn with_shape(shape: &[F64Path]) -> Option<F64Rect> {
-        if shape.is_empty() {
-            return None;
-        }
-
-        let mut rect = if let Some(first_point) = shape.iter()
-            .flat_map(|path| path.iter())
-            .next() {
-            F64Rect {
-                min_x: first_point.x,
-                max_x: first_point.x,
-                min_y: first_point.y,
-                max_y: first_point.y,
-            }
+        let first_point = if let Some(p) = shape.first_point() {
+            p
         } else {
             return None;
         };
 
+        let mut rect = Self {
+            min_x: first_point.x,
+            max_x: first_point.x,
+            min_y: first_point.y,
+            max_y: first_point.y,
+        };
+
         for path in shape.iter() {
             for p in path.iter() {
-                rect.add_point(p);
+                rect.unsafe_add_point(p);
             }
         }
 
@@ -35,32 +36,49 @@ impl RectInit for F64Rect {
     }
 
     fn with_shapes(shapes: &[F64Shape]) -> Option<F64Rect> {
-        if shapes.is_empty() {
-            return None;
-        }
-
-        let mut rect = if let Some(first_point) = shapes.iter()
-            .flat_map(|shape| shape.iter())
-            .flat_map(|path| path.iter())
-            .next() {
-            Self {
-                min_x: first_point.x,
-                max_x: first_point.x,
-                min_y: first_point.y,
-                max_y: first_point.y,
-            }
+        let first_point = if let Some(p) = shapes.first_point() {
+            p
         } else {
             return None;
+        };
+
+        let mut rect = Self {
+            min_x: first_point.x,
+            max_x: first_point.x,
+            min_y: first_point.y,
+            max_y: first_point.y,
         };
 
         for shape in shapes.iter() {
             for path in shape.iter() {
                 for p in path.iter() {
-                    rect.add_point(p);
+                    rect.unsafe_add_point(p);
                 }
             }
         }
 
         Some(rect)
+    }
+}
+
+impl FirstPoint for [F64Path] {
+    fn first_point(&self) -> Option<F64Point> {
+        for path in self.iter() {
+            if let Some(p) = path.first() {
+                return Some(p.clone());
+            }
+        }
+        None
+    }
+}
+
+impl FirstPoint for [F64Shape] {
+    fn first_point(&self) -> Option<F64Point> {
+        for shape in self.iter() {
+            if let Some(p) = shape.first_point() {
+                return Some(p.clone());
+            }
+        }
+        None
     }
 }
