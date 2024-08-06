@@ -2,6 +2,7 @@
 mod tests {
     use i_float::point::IntPoint;
     use i_shape::int::path::PointPathExtension;
+    use i_shape::int::simple::Simple;
 
     #[test]
     fn test_no_degenerates() {
@@ -12,10 +13,8 @@ mod tests {
             IntPoint::new(1, 0)
         ];
 
-        let mut path = origin.to_vec();
+        let path = origin.to_simple();
 
-        path.remove_degenerates();
-        
         assert_eq!(path.as_slice(), origin.as_ref(), "The path and origin are not equal!");
     }
 
@@ -38,10 +37,8 @@ mod tests {
             IntPoint::new(1024, 0)
         ];
 
-        let mut path = incorrect.to_vec();
+        let path = incorrect.to_simple();
 
-        path.remove_degenerates();
-        
         assert_eq!(path.as_slice(), origin.as_ref(), "The path and origin are not equal!");
     }
 
@@ -53,10 +50,8 @@ mod tests {
             IntPoint::new(0, 1)
         ];
 
-        let mut path = incorrect.to_vec();
+        let path = incorrect.to_simple();
 
-        path.remove_degenerates();
-        
         assert_eq!(path.len(), 0);
     }
 
