@@ -103,8 +103,9 @@ impl Simple for [IntPoint] {
 
         let mut buffer = vec![IntPoint::ZERO; n];
         node = nodes[first];
-        for j in 0..n {
-            buffer[j] = self[node.index];
+
+        for item in buffer.iter_mut().take(n) {
+            *item = self[node.index];
             node = nodes[node.next];
         }
 

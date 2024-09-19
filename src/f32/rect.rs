@@ -13,11 +13,7 @@ trait FirstPoint {
 
 impl RectInit for F32Rect {
     fn with_shape(shape: &[F32Path]) -> Option<F32Rect> {
-        let first_point = if let Some(p) = shape.first_point() {
-            p
-        } else {
-            return None;
-        };
+        let first_point = shape.first_point()?;
 
         let mut rect = Self {
             min_x: first_point.x,
@@ -36,11 +32,7 @@ impl RectInit for F32Rect {
     }
 
     fn with_shapes(shapes: &[F32Shape]) -> Option<F32Rect> {
-        let first_point = if let Some(p) = shapes.first_point() {
-            p
-        } else {
-            return None;
-        };
+        let first_point = shapes.first_point()?;
 
         let mut rect = Self {
             min_x: first_point.x,
@@ -65,7 +57,7 @@ impl FirstPoint for [F32Path] {
     fn first_point(&self) -> Option<F32Point> {
         for path in self.iter() {
             if let Some(p) = path.first() {
-                return Some(p.clone());
+                return Some(*p);
             }
         }
         None
@@ -76,7 +68,7 @@ impl FirstPoint for [F32Shape] {
     fn first_point(&self) -> Option<F32Point> {
         for shape in self.iter() {
             if let Some(p) = shape.first_point() {
-                return Some(p.clone());
+                return Some(p);
             }
         }
         None

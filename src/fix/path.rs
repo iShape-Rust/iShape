@@ -9,7 +9,6 @@ pub trait FixPathExtension {
 }
 
 impl FixPathExtension for FixPath {
-
     fn area_x2(&self) -> i64 {
         let n = self.len();
         let mut p0 = self[n - 1];
@@ -41,14 +40,12 @@ impl FixPathExtension for FixPath {
             if cross == 0 {
                 let dot = e1.dot_product(e0);
                 if dot == -1 {
-                    return false
+                    return false;
                 }
-            } else {
-                if sign == 0 {
-                    sign = cross
-                } else if sign != cross {
-                    return false
-                }
+            } else if sign == 0 {
+                sign = cross
+            } else if sign != cross {
+                return false;
             }
 
             e0 = e1;

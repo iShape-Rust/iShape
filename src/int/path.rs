@@ -11,7 +11,6 @@ pub trait PointPathExtension {
 }
 
 impl PointPathExtension for IntPath {
-
     /// The area of the `Path`.
     /// - Returns: A positive double area if path is clockwise and negative double area otherwise.
     fn unsafe_area(&self) -> i64 {
@@ -59,12 +58,10 @@ impl PointPathExtension for IntPath {
                 if dot == -1 {
                     return false;
                 }
-            } else {
-                if sign == 0 {
-                    sign = cross
-                } else if sign != cross {
-                    return false;
-                }
+            } else if sign == 0 {
+                sign = cross
+            } else if sign != cross {
+                return false;
             }
 
             e0 = e1;
