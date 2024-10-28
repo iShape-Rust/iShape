@@ -1,51 +1,65 @@
 use i_float::float::Float;
-use i_float::float_point::FloatPoint;
+use i_float::float_point::{FloatPoint, FloatPointCompatible};
 use i_float::float_rect::FloatRect;
-use crate::float::shape::{FloatPath, FloatShape};
 
-pub trait RectInit<T: Float> {
-    fn with_shape(shape: &[FloatPath<T>]) -> Option<FloatRect<T>>;
-    fn with_shapes(shapes: &[FloatShape<T>]) -> Option<FloatRect<T>>;
+pub trait RectInit<P, T>
+where
+    P: FloatPointCompatible<T>,
+    T: Float,
+{
+    fn with_path(path: &[P]) -> Option<FloatRect<T>>;
+    fn with_paths(paths: &[Vec<P>]) -> Option<FloatRect<T>>;
+    fn with_list_of_paths(list: &[Vec<Vec<P>>]) -> Option<FloatRect<T>>;
 }
 
-trait FirstPoint<T: Float> {
+trait FirstPoint<P, T>
+where
+    P: FloatPointCompatible<T>,
+    T: Float,
+{
     fn first_point(&self) -> Option<FloatPoint<T>>;
 }
 
-impl<T: Float> RectInit<T> for FloatRect<T> {
-    fn with_shape(shape: &[FloatPath<T>]) -> Option<FloatRect<T>> {
-        let first_point = shape.first_point()?;
+impl<P, T> RectInit<P, T> for FloatRect<T>
+where
+    P: FloatPointCompatible<T>,
+    T: Float,
+{
+    fn with_path(path: &[P]) -> Option<FloatRect<T>> {
+        let first_point = path.first()?.to_float_point();
 
-        let mut rect = Self {
-            min_x: first_point.x,
-            max_x: first_point.x,
-            min_y: first_point.y,
-            max_y: first_point.y,
-        };
+        let mut rect = Self::with_point(first_point);
 
-        for path in shape.iter() {
+        for p in path.iter() {
+            rect.unsafe_add_point(p.to_float_point());
+        }
+
+        Some(rect)
+    }
+
+    fn with_paths(paths: &[Vec<P>]) -> Option<FloatRect<T>> {
+        let first_point = paths.first_point()?;
+
+        let mut rect = Self::with_point(first_point);
+
+        for path in paths.iter() {
             for p in path.iter() {
-                rect.unsafe_add_point(p);
+                rect.unsafe_add_point(p.to_float_point());
             }
         }
 
         Some(rect)
     }
 
-    fn with_shapes(shapes: &[FloatShape<T>]) -> Option<FloatRect<T>> {
-        let first_point = shapes.first_point()?;
+    fn with_list_of_paths(list: &[Vec<Vec<P>>]) -> Option<FloatRect<T>> {
+        let first_point = list.first_point()?;
 
-        let mut rect = Self {
-            min_x: first_point.x,
-            max_x: first_point.x,
-            min_y: first_point.y,
-            max_y: first_point.y,
-        };
+        let mut rect = Self::with_point(first_point);
 
-        for shape in shapes.iter() {
-            for path in shape.iter() {
+        for paths in list.iter() {
+            for path in paths.iter() {
                 for p in path.iter() {
-                    rect.unsafe_add_point(p);
+                    rect.unsafe_add_point(p.to_float_point());
                 }
             }
         }
@@ -54,22 +68,32 @@ impl<T: Float> RectInit<T> for FloatRect<T> {
     }
 }
 
-impl<T: Float> FirstPoint<T> for [FloatPath<T>] {
+impl<P, T> FirstPoint<P, T> for [Vec<P>]
+where
+    P: FloatPointCompatible<T>,
+    T: Float,
+{
     fn first_point(&self) -> Option<FloatPoint<T>> {
         for path in self.iter() {
             if let Some(p) = path.first() {
-                return Some(*p);
+                return Some(p.to_float_point());
             }
         }
         None
     }
 }
 
-impl<T: Float> FirstPoint<T> for [FloatShape<T>] {
+impl<P, T> FirstPoint<P, T> for [Vec<Vec<P>>]
+where
+    P: FloatPointCompatible<T>,
+    T: Float,
+{
     fn first_point(&self) -> Option<FloatPoint<T>> {
-        for shape in self.iter() {
-            if let Some(p) = shape.first_point() {
-                return Some(p);
+        for paths in self.iter() {
+            for path in paths.iter() {
+                if let Some(p) = path.first() {
+                    return Some(p.to_float_point());
+                }
             }
         }
         None
