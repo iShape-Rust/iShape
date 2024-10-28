@@ -29,10 +29,9 @@ pub trait ShapesToInt<T: Float> {
 }
 
 impl<T: Float> PathToFloat<T> for IntPath {
-
     #[inline(always)]
     fn to_float(&self, adapter: &FloatPointAdapter<T>) -> FloatPath<T> {
-        self.iter().map(|p| adapter.convert_to_float(p)).collect()
+        self.iter().map(|&p| adapter.convert_to_float(p)).collect()
     }
 }
 
@@ -56,7 +55,7 @@ impl<T: Float> PathToInt<T> for FloatPath<T> {
 
     #[inline(always)]
     fn to_int(&self, adapter: &FloatPointAdapter<T>) -> IntPath {
-        self.iter().map(|p| adapter.convert_to_int(p)).collect()
+        self.iter().map(|&p| adapter.convert_to_int(p)).collect()
     }
 }
 
