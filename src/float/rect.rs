@@ -1,11 +1,11 @@
-use i_float::float::Float;
-use i_float::float_point::{FloatPoint, FloatPointCompatible};
-use i_float::float_rect::FloatRect;
+use i_float::float::compatible::FloatPointCompatible;
+use i_float::float::number::FloatNumber;
+use i_float::float::rect::FloatRect;
 
 pub trait RectInit<P, T>
 where
     P: FloatPointCompatible<T>,
-    T: Float,
+    T: FloatNumber,
 {
     fn with_path(path: &[P]) -> Option<FloatRect<T>>;
     fn with_paths(paths: &[Vec<P>]) -> Option<FloatRect<T>>;
@@ -15,23 +15,23 @@ where
 trait FirstPoint<P, T>
 where
     P: FloatPointCompatible<T>,
-    T: Float,
+    T: FloatNumber,
 {
-    fn first_point(&self) -> Option<FloatPoint<T>>;
+    fn first_point(&self) -> Option<P>;
 }
 
 impl<P, T> RectInit<P, T> for FloatRect<T>
 where
     P: FloatPointCompatible<T>,
-    T: Float,
+    T: FloatNumber,
 {
     fn with_path(path: &[P]) -> Option<FloatRect<T>> {
-        let first_point = path.first()?.to_float_point();
+        let &first_point = path.first()?;
 
         let mut rect = Self::with_point(first_point);
 
-        for p in path.iter() {
-            rect.unsafe_add_point(p.to_float_point());
+        for &p in path.iter() {
+            rect.unsafe_add_point(p);
         }
 
         Some(rect)
@@ -43,8 +43,8 @@ where
         let mut rect = Self::with_point(first_point);
 
         for path in paths.iter() {
-            for p in path.iter() {
-                rect.unsafe_add_point(p.to_float_point());
+            for &p in path.iter() {
+                rect.unsafe_add_point(p);
             }
         }
 
@@ -58,8 +58,8 @@ where
 
         for paths in list.iter() {
             for path in paths.iter() {
-                for p in path.iter() {
-                    rect.unsafe_add_point(p.to_float_point());
+                for &p in path.iter() {
+                    rect.unsafe_add_point(p);
                 }
             }
         }
@@ -71,12 +71,12 @@ where
 impl<P, T> FirstPoint<P, T> for [Vec<P>]
 where
     P: FloatPointCompatible<T>,
-    T: Float,
+    T: FloatNumber,
 {
-    fn first_point(&self) -> Option<FloatPoint<T>> {
+    fn first_point(&self) -> Option<P> {
         for path in self.iter() {
-            if let Some(p) = path.first() {
-                return Some(p.to_float_point());
+            if let Some(&p) = path.first() {
+                return Some(p);
             }
         }
         None
@@ -86,13 +86,13 @@ where
 impl<P, T> FirstPoint<P, T> for [Vec<Vec<P>>]
 where
     P: FloatPointCompatible<T>,
-    T: Float,
+    T: FloatNumber,
 {
-    fn first_point(&self) -> Option<FloatPoint<T>> {
+    fn first_point(&self) -> Option<P> {
         for paths in self.iter() {
             for path in paths.iter() {
-                if let Some(p) = path.first() {
-                    return Some(p.to_float_point());
+                if let Some(&p) = path.first() {
+                    return Some(p);
                 }
             }
         }

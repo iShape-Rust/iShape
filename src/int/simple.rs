@@ -1,4 +1,4 @@
-use i_float::point::IntPoint;
+use i_float::int::point::IntPoint;
 use crate::int::path::IntPath;
 
 pub trait Simple {
