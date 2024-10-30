@@ -1,6 +1,7 @@
 use i_float::int::point::IntPoint;
 
 pub type IntPath = Vec<IntPoint>;
+pub type IntPaths = Vec<IntPath>;
 
 pub trait PointPathExtension {
     fn unsafe_area(&self) -> i64;
