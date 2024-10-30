@@ -1,6 +1,7 @@
 use i_float::float::compatible::FloatPointCompatible;
 use i_float::float::number::FloatNumber;
 use i_float::float::rect::FloatRect;
+use crate::base::data::{Path, Shape};
 
 pub trait RectInit<P, T>
 where
@@ -37,7 +38,7 @@ where
         Some(rect)
     }
 
-    fn with_paths(paths: &[Vec<P>]) -> Option<FloatRect<T>> {
+    fn with_paths(paths: &[Path<P>]) -> Option<FloatRect<T>> {
         let first_point = paths.first_point()?;
 
         let mut rect = Self::with_point(first_point);
@@ -51,7 +52,7 @@ where
         Some(rect)
     }
 
-    fn with_list_of_paths(list: &[Vec<Vec<P>>]) -> Option<FloatRect<T>> {
+    fn with_list_of_paths(list: &[Vec<Path<P>>]) -> Option<FloatRect<T>> {
         let first_point = list.first_point()?;
 
         let mut rect = Self::with_point(first_point);
@@ -68,7 +69,7 @@ where
     }
 }
 
-impl<P, T> FirstPoint<P, T> for [Vec<P>]
+impl<P, T> FirstPoint<P, T> for [Path<P>]
 where
     P: FloatPointCompatible<T>,
     T: FloatNumber,
@@ -83,7 +84,7 @@ where
     }
 }
 
-impl<P, T> FirstPoint<P, T> for [Vec<Vec<P>>]
+impl<P, T> FirstPoint<P, T> for [Shape<P>]
 where
     P: FloatPointCompatible<T>,
     T: FloatNumber,
