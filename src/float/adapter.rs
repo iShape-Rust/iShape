@@ -33,7 +33,7 @@ pub trait ShapesToInt<P: FloatPointCompatible<T>, T: FloatNumber> {
 impl<P: FloatPointCompatible<T>, T: FloatNumber> PathToFloat<P, T> for [IntPoint] {
     #[inline(always)]
     fn to_float(&self, adapter: &FloatPointAdapter<P, T>) -> Path<P> {
-        self.iter().map(|&p| adapter.int_to_float(p)).collect()
+        self.iter().map(|p| adapter.int_to_float(p)).collect()
     }
 }
 
@@ -54,7 +54,7 @@ impl<P: FloatPointCompatible<T>, T: FloatNumber> ShapesToFloat<P, T> for [IntSha
 impl<P: FloatPointCompatible<T>, T: FloatNumber> PathToInt<P, T> for [P] {
     #[inline(always)]
     fn to_int(&self, adapter: &FloatPointAdapter<P, T>) -> IntPath {
-        self.iter().map(|&p| adapter.float_to_int(p)).collect()
+        self.iter().map(|p| adapter.float_to_int(p)).collect()
     }
 }
 

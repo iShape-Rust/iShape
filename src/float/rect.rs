@@ -31,7 +31,7 @@ where
 
         let mut rect = Self::with_point(first_point);
 
-        for &p in path.iter() {
+        for p in path.iter() {
             rect.unsafe_add_point(p);
         }
 
@@ -44,7 +44,7 @@ where
         let mut rect = Self::with_point(first_point);
 
         for path in paths.iter() {
-            for &p in path.iter() {
+            for p in path.iter() {
                 rect.unsafe_add_point(p);
             }
         }
@@ -59,7 +59,7 @@ where
 
         for paths in list.iter() {
             for path in paths.iter() {
-                for &p in path.iter() {
+                for p in path.iter() {
                     rect.unsafe_add_point(p);
                 }
             }
