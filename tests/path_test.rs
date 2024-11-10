@@ -2,7 +2,7 @@
 mod tests {
     use i_float::int::point::IntPoint;
     use i_shape::int::path::PointPathExtension;
-    use i_shape::int::simple::Simple;
+    use i_shape::int::simple::{SimpleContour, SimpleShape, SimpleShapes};
 
     #[test]
     fn test_no_degenerates() {
@@ -13,7 +13,7 @@ mod tests {
             IntPoint::new(1, 0)
         ];
 
-        let path = origin.to_simple();
+        let path = origin.simplified().unwrap();
 
         assert_eq!(path.as_slice(), origin.as_ref(), "The path and origin are not equal!");
     }
@@ -37,7 +37,7 @@ mod tests {
             IntPoint::new(1024, 0)
         ];
 
-        let path = incorrect.to_simple();
+        let path = incorrect.simplified().unwrap();
 
         assert_eq!(path.as_slice(), origin.as_ref(), "The path and origin are not equal!");
     }
@@ -50,9 +50,168 @@ mod tests {
             IntPoint::new(0, 1)
         ];
 
-        let path = incorrect.to_simple();
+        let path = incorrect.simplified();
 
-        assert_eq!(path.len(), 0);
+        assert!(path.is_none());
+    }
+
+    #[test]
+    fn test_degenerates_shape_0() {
+        let shape = [
+            vec![
+                IntPoint::new(-10, -10),
+                IntPoint::new(-10, 10),
+                IntPoint::new(10, 10),
+                IntPoint::new(-10, 10),
+                IntPoint::new(-10, -10),
+                IntPoint::new(10, -10),
+            ],
+            vec![
+                IntPoint::new(-5, -5),
+                IntPoint::new(5, -5),
+                IntPoint::new(5, 5),
+                IntPoint::new(-5, 5),
+            ],
+            vec![
+                IntPoint::new(-5, -5),
+                IntPoint::new(5, -5),
+                IntPoint::new(5, 5),
+                IntPoint::new(-5, 5),
+            ],
+        ];
+
+        assert!(shape.simplified().is_none());
+    }
+
+    #[test]
+    fn test_degenerates_shape_1() {
+        let shape = [
+            vec![
+                IntPoint::new(-10, -10),
+                IntPoint::new(-10, 10),
+                IntPoint::new(10, 10),
+                IntPoint::new(10, -10),
+            ],
+            vec![
+                IntPoint::new(-5, -5),
+                IntPoint::new(5, -5),
+                IntPoint::new(5, 5),
+                IntPoint::new(-5, 5),
+            ],
+        ];
+
+        assert_eq!(shape.simplified().unwrap().len(), 2);
+    }
+
+    #[test]
+    fn test_degenerates_shape_2() {
+        let shape = [
+            vec![
+                IntPoint::new(-10, -10),
+                IntPoint::new(-10, 10),
+                IntPoint::new(10, 10),
+                IntPoint::new(10, -10),
+            ],
+            vec![
+                IntPoint::new(-5, -5),
+                IntPoint::new(5, -5),
+                IntPoint::new(-5, -5)
+            ],
+        ];
+
+        let simple = shape.simplified();
+
+        assert_eq!(simple.unwrap().len(), 1);
+    }
+
+    #[test]
+    fn test_degenerates_shapes_0() {
+        let shapes = [
+            vec![
+                vec![
+                    IntPoint::new(-10, -10),
+                    IntPoint::new(-10, 10),
+                    IntPoint::new(10, 10),
+                    IntPoint::new(-10, 10),
+                    IntPoint::new(-10, -10),
+                    IntPoint::new(10, -10),
+                ],
+                vec![
+                    IntPoint::new(-5, -5),
+                    IntPoint::new(5, -5),
+                    IntPoint::new(5, 5),
+                    IntPoint::new(-5, 5),
+                ],
+                vec![
+                    IntPoint::new(-5, -5),
+                    IntPoint::new(5, -5),
+                    IntPoint::new(5, 5),
+                    IntPoint::new(-5, 5),
+                ],
+            ],
+            vec![
+                vec![
+                    IntPoint::new(-10, -10),
+                    IntPoint::new(-10, 10),
+                    IntPoint::new(10, 10),
+                    IntPoint::new(10, -10)
+                ],
+            ]
+        ];
+
+        assert_eq!(shapes.simplified().len(), 1);
+    }
+
+    #[test]
+    fn test_degenerates_shapes_1() {
+        let shapes = [
+            vec![
+                vec![
+                    IntPoint::new(-10, -10),
+                    IntPoint::new(-10, 10),
+                    IntPoint::new(10, 10),
+                    IntPoint::new(-10, 10),
+                    IntPoint::new(-10, -10),
+                    IntPoint::new(10, -10),
+                ],
+                vec![
+                    IntPoint::new(-5, -5),
+                    IntPoint::new(5, -5),
+                    IntPoint::new(5, 5),
+                    IntPoint::new(-5, 5),
+                ],
+                vec![
+                    IntPoint::new(-5, -5),
+                    IntPoint::new(5, -5),
+                    IntPoint::new(5, 5),
+                    IntPoint::new(-5, 5),
+                ],
+            ],
+            vec![
+                vec![
+                    IntPoint::new(-10, -10),
+                    IntPoint::new(-10, 10),
+                    IntPoint::new(10, 10),
+                    IntPoint::new(-10, 10),
+                    IntPoint::new(-10, -10),
+                    IntPoint::new(10, -10),
+                ],
+                vec![
+                    IntPoint::new(-5, -5),
+                    IntPoint::new(5, -5),
+                    IntPoint::new(5, 5),
+                    IntPoint::new(-5, 5),
+                ],
+                vec![
+                    IntPoint::new(-5, -5),
+                    IntPoint::new(5, -5),
+                    IntPoint::new(5, 5),
+                    IntPoint::new(-5, 5),
+                ],
+            ]
+        ];
+
+        assert!(shapes.simplified().is_empty());
     }
 
     #[test]
