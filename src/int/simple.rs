@@ -90,24 +90,25 @@ impl Simplify for IntContour {
 impl Simplify for IntShape {
     fn simplify(&mut self) -> bool {
         let mut any_simplified = false;
+        let mut any_empty = false;
 
         for (index, contour) in self.iter_mut().enumerate() {
             if contour.is_simple() { continue; }
+            any_simplified = true;
 
             if let Some(simple_contour) = contour.simplified() {
                 *contour = simple_contour;
-                any_simplified = true;
             } else if index == 0 {
                 // early out main contour is empty
                 self.clear();
                 return true;
             } else {
                 contour.clear();
-                any_simplified = true;
+                any_empty = true;
             }
         }
 
-        if any_simplified {
+        if any_empty {
             self.retain(|contour| !contour.is_empty());
         }
 
@@ -118,20 +119,20 @@ impl Simplify for IntShape {
 impl Simplify for IntShapes {
     fn simplify(&mut self) -> bool {
         let mut any_simplified = false;
+        let mut any_empty = false;
 
         for shape in self.iter_mut() {
             if shape.is_simple() { continue; }
-
+            any_simplified = true;
             if let Some(simple_shape) = shape.simplified() {
                 *shape = simple_shape;
-                any_simplified = true;
             } else {
                 shape.clear();
-                any_simplified = true;
+                any_empty = true;
             }
         }
 
-        if any_simplified {
+        if any_empty {
             self.retain(|contour| !contour.is_empty());
         }
 
