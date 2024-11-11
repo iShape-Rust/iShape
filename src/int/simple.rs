@@ -9,7 +9,7 @@ pub trait Simplify {
     ///
     /// - `true` if the structure was simplified successfully.
     /// - `false` if the structure was already simple and no modification was made.
-    fn simplify(&mut self) -> bool;
+    fn simplify_contour(&mut self) -> bool;
 }
 
 
@@ -74,7 +74,7 @@ pub trait SimpleShapes {
 
 impl Simplify for IntContour {
     #[inline]
-    fn simplify(&mut self) -> bool {
+    fn simplify_contour(&mut self) -> bool {
         if self.is_simple() {
             return false;
         }
@@ -88,7 +88,7 @@ impl Simplify for IntContour {
 }
 
 impl Simplify for IntShape {
-    fn simplify(&mut self) -> bool {
+    fn simplify_contour(&mut self) -> bool {
         let mut any_simplified = false;
         let mut any_empty = false;
 
@@ -117,7 +117,7 @@ impl Simplify for IntShape {
 }
 
 impl Simplify for IntShapes {
-    fn simplify(&mut self) -> bool {
+    fn simplify_contour(&mut self) -> bool {
         let mut any_simplified = false;
         let mut any_empty = false;
 
