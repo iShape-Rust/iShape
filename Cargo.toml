@@ -8,6 +8,6 @@ license = "MIT"
 repository = "https://github.com/iShape-Rust/iShape"
 
 [dependencies]
-i_float = { version = "~1.4.0"}
-#i_float = { path = "../iFloat" }
+#i_float = { version = "~1.4.0"}
+i_float = { path = "../iFloat" }
 serde = { version = "^1.0", features = ["derive"] }
