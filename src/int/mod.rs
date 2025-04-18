@@ -4,4 +4,5 @@ pub mod simple;
 pub mod count;
 pub mod reverse;
 pub mod area;
-mod dedup;
+pub mod despike;
+pub mod dedup;
