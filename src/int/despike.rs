@@ -252,4 +252,24 @@ mod tests {
         assert_eq!(contour.len(), 5);
         assert_eq!(modified, true);
     }
+
+    #[test]
+    fn test_5() {
+        let mut contour =
+            vec![
+                IntPoint::new(-10, 10),
+                IntPoint::new(-10, 0),
+                IntPoint::new(-10, -10),
+                IntPoint::new(0, -10),
+                IntPoint::new(10, -10),
+                IntPoint::new(10, 0),
+                IntPoint::new(10, 10),
+                IntPoint::new(0, 10),
+            ];
+
+        let modified = contour.remove_spikes();
+
+        assert_eq!(contour.len(), 8);
+        assert_eq!(modified, false);
+    }
 }
