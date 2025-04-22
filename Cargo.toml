@@ -1,6 +1,6 @@
 [package]
 name = "i_shape"
-version = "1.10.0"
+version = "1.11.0"
 authors = ["Nail Sharipov <nailxsharipov@gmail.com>"]
 edition = "2024"
 description = "iShape is a compact and efficient library specifically designed for representing 2D data structures using IntPoint."
