@@ -1,5 +1,5 @@
 use i_float::int::point::IntPoint;
-use crate::int::shape::IntContour;
+use crate::int::shape::{IntContour, IntShape, IntShapes};
 
 /// A trait for removing spike artifacts from polygon contours.
 pub trait DeSpike {
@@ -10,7 +10,9 @@ pub trait DeSpike {
     /// - `true` if spikes were found and removed.
     /// - `false` if the contour was already clean.
     fn remove_spikes(&mut self) -> bool;
+}
 
+pub trait DeSpikeContour {
     /// Checks whether the contour has no spikes.
     ///
     /// A contour with no spikes is considered clean and valid
@@ -31,6 +33,47 @@ pub trait DeSpike {
     fn despiked_contour(&self) -> Option<IntContour>;
 }
 
+pub trait DeSpikeShape {
+    /// Checks whether the shape has no spikes.
+    ///
+    /// A contour with no spikes is considered clean and valid
+    /// for most geometric operations.
+    ///
+    /// # Returns
+    ///
+    /// - `true` if the contour has no spike patterns.
+    /// - `false` if any spike-like edge reversal is detected.
+    fn has_no_spikes(&self) -> bool;
+
+    /// Returns an optional simplified version of the shape.
+    ///
+    /// # Returns
+    ///
+    /// - `Some(IntShape)` containing the simplified shape if simplification is possible.
+    /// - `None` if the shape is degenerate or empty.
+    fn despiked_shape(&self) -> Option<IntShape>;
+}
+
+pub trait DeSpikeShapes {
+    /// Checks whether the shapes have no spikes.
+    ///
+    /// A contour with no spikes is considered clean and valid
+    /// for most geometric operations.
+    ///
+    /// # Returns
+    ///
+    /// - `true` if the contour has no spike patterns.
+    /// - `false` if any spike-like edge reversal is detected.
+    fn has_no_spikes(&self) -> bool;
+
+    /// Returns an optional simplified version of the collection.
+    ///
+    /// # Returns
+    ///
+    /// - `IntShapes` the simplified shapes.
+    fn despiked_shapes(&self) -> IntShapes;
+}
+
 impl DeSpike for IntContour {
     fn remove_spikes(&mut self) -> bool {
         if self.has_no_spikes() {
@@ -43,7 +86,9 @@ impl DeSpike for IntContour {
         }
         true
     }
+}
 
+impl DeSpikeContour for IntContour {
     fn has_no_spikes(&self) -> bool {
         let count = self.len();
 
@@ -150,6 +195,109 @@ impl DeSpike for IntContour {
         }
 
         Some(buffer)
+    }
+}
+
+impl DeSpike for IntShape {
+    fn remove_spikes(&mut self) -> bool {
+        let mut any_simplified = false;
+        let mut any_empty = false;
+
+        for (index, contour) in self.iter_mut().enumerate() {
+            if contour.has_no_spikes() { continue; }
+            any_simplified = true;
+
+            if let Some(simple_contour) = contour.despiked_contour() {
+                *contour = simple_contour;
+            } else if index == 0 {
+                // early out main contour is empty
+                self.clear();
+                return true;
+            } else {
+                contour.clear();
+                any_empty = true;
+            }
+        }
+
+        if any_empty {
+            self.retain(|contour| !contour.is_empty());
+        }
+
+        any_simplified
+    }
+}
+
+impl DeSpikeShape for IntShape {
+    fn has_no_spikes(&self) -> bool {
+        for contour in self.iter() {
+            if !contour.has_no_spikes() {
+                return false;
+            }
+        }
+        true
+    }
+
+    fn despiked_shape(&self) -> Option<IntShape> {
+        let mut contours = Vec::with_capacity(self.len());
+        for (i, contour) in self.iter().enumerate() {
+            if contour.has_no_spikes() {
+                contours.push(contour.clone());
+            } else if let Some(simple) = contour.despiked_contour() {
+                contours.push(simple);
+            } else if i == 0 {
+                return None;
+            }
+        }
+
+        Some(contours)
+    }
+}
+
+impl DeSpike for IntShapes {
+    fn remove_spikes(&mut self) -> bool {
+        let mut any_simplified = false;
+        let mut any_empty = false;
+
+        for shape in self.iter_mut() {
+            if shape.has_no_spikes() { continue; }
+            any_simplified = true;
+            if let Some(simple_shape) = shape.despiked_shape() {
+                *shape = simple_shape;
+            } else {
+                shape.clear();
+                any_empty = true;
+            }
+        }
+
+        if any_empty {
+            self.retain(|contour| !contour.is_empty());
+        }
+
+        any_simplified
+    }
+}
+
+impl DeSpikeShapes for IntShapes {
+    fn has_no_spikes(&self) -> bool {
+        for shape in self.iter() {
+            if !shape.has_no_spikes() {
+                return false;
+            }
+        }
+        true
+    }
+
+    fn despiked_shapes(&self) -> IntShapes {
+        let mut shapes = Vec::with_capacity(self.len());
+        for shape in self.iter() {
+            if shape.has_no_spikes() {
+                shapes.push(shape.clone());
+            } else if let Some(simple) = shape.despiked_shape() {
+                shapes.push(simple);
+            }
+        }
+
+        shapes
     }
 }
 
