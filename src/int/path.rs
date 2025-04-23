@@ -111,3 +111,51 @@ impl PointPathExtension for IntPath {
         rev_path
     }
 }
+#[cfg(test)]
+mod tests {
+    use crate::int::path::PointPathExtension;
+    use i_float::int::point::IntPoint;
+
+    #[test]
+    fn test_0() {
+        let contour = vec![
+            IntPoint {
+                x: -314572800,
+                y: 209715200,
+            },
+            IntPoint {
+                x: -314572800,
+                y: -209715200,
+            },
+            IntPoint {
+                x: -209715200,
+                y: -314572800,
+            },
+            IntPoint {
+                x: 209715200,
+                y: -314572800,
+            },
+            IntPoint {
+                x: 314572800,
+                y: -209715200,
+            },
+            IntPoint {
+                x: 314572800,
+                y: 209715200,
+            },
+            IntPoint {
+                x: 209715200,
+                y: 314572800,
+            },
+            IntPoint {
+                x: -209715200,
+                y: 314572800,
+            },
+        ];
+
+        let area = contour.unsafe_area();
+        let abs_area = area.unsigned_abs() as usize >> 1;
+        assert!(area < 0);
+        assert!(abs_area > 1);
+    }
+}
