@@ -1,3 +1,5 @@
+use alloc::vec;
+use alloc::vec::Vec;
 use i_float::int::point::IntPoint;
 use crate::int::shape::{IntContour, IntShape, IntShapes};
 
@@ -310,6 +312,7 @@ struct Node {
 
 #[cfg(test)]
 mod tests {
+    use alloc::vec;
     use i_float::int::point::IntPoint;
     use crate::int::despike::DeSpike;
 

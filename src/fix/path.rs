@@ -1,3 +1,4 @@
+use alloc::vec::Vec;
 use i_float::fix_vec::FixVec;
 
 pub type FixPath = Vec<FixVec>;

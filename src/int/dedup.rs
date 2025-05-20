@@ -26,6 +26,7 @@ impl DedupContour for IntContour {
 
 #[cfg(test)]
 mod tests {
+    use alloc::vec;
     use i_float::int::point::IntPoint;
     use crate::int::dedup::DedupContour;
 

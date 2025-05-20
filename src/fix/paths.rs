@@ -1,3 +1,4 @@
+use alloc::vec::Vec;
 use crate::fix::path::FixPath;
 
 pub type FixPaths = Vec<FixPath>;

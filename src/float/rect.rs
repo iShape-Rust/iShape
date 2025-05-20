@@ -1,3 +1,4 @@
+use alloc::vec::Vec;
 use i_float::float::compatible::FloatPointCompatible;
 use i_float::float::number::FloatNumber;
 use i_float::float::rect::FloatRect;

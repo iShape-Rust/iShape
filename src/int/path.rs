@@ -1,3 +1,4 @@
+use alloc::vec::Vec;
 use i_float::int::point::IntPoint;
 
 pub type IntPath = Vec<IntPoint>;
@@ -113,6 +114,7 @@ impl PointPathExtension for IntPath {
 }
 #[cfg(test)]
 mod tests {
+    use alloc::vec;
     use crate::int::path::PointPathExtension;
     use i_float::int::point::IntPoint;
 

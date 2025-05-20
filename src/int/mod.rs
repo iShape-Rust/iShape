@@ -6,3 +6,4 @@ pub mod reverse;
 pub mod area;
 pub mod despike;
 pub mod dedup;
+mod flat;

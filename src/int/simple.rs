@@ -1,3 +1,5 @@
+use alloc::vec;
+use alloc::vec::Vec;
 use i_float::int::point::IntPoint;
 use crate::int::shape::{IntContour, IntShape, IntShapes};
 
@@ -12,6 +14,10 @@ pub trait Simplify {
     fn simplify_contour(&mut self) -> bool;
 }
 
+pub trait Simplified {
+    /// Simplified the structure if it is not already simple.
+    fn simplified_contour(&self) -> Option<IntContour>;
+}
 
 /// A trait for determining if a contour is simple and for obtaining a simplified version.
 pub trait SimpleContour {
@@ -79,7 +85,8 @@ impl Simplify for IntContour {
             return false;
         }
         if let Some(contour) = self.simplified() {
-            *self = contour;
+            self.clear();
+            self.extend(contour);
         } else {
             self.clear()
         }
@@ -97,7 +104,8 @@ impl Simplify for IntShape {
             any_simplified = true;
 
             if let Some(simple_contour) = contour.simplified() {
-                *contour = simple_contour;
+                contour.clear();
+                contour.extend(simple_contour);
             } else if index == 0 {
                 // early out main contour is empty
                 self.clear();
