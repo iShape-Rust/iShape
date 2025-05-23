@@ -1,4 +1,4 @@
-use crate::int::path::{IntPath, PointPathExtension};
+use crate::int::path::{IntPath, ContourExtension};
 use crate::int::shape::{IntShape, IntShapes};
 
 pub trait Area {

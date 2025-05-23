@@ -1,7 +1,7 @@
 #[cfg(test)]
 mod tests {
     use i_float::int::point::IntPoint;
-    use i_shape::int::path::PointPathExtension;
+    use i_shape::int::path::ContourExtension;
     use i_shape::int::simple::{SimpleContour, SimpleShape, SimpleShapes};
 
     #[test]

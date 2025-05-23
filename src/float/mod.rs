@@ -5,3 +5,4 @@ pub mod simple;
 pub mod area;
 pub mod reverse;
 pub mod despike;
+pub mod init;

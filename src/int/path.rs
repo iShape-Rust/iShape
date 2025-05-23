@@ -1,18 +1,19 @@
 use alloc::vec::Vec;
 use i_float::int::point::IntPoint;
+use crate::int::shape::IntContour;
 
 pub type IntPath = Vec<IntPoint>;
 pub type IntPaths = Vec<IntPath>;
 
-pub trait PointPathExtension {
+pub trait ContourExtension {
     fn unsafe_area(&self) -> i64;
     fn is_convex(&self) -> bool;
     fn is_clockwise_ordered(&self) -> bool;
     fn contains(&self, point: IntPoint) -> bool;
-    fn into_reversed(self) -> IntPath;
+    fn to_reversed(&self) -> IntContour;
 }
 
-impl PointPathExtension for IntPath {
+impl ContourExtension for [IntPoint] {
     /// The area of the `Path`.
     /// - Returns: A positive double area if path is clockwise and negative double area otherwise.
     fn unsafe_area(&self) -> i64 {
@@ -106,16 +107,16 @@ impl PointPathExtension for IntPath {
     }
 
     #[inline]
-    fn into_reversed(self) -> IntPath {
-        let mut rev_path = self;
-        rev_path.reverse();
-        rev_path
+    fn to_reversed(&self) -> IntContour {
+        let mut contour = self.to_vec();
+        contour.reverse();
+        contour
     }
 }
 #[cfg(test)]
 mod tests {
     use alloc::vec;
-    use crate::int::path::PointPathExtension;
+    use crate::int::path::ContourExtension;
     use i_float::int::point::IntPoint;
 
     #[test]

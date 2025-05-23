@@ -14,3 +14,5 @@ serde = ["dep:serde", "i_float/serde"]
 #i_float = { version = "^1.10.0"}
 i_float = { path = "../iFloat" }
 serde = { version = "^1.0", default-features = false, features = ["derive"], optional = true }
+rand = "0.9.1"
+rand_chacha = "0.9.0"
