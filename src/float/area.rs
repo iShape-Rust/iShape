@@ -1,27 +1,51 @@
-use i_float::adapter::FloatPointAdapter;
 use i_float::float::compatible::FloatPointCompatible;
 use i_float::float::number::FloatNumber;
+use crate::base::data::{Contour, Shape};
 
-pub trait IntArea<P: FloatPointCompatible<T>, T: FloatNumber> {
-    /// The area of the `Path`.
-    /// - Returns: A positive double area if path is clockwise and negative double area otherwise.
-    fn unsafe_int_area(&self, adapter: &FloatPointAdapter<P, T>) -> i64;
+pub trait Area<P: FloatPointCompatible<T>, T: FloatNumber> {
+    fn area(&self) -> T;
 }
 
-impl<P: FloatPointCompatible<T>, T: FloatNumber> IntArea<P, T> for &[P] {
-    fn unsafe_int_area(&self, adapter: &FloatPointAdapter<P, T>) -> i64 {
-        let n = self.len();
-        let mut p0 = adapter.float_to_int(&self[n - 1]);
-        let mut area: i64 = 0;
+impl<P: FloatPointCompatible<T>, T: FloatNumber> Area<P, T> for [P] {
 
-        for pi in self.iter() {
-            let p1 = adapter.float_to_int(pi);
-            let a = (p1.x as i64).wrapping_mul(p0.y as i64);
-            let b = (p1.y as i64).wrapping_mul(p0.x as i64);
-            area = area.wrapping_add(a).wrapping_sub(b);
-            p0 = p1;
+    #[inline]
+    fn area(&self) -> T {
+        let mut area = T::from_float(0.0);
+
+        let mut a = if let Some(p) = self.last() {
+            *p
+        } else {
+            return area;
+        };
+
+        for &b in self.iter() {
+            let ab = a.x() * b.y() - b.x() * a.y();
+            area = area + ab;
+            a = b;
         }
 
+        area
+    }
+}
+
+impl<P: FloatPointCompatible<T>, T: FloatNumber> Area<P, T> for [Contour<P>] {
+    #[inline]
+    fn area(&self) -> T {
+        let mut area = T::from_float(0.0);
+        for contour in self.iter() {
+            area = area + contour.area();
+        }
+        area
+    }
+}
+
+impl<P: FloatPointCompatible<T>, T: FloatNumber> Area<P, T> for [Shape<P>] {
+    #[inline]
+    fn area(&self) -> T {
+        let mut area = T::from_float(0.0);
+        for shape in self.iter() {
+            area = area + shape.area();
+        }
         area
     }
 }

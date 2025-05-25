@@ -1,12 +1,13 @@
-use crate::int::path::{IntPath, ContourExtension};
-use crate::int::shape::{IntShape, IntShapes};
+use i_float::int::point::IntPoint;
+use crate::int::path::ContourExtension;
+use crate::int::shape::{IntContour, IntShape, IntShapes};
 
 pub trait Area {
     fn area_two(&self) -> i64;
     fn area(&self) -> i64;
 }
 
-impl Area for IntPath {
+impl Area for [IntPoint] {
 
     #[inline]
     fn area_two(&self) -> i64 {
@@ -19,7 +20,7 @@ impl Area for IntPath {
     }
 }
 
-impl Area for IntShape {
+impl Area for [IntContour] {
 
     #[inline]
     fn area_two(&self) -> i64 {
@@ -36,7 +37,7 @@ impl Area for IntShape {
     }
 }
 
-impl Area for IntShapes {
+impl Area for [IntShape] {
 
     #[inline]
     fn area_two(&self) -> i64 {
