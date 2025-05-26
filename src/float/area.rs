@@ -24,7 +24,7 @@ impl<P: FloatPointCompatible<T>, T: FloatNumber> Area<P, T> for [P] {
             a = b;
         }
 
-        area
+        T::from_float(0.5) * area
     }
 }
 

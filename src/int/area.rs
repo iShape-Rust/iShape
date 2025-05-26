@@ -1,6 +1,6 @@
 use i_float::int::point::IntPoint;
 use crate::int::path::ContourExtension;
-use crate::int::shape::{IntContour, IntShape, IntShapes};
+use crate::int::shape::{IntContour, IntShape};
 
 pub trait Area {
     fn area_two(&self) -> i64;
