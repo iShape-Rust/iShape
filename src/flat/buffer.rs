@@ -124,6 +124,7 @@ impl FlatContoursBuffer {
 mod tests {
     use alloc::vec;
     use i_float::int_pnt;
+    use rand::Rng;
     use super::*;
     use crate::int::shape::{IntContour, IntShape, IntShapes};
 
@@ -178,10 +179,7 @@ mod tests {
 
     #[test]
     fn test_random_shapes_round_trip() {
-        use rand::{Rng, SeedableRng};
-        use rand_chacha::ChaCha8Rng;
-
-        let mut rng = ChaCha8Rng::seed_from_u64(12345);
+        let mut rng = rand::rng();
         let mut shapes: IntShapes = Vec::new();
 
         for _ in 0..5 {
