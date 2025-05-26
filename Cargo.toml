@@ -1,6 +1,6 @@
 [package]
 name = "i_shape"
-version = "1.12.0"
+version = "1.13.0"
 authors = ["Nail Sharipov <nailxsharipov@gmail.com>"]
 edition = "2024"
 description = "iShape is a compact and efficient library specifically designed for representing 2D data structures using IntPoint."
@@ -11,8 +11,9 @@ repository = "https://github.com/iShape-Rust/iShape"
 serde = ["dep:serde", "i_float/serde"]
 
 [dependencies]
-#i_float = { version = "^1.10.0"}
-i_float = { path = "../iFloat" }
+i_float = { version = "^1.14.0"}
+#i_float = { path = "../iFloat" }
 serde = { version = "^1.0", default-features = false, features = ["derive"], optional = true }
-rand = "0.9.1"
-rand_chacha = "0.9.0"
+
+[dev-dependencies]
+rand = { version = "~0.9" }
