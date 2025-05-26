@@ -23,6 +23,11 @@ impl FlatContoursBuffer {
     }
 
     #[inline]
+    pub fn is_empty(&self) -> bool {
+        self.points.is_empty()
+    }
+
+    #[inline]
     pub fn is_single_contour(&self) -> bool {
         self.ranges.len() == 1
     }
@@ -44,9 +49,6 @@ impl FlatContoursBuffer {
             &mut self.points
         }
     }
-}
-
-impl FlatContoursBuffer {
 
     #[inline]
     pub fn set_with_contour(&mut self, contour: &[IntPoint]) {
@@ -88,9 +90,7 @@ impl FlatContoursBuffer {
             }
         }
     }
-}
 
-impl FlatContoursBuffer {
     #[inline]
     pub fn clear_and_reserve(&mut self, points: usize, contours: usize) {
         self.points.reserve_capacity(points);
@@ -99,9 +99,7 @@ impl FlatContoursBuffer {
         self.ranges.reserve_capacity(contours);
         self.ranges.clear();
     }
-}
 
-impl FlatContoursBuffer {
     #[inline]
     pub fn add_contour(&mut self, contour: &[IntPoint]) {
         let start = self.points.len();
@@ -109,9 +107,7 @@ impl FlatContoursBuffer {
         self.ranges.push(start..end);
         self.points.extend_from_slice(contour);
     }
-}
 
-impl FlatContoursBuffer {
     #[inline]
     pub fn to_contours(&self) -> Vec<IntContour> {
         let mut contours = Vec::with_capacity(self.ranges.len());
