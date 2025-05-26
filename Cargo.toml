@@ -7,6 +7,8 @@ description = "iShape is a compact and efficient library specifically designed f
 license = "MIT"
 repository = "https://github.com/iShape-Rust/iShape"
 
+categories = ["no-std", "data-structures"]
+
 [features]
 serde = ["dep:serde", "i_float/serde"]
 
