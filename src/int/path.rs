@@ -113,6 +113,7 @@ impl ContourExtension for [IntPoint] {
         contour
     }
 }
+
 #[cfg(test)]
 mod tests {
     use alloc::vec;

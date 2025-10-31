@@ -8,3 +8,4 @@ pub mod int;
 pub mod source;
 pub mod util;
 pub mod flat;
+mod macros;
