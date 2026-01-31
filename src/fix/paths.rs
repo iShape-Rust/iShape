@@ -1,5 +1,5 @@
-use alloc::vec::Vec;
 use crate::fix::path::FixPath;
+use alloc::vec::Vec;
 
 pub type FixPaths = Vec<FixPath>;
 
@@ -8,7 +8,6 @@ pub trait FixPathsExtension {
 }
 
 impl FixPathsExtension for FixPaths {
-
     #[inline(always)]
     fn points_count(&self) -> usize {
         self.iter().fold(0, |acc, x| acc + x.len())
@@ -16,7 +15,6 @@ impl FixPathsExtension for FixPaths {
 }
 
 impl FixPathsExtension for [FixPath] {
-
     #[inline(always)]
     fn points_count(&self) -> usize {
         self.iter().fold(0, |acc, x| acc + x.len())

@@ -1,6 +1,6 @@
-use i_float::int::point::IntPoint;
 use crate::int::path::ContourExtension;
 use crate::int::shape::{IntContour, IntShape};
+use i_float::int::point::IntPoint;
 
 pub trait Area {
     fn area_two(&self) -> i64;
@@ -8,7 +8,6 @@ pub trait Area {
 }
 
 impl Area for [IntPoint] {
-
     #[inline]
     fn area_two(&self) -> i64 {
         self.unsafe_area()
@@ -21,7 +20,6 @@ impl Area for [IntPoint] {
 }
 
 impl Area for [IntContour] {
-
     #[inline]
     fn area_two(&self) -> i64 {
         let mut s: i64 = 0;
@@ -38,7 +36,6 @@ impl Area for [IntContour] {
 }
 
 impl Area for [IntShape] {
-
     #[inline]
     fn area_two(&self) -> i64 {
         let mut s: i64 = 0;

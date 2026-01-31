@@ -1,7 +1,7 @@
+use crate::int::shape::{IntContour, IntShape, IntShapes};
 use alloc::vec;
 use alloc::vec::Vec;
 use i_float::int::point::IntPoint;
-use crate::int::shape::{IntContour, IntShape, IntShapes};
 
 /// A trait that provides methods for simplifying complex geometrical structures.
 pub trait Simplify {
@@ -12,11 +12,6 @@ pub trait Simplify {
     /// - `true` if the structure was simplified successfully.
     /// - `false` if the structure was already simple and no modification was made.
     fn simplify_contour(&mut self) -> bool;
-}
-
-pub trait Simplified {
-    /// Simplified the structure if it is not already simple.
-    fn simplified_contour(&self) -> Option<IntContour>;
 }
 
 /// A trait for determining if a contour is simple and for obtaining a simplified version.
@@ -100,7 +95,9 @@ impl Simplify for IntShape {
         let mut any_empty = false;
 
         for (index, contour) in self.iter_mut().enumerate() {
-            if contour.is_simple() { continue; }
+            if contour.is_simple() {
+                continue;
+            }
             any_simplified = true;
 
             if let Some(simple_contour) = contour.simplified() {
@@ -130,7 +127,9 @@ impl Simplify for IntShapes {
         let mut any_empty = false;
 
         for shape in self.iter_mut() {
-            if shape.is_simple() { continue; }
+            if shape.is_simple() {
+                continue;
+            }
             any_simplified = true;
             if let Some(simple_shape) = shape.simplified() {
                 *shape = simple_shape;
@@ -203,7 +202,9 @@ impl SimpleContour for [IntPoint] {
     fn is_simple(&self) -> bool {
         let count = self.len();
 
-        if count < 3 { return false; }
+        if count < 3 {
+            return false;
+        }
 
         let mut p0 = self[count - 2];
         let p1 = self[count - 1];
@@ -224,35 +225,58 @@ impl SimpleContour for [IntPoint] {
         true
     }
 
+    #[inline]
     fn simplified(&self) -> Option<IntContour> {
-        if self.len() < 3 {
+        ContourSimplifier::default().simplify_contour(self)
+    }
+}
+
+#[derive(Default)]
+pub struct ContourSimplifier {
+    nodes: Vec<Node>,
+    validated: Vec<bool>,
+}
+
+impl ContourSimplifier {
+    pub fn simplify_contour(&mut self, contour: &[IntPoint]) -> Option<IntContour> {
+        let mut n = contour.len();
+
+        if n < 3 {
             return None;
         }
 
-        let mut n = self.len();
-        let mut nodes: Vec<Node> = vec![Node { next: 0, index: 0, prev: 0 }; n];
-        let mut validated: Vec<bool> = vec![false; n];
+        self.validated.clear();
+        self.validated.resize(n, false);
 
-        let mut i0 = n - 2;
-        let mut i1 = n - 1;
-        for i2 in 0..n {
-            nodes[i1] = Node { next: i2, index: i1, prev: i0 };
-            i0 = i1;
-            i1 = i2;
+        self.nodes.clear();
+        self.nodes.reserve(n);
+
+        let mut prev = n - 1;
+        let mut next = 1;
+        let last = n - 1;
+        for index in 0..last {
+            self.nodes.push(Node { next, index, prev });
+            prev = index;
+            next += 1;
         }
+        self.nodes.push(Node {
+            next: 0,
+            index: last,
+            prev,
+        });
 
         let mut first: usize = 0;
-        let mut node = nodes[first];
+        let mut node = self.nodes[first];
         let mut i = 0;
         while i < n {
-            if validated[node.index] {
-                node = nodes[node.next];
+            if self.validated[node.index] {
+                node = self.nodes[node.next];
                 continue;
             }
 
-            let p0 = self[node.prev];
-            let p1 = self[node.index];
-            let p2 = self[node.next];
+            let p0 = contour[node.prev];
+            let p1 = contour[node.index];
+            let p2 = contour[node.next];
 
             if p1.subtract(p0).cross_product(p2.subtract(p1)) == 0 {
                 n -= 1;
@@ -261,48 +285,47 @@ impl SimpleContour for [IntPoint] {
                 }
 
                 // remove node
-                nodes[node.prev].next = node.next;
-                nodes[node.next].prev = node.prev;
+                self.nodes[node.prev].next = node.next;
+                self.nodes[node.next].prev = node.prev;
 
                 if node.index == first {
                     first = node.next
                 }
 
-                node = nodes[node.prev];
+                node = self.nodes[node.prev];
 
-                if validated[node.prev] {
+                if self.validated[node.prev] {
                     i -= 1;
-                    validated[node.prev] = false
+                    self.validated[node.prev] = false
                 }
 
-                if validated[node.next] {
+                if self.validated[node.next] {
                     i -= 1;
-                    validated[node.next] = false
+                    self.validated[node.next] = false
                 }
 
-                if validated[node.index] {
+                if self.validated[node.index] {
                     i -= 1;
-                    validated[node.index] = false
+                    self.validated[node.index] = false
                 }
             } else {
-                validated[node.index] = true;
+                self.validated[node.index] = true;
                 i += 1;
-                node = nodes[node.next];
+                node = self.nodes[node.next];
             }
         }
 
         let mut buffer = vec![IntPoint::ZERO; n];
-        node = nodes[first];
+        node = self.nodes[first];
 
         for item in buffer.iter_mut().take(n) {
-            *item = self[node.index];
-            node = nodes[node.next];
+            *item = contour[node.index];
+            node = self.nodes[node.next];
         }
 
         Some(buffer)
     }
 }
-
 #[derive(Clone, Copy)]
 struct Node {
     next: usize,

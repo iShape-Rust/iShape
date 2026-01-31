@@ -1,9 +1,9 @@
-use i_float::adapter::FloatPointAdapter;
-use i_float::float::compatible::FloatPointCompatible;
-use i_float::float::number::FloatNumber;
 use crate::base::data::Contour;
 use crate::int::shape::IntContour;
 use crate::util::reserve::Reserve;
+use i_float::adapter::FloatPointAdapter;
+use i_float::float::compatible::FloatPointCompatible;
+use i_float::float::number::FloatNumber;
 
 pub trait IntContourInit<P: FloatPointCompatible<T>, T: FloatNumber> {
     fn set_with_float(&mut self, contour: &Contour<P>, adapter: &FloatPointAdapter<P, T>);

@@ -1,6 +1,6 @@
+use crate::int::shape::IntContour;
 use alloc::vec::Vec;
 use i_float::int::point::IntPoint;
-use crate::int::shape::IntContour;
 
 pub type IntPath = Vec<IntPoint>;
 pub type IntPaths = Vec<IntPath>;
@@ -116,8 +116,8 @@ impl ContourExtension for [IntPoint] {
 
 #[cfg(test)]
 mod tests {
-    use alloc::vec;
     use crate::int::path::ContourExtension;
+    use alloc::vec;
     use i_float::int::point::IntPoint;
 
     #[test]

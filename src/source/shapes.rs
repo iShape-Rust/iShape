@@ -1,7 +1,7 @@
+use crate::source::resource::ShapeResource;
 use alloc::vec::Vec;
 use i_float::float::compatible::FloatPointCompatible;
 use i_float::float::number::FloatNumber;
-use crate::source::resource::ShapeResource;
 
 pub struct ShapesResourceIterator<'a, P> {
     slice: &'a [Vec<Vec<P>>],
@@ -41,7 +41,7 @@ impl<'a, P> Iterator for ShapesResourceIterator<'a, P> {
     where
         Self: Sized,
     {
-        self.slice.iter().fold(0, |s, shape|s + shape.len())
+        self.slice.iter().fold(0, |s, shape| s + shape.len())
     }
 }
 
@@ -98,8 +98,8 @@ where
 
 #[cfg(test)]
 mod tests {
-    use alloc::vec;
     use crate::source::resource::ShapeResource;
+    use alloc::vec;
 
     #[test]
     fn test_resource_fixed_array() {

@@ -1,18 +1,17 @@
+use crate::flat::buffer::FlatContoursBuffer;
+use crate::source::resource::ShapeResource;
 use i_float::adapter::FloatPointAdapter;
 use i_float::float::compatible::FloatPointCompatible;
 use i_float::float::number::FloatNumber;
 use i_float::float::rect::FloatRect;
-use crate::flat::buffer::FlatContoursBuffer;
-use crate::source::resource::ShapeResource;
 
 impl FlatContoursBuffer {
-
     #[inline]
     pub fn set_with_resource<P, T, R>(&mut self, resource: &R) -> FloatPointAdapter<P, T>
     where
         T: FloatNumber,
         P: FloatPointCompatible<T>,
-        R: ShapeResource<P, T> +?Sized
+        R: ShapeResource<P, T> + ?Sized,
     {
         let mut contours_count = 0;
         let mut points_count = 0;
@@ -50,5 +49,38 @@ impl FlatContoursBuffer {
         }
 
         adapter
+    }
+
+    #[inline]
+    pub fn set_with_resource_and_adapter<P, T, R>(
+        &mut self,
+        resource: &R,
+        adapter: FloatPointAdapter<P, T>,
+    ) where
+        T: FloatNumber,
+        P: FloatPointCompatible<T>,
+        R: ShapeResource<P, T> + ?Sized,
+    {
+        let mut contours_count = 0;
+        let mut points_count = 0;
+        for contour in resource.iter_paths() {
+            contours_count += 1;
+            points_count += contour.len();
+        }
+
+        self.clear_and_reserve(points_count, contours_count);
+        if points_count == 0 {
+            return;
+        }
+
+        let mut offset = 0;
+        for contour in resource.iter_paths() {
+            for p in contour.iter() {
+                self.points.push(adapter.float_to_int(p));
+            }
+            let contour_len = contour.len();
+            self.ranges.push(offset..offset + contour_len);
+            offset += contour_len;
+        }
     }
 }

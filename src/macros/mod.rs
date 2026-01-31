@@ -1,4 +1,3 @@
-
 #[macro_export]
 macro_rules! int_path {
     ( $( [$x:expr, $y:expr] ),* $(,)? ) => {
@@ -88,48 +87,22 @@ mod tests {
     #[test]
     fn int_path_macro_builds_vectors() {
         let path = int_path![[0, 1], [2, 3], [4, 5]];
-        assert_eq!(path, vec![
-            IntPoint::new(0, 1),
-            IntPoint::new(2, 3),
-            IntPoint::new(4, 5),
-        ]);
+        assert_eq!(
+            path,
+            vec![
+                IntPoint::new(0, 1),
+                IntPoint::new(2, 3),
+                IntPoint::new(4, 5),
+            ]
+        );
     }
 
     #[test]
     fn int_shape_macro_builds_nested_vectors() {
-        let shape = int_shape![
-            [[0, 0], [1, 0], [1, 1]],
-            [[2, 2], [3, 2], [3, 3], [2, 3]],
-        ];
+        let shape = int_shape![[[0, 0], [1, 0], [1, 1]], [[2, 2], [3, 2], [3, 3], [2, 3]],];
 
-        assert_eq!(shape, vec![
-            vec![
-                IntPoint::new(0, 0),
-                IntPoint::new(1, 0),
-                IntPoint::new(1, 1),
-            ],
-            vec![
-                IntPoint::new(2, 2),
-                IntPoint::new(3, 2),
-                IntPoint::new(3, 3),
-                IntPoint::new(2, 3),
-            ],
-        ]);
-    }
-
-    #[test]
-    fn int_shapes_macro_builds_multiple_shapes() {
-        let shapes = int_shapes![
-            [
-                [[0, 0], [1, 0], [1, 1]],
-                [[2, 0], [3, 0], [3, 1]],
-            ],
-            [
-                [[10, 10], [11, 10], [11, 11], [10, 11]],
-            ],
-        ];
-
-        assert_eq!(shapes, vec![
+        assert_eq!(
+            shape,
             vec![
                 vec![
                     IntPoint::new(0, 0),
@@ -137,19 +110,44 @@ mod tests {
                     IntPoint::new(1, 1),
                 ],
                 vec![
-                    IntPoint::new(2, 0),
-                    IntPoint::new(3, 0),
-                    IntPoint::new(3, 1),
+                    IntPoint::new(2, 2),
+                    IntPoint::new(3, 2),
+                    IntPoint::new(3, 3),
+                    IntPoint::new(2, 3),
                 ],
-            ],
+            ]
+        );
+    }
+
+    #[test]
+    fn int_shapes_macro_builds_multiple_shapes() {
+        let shapes = int_shapes![
+            [[[0, 0], [1, 0], [1, 1]], [[2, 0], [3, 0], [3, 1]],],
+            [[[10, 10], [11, 10], [11, 11], [10, 11]],],
+        ];
+
+        assert_eq!(
+            shapes,
             vec![
                 vec![
+                    vec![
+                        IntPoint::new(0, 0),
+                        IntPoint::new(1, 0),
+                        IntPoint::new(1, 1),
+                    ],
+                    vec![
+                        IntPoint::new(2, 0),
+                        IntPoint::new(3, 0),
+                        IntPoint::new(3, 1),
+                    ],
+                ],
+                vec![vec![
                     IntPoint::new(10, 10),
                     IntPoint::new(11, 10),
                     IntPoint::new(11, 11),
                     IntPoint::new(10, 11),
-                ],
-            ],
-        ]);
+                ],],
+            ]
+        );
     }
 }

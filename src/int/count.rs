@@ -1,6 +1,6 @@
-use alloc::vec::Vec;
 use crate::int::path::IntPath;
 use crate::int::shape::IntShape;
+use alloc::vec::Vec;
 
 pub type IntShapes = Vec<IntShape>;
 

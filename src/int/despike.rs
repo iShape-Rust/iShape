@@ -1,7 +1,7 @@
+use crate::int::shape::{IntContour, IntShape, IntShapes};
 use alloc::vec;
 use alloc::vec::Vec;
 use i_float::int::point::IntPoint;
-use crate::int::shape::{IntContour, IntShape, IntShapes};
 
 /// A trait for removing spike artifacts from polygon contours.
 pub trait DeSpike {
@@ -94,7 +94,9 @@ impl DeSpikeContour for IntContour {
     fn has_no_spikes(&self) -> bool {
         let count = self.len();
 
-        if count < 3 { return false; }
+        if count < 3 {
+            return false;
+        }
 
         let mut p0 = self[count - 2];
         let p1 = self[count - 1];
@@ -122,13 +124,24 @@ impl DeSpikeContour for IntContour {
         }
 
         let mut n = self.len();
-        let mut nodes: Vec<Node> = vec![Node { next: 0, index: 0, prev: 0 }; n];
+        let mut nodes: Vec<Node> = vec![
+            Node {
+                next: 0,
+                index: 0,
+                prev: 0
+            };
+            n
+        ];
         let mut validated: Vec<bool> = vec![false; n];
 
         let mut i0 = n - 2;
         let mut i1 = n - 1;
         for i2 in 0..n {
-            nodes[i1] = Node { next: i2, index: i1, prev: i0 };
+            nodes[i1] = Node {
+                next: i2,
+                index: i1,
+                prev: i0,
+            };
             i0 = i1;
             i1 = i2;
         }
@@ -206,7 +219,9 @@ impl DeSpike for IntShape {
         let mut any_empty = false;
 
         for (index, contour) in self.iter_mut().enumerate() {
-            if contour.has_no_spikes() { continue; }
+            if contour.has_no_spikes() {
+                continue;
+            }
             any_simplified = true;
 
             if let Some(simple_contour) = contour.despiked_contour() {
@@ -261,7 +276,9 @@ impl DeSpike for IntShapes {
         let mut any_empty = false;
 
         for shape in self.iter_mut() {
-            if shape.has_no_spikes() { continue; }
+            if shape.has_no_spikes() {
+                continue;
+            }
             any_simplified = true;
             if let Some(simple_shape) = shape.despiked_shape() {
                 *shape = simple_shape;
@@ -312,19 +329,18 @@ struct Node {
 
 #[cfg(test)]
 mod tests {
+    use crate::int::despike::DeSpike;
     use alloc::vec;
     use i_float::int::point::IntPoint;
-    use crate::int::despike::DeSpike;
 
     #[test]
     fn test_0() {
-        let mut contour =
-            vec![
-                IntPoint::new(0, 0),
-                IntPoint::new(1, 0),
-                IntPoint::new(1, 1),
-                IntPoint::new(0, 1),
-            ];
+        let mut contour = vec![
+            IntPoint::new(0, 0),
+            IntPoint::new(1, 0),
+            IntPoint::new(1, 1),
+            IntPoint::new(0, 1),
+        ];
 
         let modified = contour.remove_spikes();
 
@@ -334,14 +350,13 @@ mod tests {
 
     #[test]
     fn test_1() {
-        let mut contour =
-            vec![
-                IntPoint::new(0, -1),
-                IntPoint::new(0, 1),
-                IntPoint::new(1, 1),
-                IntPoint::new(1, 0),
-                IntPoint::new(0, 0),
-            ];
+        let mut contour = vec![
+            IntPoint::new(0, -1),
+            IntPoint::new(0, 1),
+            IntPoint::new(1, 1),
+            IntPoint::new(1, 0),
+            IntPoint::new(0, 0),
+        ];
 
         let modified = contour.remove_spikes();
 
@@ -351,14 +366,13 @@ mod tests {
 
     #[test]
     fn test_2() {
-        let mut contour =
-            vec![
-                IntPoint::new(0, -1),
-                IntPoint::new(0, 1),
-                IntPoint::new(1, 1),
-                IntPoint::new(1, 0),
-                IntPoint::new(0, 0),
-            ];
+        let mut contour = vec![
+            IntPoint::new(0, -1),
+            IntPoint::new(0, 1),
+            IntPoint::new(1, 1),
+            IntPoint::new(1, 0),
+            IntPoint::new(0, 0),
+        ];
 
         let modified = contour.remove_spikes();
 
@@ -368,16 +382,15 @@ mod tests {
 
     #[test]
     fn test_3() {
-        let mut contour =
-            vec![
-                IntPoint::new(0, 0),
-                IntPoint::new(0, 2),
-                IntPoint::new(1, 2),
-                IntPoint::new(3, 2),
-                IntPoint::new(4, 2),
-                IntPoint::new(2, 2),
-                IntPoint::new(2, 0),
-            ];
+        let mut contour = vec![
+            IntPoint::new(0, 0),
+            IntPoint::new(0, 2),
+            IntPoint::new(1, 2),
+            IntPoint::new(3, 2),
+            IntPoint::new(4, 2),
+            IntPoint::new(2, 2),
+            IntPoint::new(2, 0),
+        ];
 
         let modified = contour.remove_spikes();
 
@@ -387,16 +400,15 @@ mod tests {
 
     #[test]
     fn test_4() {
-        let mut contour =
-            vec![
-                IntPoint::new(0, 0),
-                IntPoint::new(0, 2),
-                IntPoint::new(1, 2),
-                IntPoint::new(4, 2),
-                IntPoint::new(3, 2),
-                IntPoint::new(2, 2),
-                IntPoint::new(2, 0),
-            ];
+        let mut contour = vec![
+            IntPoint::new(0, 0),
+            IntPoint::new(0, 2),
+            IntPoint::new(1, 2),
+            IntPoint::new(4, 2),
+            IntPoint::new(3, 2),
+            IntPoint::new(2, 2),
+            IntPoint::new(2, 0),
+        ];
 
         let modified = contour.remove_spikes();
 
@@ -406,17 +418,16 @@ mod tests {
 
     #[test]
     fn test_5() {
-        let mut contour =
-            vec![
-                IntPoint::new(-10, 10),
-                IntPoint::new(-10, 0),
-                IntPoint::new(-10, -10),
-                IntPoint::new(0, -10),
-                IntPoint::new(10, -10),
-                IntPoint::new(10, 0),
-                IntPoint::new(10, 10),
-                IntPoint::new(0, 10),
-            ];
+        let mut contour = vec![
+            IntPoint::new(-10, 10),
+            IntPoint::new(-10, 0),
+            IntPoint::new(-10, -10),
+            IntPoint::new(0, -10),
+            IntPoint::new(10, -10),
+            IntPoint::new(10, 0),
+            IntPoint::new(10, 10),
+            IntPoint::new(0, 10),
+        ];
 
         let modified = contour.remove_spikes();
 

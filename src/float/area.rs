@@ -1,13 +1,12 @@
+use crate::base::data::{Contour, Shape};
 use i_float::float::compatible::FloatPointCompatible;
 use i_float::float::number::FloatNumber;
-use crate::base::data::{Contour, Shape};
 
 pub trait Area<P: FloatPointCompatible<T>, T: FloatNumber> {
     fn area(&self) -> T;
 }
 
 impl<P: FloatPointCompatible<T>, T: FloatNumber> Area<P, T> for [P] {
-
     #[inline]
     fn area(&self) -> T {
         let mut area = T::from_float(0.0);

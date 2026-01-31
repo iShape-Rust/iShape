@@ -1,6 +1,6 @@
-use alloc::vec::Vec;
 use crate::fix::path::{FixPath, FixPathExtension};
 use crate::fix::paths::FixPathsExtension;
+use alloc::vec::Vec;
 
 /// Represents a fixed geometric shape with contour and holes.
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -10,7 +10,6 @@ pub struct FixShape {
 }
 
 impl FixShape {
-
     #[inline(always)]
     pub fn points_count(&self) -> usize {
         self.paths.points_count()

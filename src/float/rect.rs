@@ -1,8 +1,8 @@
+use crate::base::data::{Path, Shape};
 use alloc::vec::Vec;
 use i_float::float::compatible::FloatPointCompatible;
 use i_float::float::number::FloatNumber;
 use i_float::float::rect::FloatRect;
-use crate::base::data::{Path, Shape};
 
 pub trait RectInit<P, T>
 where

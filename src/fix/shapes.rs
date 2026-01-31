@@ -1,5 +1,5 @@
-use alloc::vec::Vec;
 use crate::fix::shape::FixShape;
+use alloc::vec::Vec;
 
 pub type FixShapes = Vec<FixShape>;
 

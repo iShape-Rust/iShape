@@ -1,6 +1,6 @@
+use crate::base::data::{Contour, Shape};
 use i_float::float::compatible::FloatPointCompatible;
 use i_float::float::number::FloatNumber;
-use crate::base::data::{Contour, Shape};
 
 pub trait PointsCount<P, T> {
     fn points_count(&self) -> usize;

@@ -1,7 +1,7 @@
+use crate::source::resource::ShapeResource;
 use alloc::vec::Vec;
 use i_float::float::compatible::FloatPointCompatible;
 use i_float::float::number::FloatNumber;
-use crate::source::resource::ShapeResource;
 
 pub struct ShapeResourceIterator<'a, P> {
     slice: &'a [Vec<P>],
@@ -109,8 +109,8 @@ where
 
 #[cfg(test)]
 mod tests {
-    use alloc::vec;
     use crate::source::resource::ShapeResource;
+    use alloc::vec;
 
     #[test]
     fn test_resource_fixed_array() {

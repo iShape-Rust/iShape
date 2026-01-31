@@ -1,9 +1,9 @@
+use crate::int::count::PointsCount;
+use crate::int::shape::{IntContour, IntShape};
+use crate::util::reserve::Reserve;
 use alloc::vec::Vec;
 use core::ops::Range;
 use i_float::int::point::IntPoint;
-use crate::int::count::PointsCount;
-use crate::int::shape::{IntContour, IntShape,};
-use crate::util::reserve::Reserve;
 
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Debug, Clone, Default)]
@@ -13,7 +13,6 @@ pub struct FlatContoursBuffer {
 }
 
 impl FlatContoursBuffer {
-
     #[inline]
     pub fn with_capacity(capacity: usize) -> Self {
         Self {
@@ -122,11 +121,11 @@ impl FlatContoursBuffer {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+    use crate::int::shape::{IntContour, IntShape, IntShapes};
     use alloc::vec;
     use i_float::int_pnt;
     use rand::Rng;
-    use super::*;
-    use crate::int::shape::{IntContour, IntShape, IntShapes};
 
     fn make_contour(p: &[(i32, i32)]) -> IntContour {
         p.iter().map(|&(x, y)| int_pnt!(x, y)).collect()
@@ -201,6 +200,9 @@ mod tests {
         let mut flat = FlatContoursBuffer::with_capacity(0);
         flat.set_with_shapes(&shapes);
         let contours = flat.to_contours();
-        assert_eq!(contours.len(), shapes.iter().fold(0, |s, shape|s + shape.len()));
+        assert_eq!(
+            contours.len(),
+            shapes.iter().fold(0, |s, shape| s + shape.len())
+        );
     }
 }

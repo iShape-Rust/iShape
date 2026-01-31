@@ -1,10 +1,10 @@
+use crate::base::data::{Contour, Path, Shape, Shapes};
+use crate::int::path::IntPath;
+use crate::int::shape::{IntContour, IntShape, IntShapes};
 use i_float::adapter::FloatPointAdapter;
 use i_float::float::compatible::FloatPointCompatible;
 use i_float::float::number::FloatNumber;
 use i_float::int::point::IntPoint;
-use crate::base::data::{Contour, Path, Shape, Shapes};
-use crate::int::path::IntPath;
-use crate::int::shape::{IntContour, IntShape, IntShapes};
 
 pub trait PathToFloat<P: FloatPointCompatible<T>, T: FloatNumber> {
     fn to_float(&self, adapter: &FloatPointAdapter<P, T>) -> Path<P>;

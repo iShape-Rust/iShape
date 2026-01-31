@@ -6,7 +6,7 @@ where
     P: FloatPointCompatible<T>,
     T: FloatNumber,
 {
-    type ResourceIter<'a>: Iterator<Item=&'a [P]>
+    type ResourceIter<'a>: Iterator<Item = &'a [P]>
     where
         P: 'a,
         Self: 'a;

@@ -1,7 +1,7 @@
+use crate::source::resource::ShapeResource;
 use alloc::vec::Vec;
 use i_float::float::compatible::FloatPointCompatible;
 use i_float::float::number::FloatNumber;
-use crate::source::resource::ShapeResource;
 
 pub struct ContourResourceIterator<'a, P> {
     slice: &'a [P],
@@ -11,7 +11,10 @@ pub struct ContourResourceIterator<'a, P> {
 impl<'a, P> ContourResourceIterator<'a, P> {
     #[inline]
     fn with_slice(slice: &'a [P]) -> Self {
-        Self { slice, finished: false }
+        Self {
+            slice,
+            finished: false,
+        }
     }
 }
 
@@ -41,7 +44,8 @@ where
     P: FloatPointCompatible<T>,
     T: FloatNumber,
 {
-    type ResourceIter<'a> = ContourResourceIterator<'a, P>
+    type ResourceIter<'a>
+        = ContourResourceIterator<'a, P>
     where
         P: 'a,
         Self: 'a;
@@ -57,7 +61,8 @@ where
     P: FloatPointCompatible<T>,
     T: FloatNumber,
 {
-    type ResourceIter<'a> = ContourResourceIterator<'a, P>
+    type ResourceIter<'a>
+        = ContourResourceIterator<'a, P>
     where
         P: 'a,
         Self: 'a;
@@ -73,7 +78,8 @@ where
     P: FloatPointCompatible<T>,
     T: FloatNumber,
 {
-    type ResourceIter<'a> = ContourResourceIterator<'a, P>
+    type ResourceIter<'a>
+        = ContourResourceIterator<'a, P>
     where
         P: 'a,
         Self: 'a;
@@ -89,7 +95,8 @@ where
     P: FloatPointCompatible<T>,
     T: FloatNumber,
 {
-    type ResourceIter<'a> = ContourResourceIterator<'a, P>
+    type ResourceIter<'a>
+        = ContourResourceIterator<'a, P>
     where
         P: 'a,
         Self: 'a;
@@ -100,11 +107,10 @@ where
     }
 }
 
-
 #[cfg(test)]
 mod tests {
-    use alloc::vec;
     use crate::source::resource::ShapeResource;
+    use alloc::vec;
 
     #[test]
     fn test_resource_fixed_array() {
