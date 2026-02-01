@@ -116,8 +116,8 @@ impl ContourExtension for [IntPoint] {
 
 #[cfg(test)]
 mod tests {
-    use crate::int_path;
     use crate::int::path::ContourExtension;
+    use crate::int_path;
 
     #[test]
     fn test_0() {

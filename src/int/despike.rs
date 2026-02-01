@@ -364,15 +364,7 @@ mod tests {
 
     #[test]
     fn test_3() {
-        let mut contour = int_path![
-            [0, 0],
-            [0, 2],
-            [1, 2],
-            [3, 2],
-            [4, 2],
-            [2, 2],
-            [2, 0],
-        ];
+        let mut contour = int_path![[0, 0], [0, 2], [1, 2], [3, 2], [4, 2], [2, 2], [2, 0],];
 
         let modified = contour.remove_spikes();
 
@@ -382,15 +374,7 @@ mod tests {
 
     #[test]
     fn test_4() {
-        let mut contour = int_path![
-            [0, 0],
-            [0, 2],
-            [1, 2],
-            [4, 2],
-            [3, 2],
-            [2, 2],
-            [2, 0],
-        ];
+        let mut contour = int_path![[0, 0], [0, 2], [1, 2], [4, 2], [3, 2], [2, 2], [2, 0],];
 
         let modified = contour.remove_spikes();
 

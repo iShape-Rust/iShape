@@ -1,8 +1,8 @@
 #[cfg(test)]
 mod tests {
-    use i_shape::{int_path, int_shape, int_shapes};
     use i_shape::int::path::ContourExtension;
     use i_shape::int::simple::{SimpleContour, SimpleShape, SimpleShapes};
+    use i_shape::{int_path, int_shape, int_shapes};
 
     #[test]
     fn test_no_degenerates() {
