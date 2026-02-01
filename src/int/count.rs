@@ -29,9 +29,6 @@ pub trait BiggestShapePoints {
 impl BiggestShapePoints for [IntShape] {
     #[inline(always)]
     fn points_in_biggest_shape(&self) -> usize {
-        self.iter()
-            .map(|shape| shape.points_count())
-            .max()
-            .unwrap_or(0)
+        self.iter().map(|shape| shape.points_count()).max().unwrap_or(0)
     }
 }

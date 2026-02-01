@@ -330,17 +330,11 @@ struct Node {
 #[cfg(test)]
 mod tests {
     use crate::int::despike::DeSpike;
-    use alloc::vec;
-    use i_float::int::point::IntPoint;
+    use crate::int_path;
 
     #[test]
     fn test_0() {
-        let mut contour = vec![
-            IntPoint::new(0, 0),
-            IntPoint::new(1, 0),
-            IntPoint::new(1, 1),
-            IntPoint::new(0, 1),
-        ];
+        let mut contour = int_path![[0, 0], [1, 0], [1, 1], [0, 1],];
 
         let modified = contour.remove_spikes();
 
@@ -350,13 +344,7 @@ mod tests {
 
     #[test]
     fn test_1() {
-        let mut contour = vec![
-            IntPoint::new(0, -1),
-            IntPoint::new(0, 1),
-            IntPoint::new(1, 1),
-            IntPoint::new(1, 0),
-            IntPoint::new(0, 0),
-        ];
+        let mut contour = int_path![[0, -1], [0, 1], [1, 1], [1, 0], [0, 0],];
 
         let modified = contour.remove_spikes();
 
@@ -366,13 +354,7 @@ mod tests {
 
     #[test]
     fn test_2() {
-        let mut contour = vec![
-            IntPoint::new(0, -1),
-            IntPoint::new(0, 1),
-            IntPoint::new(1, 1),
-            IntPoint::new(1, 0),
-            IntPoint::new(0, 0),
-        ];
+        let mut contour = int_path![[0, -1], [0, 1], [1, 1], [1, 0], [0, 0],];
 
         let modified = contour.remove_spikes();
 
@@ -382,14 +364,14 @@ mod tests {
 
     #[test]
     fn test_3() {
-        let mut contour = vec![
-            IntPoint::new(0, 0),
-            IntPoint::new(0, 2),
-            IntPoint::new(1, 2),
-            IntPoint::new(3, 2),
-            IntPoint::new(4, 2),
-            IntPoint::new(2, 2),
-            IntPoint::new(2, 0),
+        let mut contour = int_path![
+            [0, 0],
+            [0, 2],
+            [1, 2],
+            [3, 2],
+            [4, 2],
+            [2, 2],
+            [2, 0],
         ];
 
         let modified = contour.remove_spikes();
@@ -400,14 +382,14 @@ mod tests {
 
     #[test]
     fn test_4() {
-        let mut contour = vec![
-            IntPoint::new(0, 0),
-            IntPoint::new(0, 2),
-            IntPoint::new(1, 2),
-            IntPoint::new(4, 2),
-            IntPoint::new(3, 2),
-            IntPoint::new(2, 2),
-            IntPoint::new(2, 0),
+        let mut contour = int_path![
+            [0, 0],
+            [0, 2],
+            [1, 2],
+            [4, 2],
+            [3, 2],
+            [2, 2],
+            [2, 0],
         ];
 
         let modified = contour.remove_spikes();
@@ -418,15 +400,15 @@ mod tests {
 
     #[test]
     fn test_5() {
-        let mut contour = vec![
-            IntPoint::new(-10, 10),
-            IntPoint::new(-10, 0),
-            IntPoint::new(-10, -10),
-            IntPoint::new(0, -10),
-            IntPoint::new(10, -10),
-            IntPoint::new(10, 0),
-            IntPoint::new(10, 10),
-            IntPoint::new(0, 10),
+        let mut contour = int_path![
+            [-10, 10],
+            [-10, 0],
+            [-10, -10],
+            [0, -10],
+            [10, -10],
+            [10, 0],
+            [10, 10],
+            [0, 10],
         ];
 
         let modified = contour.remove_spikes();

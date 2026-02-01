@@ -27,12 +27,11 @@ impl DedupContour for IntContour {
 #[cfg(test)]
 mod tests {
     use crate::int::dedup::DedupContour;
-    use alloc::vec;
-    use i_float::int::point::IntPoint;
+    use crate::int_path;
 
     #[test]
     fn test_0() {
-        let mut contour = vec![IntPoint::new(0, 0), IntPoint::new(1, 0)];
+        let mut contour = int_path![[0, 0], [1, 0],];
 
         let modified = contour.dedup_contour();
 
@@ -42,11 +41,7 @@ mod tests {
 
     #[test]
     fn test_1() {
-        let mut contour = vec![
-            IntPoint::new(0, 0),
-            IntPoint::new(1, 0),
-            IntPoint::new(0, 0),
-        ];
+        let mut contour = int_path![[0, 0], [1, 0], [0, 0],];
 
         let modified = contour.dedup_contour();
 
@@ -56,11 +51,7 @@ mod tests {
 
     #[test]
     fn test_2() {
-        let mut contour = vec![
-            IntPoint::new(0, 0),
-            IntPoint::new(0, 0),
-            IntPoint::new(1, 0),
-        ];
+        let mut contour = int_path![[0, 0], [0, 0], [1, 0],];
 
         let modified = contour.dedup_contour();
 

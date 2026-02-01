@@ -1,7 +1,5 @@
 use crate::base::data::{Contour, Shape, Shapes};
-use crate::float::adapter::{
-    PathToFloat, PathToInt, ShapeToFloat, ShapeToInt, ShapesToFloat, ShapesToInt,
-};
+use crate::float::adapter::{PathToFloat, PathToInt, ShapeToFloat, ShapeToInt, ShapesToFloat, ShapesToInt};
 use crate::int::despike::DeSpike;
 use i_float::adapter::FloatPointAdapter;
 use i_float::float::compatible::FloatPointCompatible;

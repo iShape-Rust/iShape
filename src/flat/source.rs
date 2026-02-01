@@ -52,11 +52,8 @@ impl FlatContoursBuffer {
     }
 
     #[inline]
-    pub fn set_with_resource_and_adapter<P, T, R>(
-        &mut self,
-        resource: &R,
-        adapter: FloatPointAdapter<P, T>,
-    ) where
+    pub fn set_with_resource_and_adapter<P, T, R>(&mut self, resource: &R, adapter: FloatPointAdapter<P, T>)
+    where
         T: FloatNumber,
         P: FloatPointCompatible<T>,
         R: ShapeResource<P, T> + ?Sized,

@@ -116,45 +116,20 @@ impl ContourExtension for [IntPoint] {
 
 #[cfg(test)]
 mod tests {
+    use crate::int_path;
     use crate::int::path::ContourExtension;
-    use alloc::vec;
-    use i_float::int::point::IntPoint;
 
     #[test]
     fn test_0() {
-        let contour = vec![
-            IntPoint {
-                x: -314572800,
-                y: 209715200,
-            },
-            IntPoint {
-                x: -314572800,
-                y: -209715200,
-            },
-            IntPoint {
-                x: -209715200,
-                y: -314572800,
-            },
-            IntPoint {
-                x: 209715200,
-                y: -314572800,
-            },
-            IntPoint {
-                x: 314572800,
-                y: -209715200,
-            },
-            IntPoint {
-                x: 314572800,
-                y: 209715200,
-            },
-            IntPoint {
-                x: 209715200,
-                y: 314572800,
-            },
-            IntPoint {
-                x: -209715200,
-                y: 314572800,
-            },
+        let contour = int_path![
+            [-314572800, 209715200],
+            [-314572800, -209715200],
+            [-209715200, -314572800],
+            [209715200, -314572800],
+            [314572800, -209715200],
+            [314572800, 209715200],
+            [209715200, 314572800],
+            [-209715200, 314572800],
         ];
 
         let area = contour.unsafe_area();

@@ -89,11 +89,7 @@ mod tests {
         let path = int_path![[0, 1], [2, 3], [4, 5]];
         assert_eq!(
             path,
-            vec![
-                IntPoint::new(0, 1),
-                IntPoint::new(2, 3),
-                IntPoint::new(4, 5),
-            ]
+            vec![IntPoint::new(0, 1), IntPoint::new(2, 3), IntPoint::new(4, 5),]
         );
     }
 
@@ -104,11 +100,7 @@ mod tests {
         assert_eq!(
             shape,
             vec![
-                vec![
-                    IntPoint::new(0, 0),
-                    IntPoint::new(1, 0),
-                    IntPoint::new(1, 1),
-                ],
+                vec![IntPoint::new(0, 0), IntPoint::new(1, 0), IntPoint::new(1, 1),],
                 vec![
                     IntPoint::new(2, 2),
                     IntPoint::new(3, 2),
@@ -130,16 +122,8 @@ mod tests {
             shapes,
             vec![
                 vec![
-                    vec![
-                        IntPoint::new(0, 0),
-                        IntPoint::new(1, 0),
-                        IntPoint::new(1, 1),
-                    ],
-                    vec![
-                        IntPoint::new(2, 0),
-                        IntPoint::new(3, 0),
-                        IntPoint::new(3, 1),
-                    ],
+                    vec![IntPoint::new(0, 0), IntPoint::new(1, 0), IntPoint::new(1, 1),],
+                    vec![IntPoint::new(2, 0), IntPoint::new(3, 0), IntPoint::new(3, 1),],
                 ],
                 vec![vec![
                     IntPoint::new(10, 10),

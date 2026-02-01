@@ -200,9 +200,6 @@ mod tests {
         let mut flat = FlatContoursBuffer::with_capacity(0);
         flat.set_with_shapes(&shapes);
         let contours = flat.to_contours();
-        assert_eq!(
-            contours.len(),
-            shapes.iter().fold(0, |s, shape| s + shape.len())
-        );
+        assert_eq!(contours.len(), shapes.iter().fold(0, |s, shape| s + shape.len()));
     }
 }
