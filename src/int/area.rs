@@ -50,3 +50,22 @@ impl Area for [IntShape] {
         self.area_two() / 2
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::int::area::Area;
+    use crate::int_path;
+
+    #[test]
+    fn test_0() {
+        let square = int_path![
+            [-1, -1],
+            [1, -1],
+            [1, 1],
+            [-1, 1],
+        ];
+
+        let area = square.area_two();
+        assert_eq!(area, -8);
+    }
+}

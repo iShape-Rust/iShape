@@ -25,3 +25,24 @@ impl<P: FloatPointCompatible<T>, T: FloatNumber> IntArea<P, T> for [P] {
         area
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use i_float::adapter::FloatPointAdapter;
+    use crate::float::int_area::IntArea;
+    use crate::path;
+
+    #[test]
+    fn test_0() {
+        let square = path![
+            [-1f32, -1f32],
+            [1f32, -1f32],
+            [1f32, 1f32],
+            [-1f32, 1f32],
+        ];
+        let adapter = FloatPointAdapter::with_iter(square.iter());
+
+        let area = square.unsafe_int_area(&adapter);
+        assert!(area < 0);
+    }
+}
