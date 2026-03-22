@@ -125,7 +125,7 @@ mod tests {
     use crate::int::shape::{IntContour, IntShape, IntShapes};
     use alloc::vec;
     use i_float::int_pnt;
-    use rand::Rng;
+    use rand::RngExt;
 
     fn make_contour(p: &[(i32, i32)]) -> IntContour {
         p.iter().map(|&(x, y)| int_pnt!(x, y)).collect()
