@@ -1,5 +1,8 @@
 use crate::base::data::{Contour, Shape, Shapes};
-use crate::float::adapter::{PathToFloat, PathToInt, ShapeToFloat, ShapeToInt, ShapesToFloat, ShapesToInt};
+use crate::flat::float::FloatFlatContoursBuffer;
+use crate::float::adapter::{
+    BufferToInt, PathToFloat, PathToInt, ShapeToFloat, ShapeToInt, ShapesToFloat, ShapesToInt,
+};
 use crate::int::simple::Simplify as IntSimplify;
 use i_float::adapter::FloatPointAdapter;
 use i_float::float::compatible::FloatPointCompatible;
@@ -59,6 +62,26 @@ impl<P: FloatPointCompatible<T>, T: FloatNumber> SimplifyContour<P, T> for Shape
             self.clear();
         } else {
             *self = int_shapes.to_float(adapter);
+        }
+        true
+    }
+}
+
+impl<P: FloatPointCompatible<T>, T: FloatNumber> SimplifyContour<P, T> for FloatFlatContoursBuffer<P> {
+    fn simplify_contour(&mut self, adapter: &FloatPointAdapter<P, T>) -> bool {
+        let int_buffer = self.to_int(adapter);
+        self.clear_and_reserve(int_buffer.ranges.len(), int_buffer.ranges.len());
+        let mut changed = false;
+
+        for mut contour in int_buffer.to_contours().into_iter() {
+            changed |= contour.simplify_contour();
+            if !contour.is_empty() {
+                self.add_contour_iter(contour.iter().map(|p| adapter.int_to_float(p)));
+            }
+        }
+
+        if !changed {
+            return false;
         }
         true
     }

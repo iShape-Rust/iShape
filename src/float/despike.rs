@@ -1,5 +1,9 @@
 use crate::base::data::{Contour, Shape, Shapes};
-use crate::float::adapter::{PathToFloat, PathToInt, ShapeToFloat, ShapeToInt, ShapesToFloat, ShapesToInt};
+use crate::flat::buffer::FlatContoursBuffer;
+use crate::flat::float::FloatFlatContoursBuffer;
+use crate::float::adapter::{
+    BufferToFloat, BufferToInt, PathToFloat, PathToInt, ShapeToFloat, ShapeToInt, ShapesToFloat, ShapesToInt,
+};
 use crate::int::despike::DeSpike;
 use i_float::adapter::FloatPointAdapter;
 use i_float::float::compatible::FloatPointCompatible;
@@ -60,6 +64,28 @@ impl<P: FloatPointCompatible<T>, T: FloatNumber> DeSpikeContour<P, T> for Shapes
         } else {
             *self = int_shapes.to_float(adapter);
         }
+        true
+    }
+}
+
+impl<P: FloatPointCompatible<T>, T: FloatNumber> DeSpikeContour<P, T> for FloatFlatContoursBuffer<P> {
+    fn despike_contour(&mut self, adapter: &FloatPointAdapter<P, T>) -> bool {
+        let int_buffer = self.to_int(adapter);
+        let mut out = FlatContoursBuffer::with_capacity(int_buffer.points.len());
+        let mut changed = false;
+
+        for mut contour in int_buffer.to_contours().into_iter() {
+            changed |= contour.remove_spikes();
+            if !contour.is_empty() {
+                out.add_contour(&contour);
+            }
+        }
+
+        if !changed {
+            return false;
+        }
+
+        *self = out.to_float(adapter);
         true
     }
 }

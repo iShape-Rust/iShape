@@ -58,12 +58,7 @@ mod tests {
 
     #[test]
     fn test_0() {
-        let square = int_path![
-            [-1, -1],
-            [1, -1],
-            [1, 1],
-            [-1, 1],
-        ];
+        let square = int_path![[-1, -1], [1, -1], [1, 1], [-1, 1],];
 
         let area = square.area_two();
         assert_eq!(area, -8);

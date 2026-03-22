@@ -1,21 +1,21 @@
-use i_float::float::compatible::FloatPointCompatible;
 use crate::flat::float::FloatFlatContoursBuffer;
 use crate::source::resource::ShapeResource;
+use i_float::float::compatible::FloatPointCompatible;
 use i_float::float::number::FloatNumber;
 
-pub struct FloatContoursBufferResourceIterator<'a, P: FloatPointCompatible<T>, T: FloatNumber> {
-    buffer: &'a FloatFlatContoursBuffer<P, T>,
+pub struct FloatContoursBufferResourceIterator<'a, P> {
+    buffer: &'a FloatFlatContoursBuffer<P>,
     index: usize,
 }
 
-impl<'a, P: FloatPointCompatible<T>, T: FloatNumber> FloatContoursBufferResourceIterator<'a, P, T> {
+impl<'a, P> FloatContoursBufferResourceIterator<'a, P> {
     #[inline]
-    fn with_buffer(buffer: &'a FloatFlatContoursBuffer<P, T>) -> Self {
+    fn with_buffer(buffer: &'a FloatFlatContoursBuffer<P>) -> Self {
         Self { buffer, index: 0 }
     }
 }
 
-impl<'a, P: FloatPointCompatible<T>, T: FloatNumber> Iterator for FloatContoursBufferResourceIterator<'a, P, T> {
+impl<'a, P> Iterator for FloatContoursBufferResourceIterator<'a, P> {
     type Item = &'a [P];
 
     #[inline]
@@ -32,11 +32,10 @@ impl<'a, P: FloatPointCompatible<T>, T: FloatNumber> Iterator for FloatContoursB
     }
 }
 
-impl<P: FloatPointCompatible<T>, T: FloatNumber> ShapeResource<P, T> for FloatFlatContoursBuffer<P, T> {
+impl<P: FloatPointCompatible<T>, T: FloatNumber> ShapeResource<P, T> for FloatFlatContoursBuffer<P> {
     type ResourceIter<'a>
-        = FloatContoursBufferResourceIterator<'a, P, T>
+        = FloatContoursBufferResourceIterator<'a, P>
     where
-        T: 'a,
         Self: 'a;
 
     #[inline]
@@ -54,10 +53,14 @@ mod tests {
 
     #[test]
     fn test_iter_paths() {
-        let mut buffer = FloatFlatContoursBuffer::<[f64; 2], f64>::default();
+        let mut buffer = FloatFlatContoursBuffer::<[f64; 2]>::default();
         let points = [
-            [0.0, 0.0], [2.0, 0.0], [2.0, 2.0],
-            [10.0, 10.0], [11.0, 10.0], [11.0, 11.0],
+            [0.0, 0.0],
+            [2.0, 0.0],
+            [2.0, 2.0],
+            [10.0, 10.0],
+            [11.0, 10.0],
+            [11.0, 11.0],
         ];
         let ranges: [Range<usize>; 2] = [0..3, 3..6];
         buffer.set_flat(&points, &ranges);
@@ -84,7 +87,7 @@ mod tests {
             vec![[1.0, 1.0], [1.5, 1.0], [1.5, 1.5]],
         ];
 
-        let mut buffer = FloatFlatContoursBuffer::<[f64; 2], f64>::default();
+        let mut buffer = FloatFlatContoursBuffer::<[f64; 2]>::default();
         buffer.set_with_resource(&shape);
 
         assert_eq!(buffer.ranges.len(), 2);
