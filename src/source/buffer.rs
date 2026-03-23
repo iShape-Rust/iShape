@@ -1,4 +1,4 @@
-use crate::flat::float::FloatFlatContoursBuffer;
+use crate::flat::float::{FloatFlatContoursBuffer, FloatFlatShapesBuffer};
 use crate::source::resource::ShapeResource;
 use i_float::float::compatible::FloatPointCompatible;
 use i_float::float::number::FloatNumber;
@@ -8,9 +8,21 @@ pub struct FloatContoursBufferResourceIterator<'a, P> {
     index: usize,
 }
 
+pub struct FloatShapesBufferResourceIterator<'a, P> {
+    buffer: &'a FloatFlatShapesBuffer<P>,
+    index: usize,
+}
+
 impl<'a, P> FloatContoursBufferResourceIterator<'a, P> {
     #[inline]
     fn with_buffer(buffer: &'a FloatFlatContoursBuffer<P>) -> Self {
+        Self { buffer, index: 0 }
+    }
+}
+
+impl<'a, P> FloatShapesBufferResourceIterator<'a, P> {
+    #[inline]
+    fn with_buffer(buffer: &'a FloatFlatShapesBuffer<P>) -> Self {
         Self { buffer, index: 0 }
     }
 }
@@ -41,6 +53,35 @@ impl<P: FloatPointCompatible<T>, T: FloatNumber> ShapeResource<P, T> for FloatFl
     #[inline]
     fn iter_paths(&self) -> Self::ResourceIter<'_> {
         FloatContoursBufferResourceIterator::with_buffer(self)
+    }
+}
+
+impl<P: FloatPointCompatible<T>, T: FloatNumber> ShapeResource<P, T> for FloatFlatShapesBuffer<P> {
+    type ResourceIter<'a>
+        = FloatShapesBufferResourceIterator<'a, P>
+    where
+        Self: 'a;
+
+    #[inline]
+    fn iter_paths(&self) -> Self::ResourceIter<'_> {
+        FloatShapesBufferResourceIterator::with_buffer(self)
+    }
+}
+
+impl<'a, P> Iterator for FloatShapesBufferResourceIterator<'a, P> {
+    type Item = &'a [P];
+
+    #[inline]
+    fn next(&mut self) -> Option<Self::Item> {
+        while self.index < self.buffer.contour_ranges.len() {
+            let i = self.index;
+            self.index += 1;
+            if let Some(contour) = self.buffer.contour_pairs_at(i) {
+                return Some(contour);
+            }
+        }
+
+        None
     }
 }
 
@@ -93,5 +134,26 @@ mod tests {
         assert_eq!(buffer.ranges.len(), 2);
         let contours = buffer.to_contours();
         assert_eq!(contours, shape);
+    }
+
+    #[test]
+    fn test_shapes_iter_paths() {
+        let mut buffer = FloatFlatShapesBuffer::<[f64; 2]>::default();
+        let points = [
+            [0.0, 0.0],
+            [2.0, 0.0],
+            [2.0, 2.0],
+            [10.0, 10.0],
+            [11.0, 10.0],
+            [11.0, 11.0],
+        ];
+        let contour_ranges: [Range<usize>; 2] = [0..3, 3..6];
+        let shape_ranges: [Range<usize>; 1] = [0..2];
+        buffer.set_flat(&points, &contour_ranges, &shape_ranges);
+
+        let mut iter = buffer.iter_paths();
+        assert_eq!(iter.next().unwrap(), &points[0..3]);
+        assert_eq!(iter.next().unwrap(), &points[3..6]);
+        assert!(iter.next().is_none());
     }
 }

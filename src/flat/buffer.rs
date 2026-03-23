@@ -12,6 +12,14 @@ pub struct FlatContoursBuffer {
     pub ranges: Vec<Range<usize>>,
 }
 
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[derive(Debug, Clone, Default)]
+pub struct FlatShapesBuffer {
+    pub points: Vec<IntPoint>,
+    pub contour_ranges: Vec<Range<usize>>,
+    pub shape_ranges: Vec<Range<usize>>,
+}
+
 impl FlatContoursBuffer {
     #[inline]
     pub fn with_capacity(capacity: usize) -> Self {
@@ -119,6 +127,112 @@ impl FlatContoursBuffer {
     }
 }
 
+impl FlatShapesBuffer {
+    #[inline]
+    pub fn with_capacity(points: usize, contours: usize, shapes: usize) -> Self {
+        Self {
+            points: Vec::with_capacity(points),
+            contour_ranges: Vec::with_capacity(contours),
+            shape_ranges: Vec::with_capacity(shapes),
+        }
+    }
+
+    #[inline]
+    pub fn is_empty(&self) -> bool {
+        self.points.is_empty()
+    }
+
+    #[inline]
+    pub fn set_with_contour(&mut self, contour: &[IntPoint]) {
+        let points_len = contour.len();
+        self.clear_and_reserve(points_len, 1, 1);
+
+        self.points.extend_from_slice(contour);
+        self.contour_ranges.push(0..points_len);
+        self.shape_ranges.push(0..1);
+    }
+
+    #[inline]
+    pub fn set_with_shape(&mut self, shape: &[IntContour]) {
+        let points_len = shape.points_count();
+        let contours_len = shape.len();
+        self.clear_and_reserve(points_len, contours_len, 1);
+
+        let mut points_offset = 0;
+        for contour in shape.iter() {
+            let len = contour.len();
+            self.points.extend_from_slice(contour);
+            self.contour_ranges.push(points_offset..points_offset + len);
+            points_offset += len;
+        }
+
+        self.shape_ranges.push(0..contours_len);
+    }
+
+    #[inline]
+    pub fn set_with_shapes(&mut self, shapes: &[IntShape]) {
+        let points_len = shapes.points_count();
+        let contours_len = shapes.iter().map(Vec::len).sum();
+        let shapes_len = shapes.len();
+        self.clear_and_reserve(points_len, contours_len, shapes_len);
+
+        let mut points_offset = 0;
+        let mut contours_offset = 0;
+        for shape in shapes.iter() {
+            let shape_start = contours_offset;
+            for contour in shape.iter() {
+                let len = contour.len();
+                self.points.extend_from_slice(contour);
+                self.contour_ranges.push(points_offset..points_offset + len);
+                points_offset += len;
+                contours_offset += 1;
+            }
+            self.shape_ranges.push(shape_start..contours_offset);
+        }
+    }
+
+    #[inline]
+    pub fn clear_and_reserve(&mut self, points: usize, contours: usize, shapes: usize) {
+        self.points.reserve_capacity(points);
+        self.points.clear();
+
+        self.contour_ranges.reserve_capacity(contours);
+        self.contour_ranges.clear();
+
+        self.shape_ranges.reserve_capacity(shapes);
+        self.shape_ranges.clear();
+    }
+
+    #[inline]
+    pub fn add_shape(&mut self, shape: &[IntContour]) {
+        let shape_start = self.contour_ranges.len();
+        let mut points_offset = self.points.len();
+        for contour in shape.iter() {
+            let len = contour.len();
+            self.points.extend_from_slice(contour);
+            self.contour_ranges.push(points_offset..points_offset + len);
+            points_offset += len;
+        }
+        self.shape_ranges.push(shape_start..self.contour_ranges.len());
+    }
+
+    #[inline]
+    pub fn to_shapes(&self) -> Vec<IntShape> {
+        let mut shapes = Vec::with_capacity(self.shape_ranges.len());
+
+        for shape_range in self.shape_ranges.iter() {
+            let mut shape = Vec::with_capacity(shape_range.len());
+            for contour_index in shape_range.clone() {
+                let contour_range = self.contour_ranges[contour_index].clone();
+                shape.push(self.points[contour_range].to_vec());
+            }
+            shapes.push(shape);
+        }
+
+        shapes
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -201,5 +315,71 @@ mod tests {
         flat.set_with_shapes(&shapes);
         let contours = flat.to_contours();
         assert_eq!(contours.len(), shapes.iter().fold(0, |s, shape| s + shape.len()));
+    }
+
+    #[test]
+    fn test_shapes_buffer_with_contour_round_trip() {
+        let contour = make_contour(&[(1, 2), (3, 4), (5, 6)]);
+        let mut flat = FlatShapesBuffer::with_capacity(0, 0, 0);
+        flat.set_with_contour(&contour);
+
+        assert_eq!(flat.contour_ranges, vec![0..3]);
+        assert_eq!(flat.shape_ranges, vec![0..1]);
+
+        let shapes = flat.to_shapes();
+        assert_eq!(shapes.len(), 1);
+        assert_eq!(shapes[0].len(), 1);
+        assert_eq!(shapes[0][0], contour);
+    }
+
+    #[test]
+    fn test_shapes_buffer_with_shape_round_trip() {
+        let shape = vec![
+            make_contour(&[(0, 0), (1, 0), (1, 1), (0, 1)]),
+            make_contour(&[(2, 2), (3, 2), (3, 3), (2, 3)]),
+        ];
+        let mut flat = FlatShapesBuffer::with_capacity(0, 0, 0);
+        flat.set_with_shape(&shape);
+
+        assert_eq!(flat.shape_ranges, vec![0..2]);
+        assert_eq!(flat.contour_ranges, vec![0..4, 4..8]);
+
+        let shapes = flat.to_shapes();
+        assert_eq!(shapes, vec![shape]);
+    }
+
+    #[test]
+    fn test_shapes_buffer_with_shapes_round_trip() {
+        let shapes = vec![
+            vec![make_contour(&[(0, 0), (1, 0), (1, 1)])],
+            vec![
+                make_contour(&[(5, 5), (6, 5), (6, 6)]),
+                make_contour(&[(7, 7), (8, 7), (8, 8)]),
+            ],
+        ];
+
+        let mut flat = FlatShapesBuffer::with_capacity(0, 0, 0);
+        flat.set_with_shapes(&shapes);
+
+        assert_eq!(flat.shape_ranges, vec![0..1, 1..3]);
+        assert_eq!(flat.contour_ranges, vec![0..3, 3..6, 6..9]);
+        assert_eq!(flat.to_shapes(), shapes);
+    }
+
+    #[test]
+    fn test_shapes_buffer_add_shape() {
+        let mut flat = FlatShapesBuffer::with_capacity(0, 0, 0);
+        let shape0 = vec![make_contour(&[(0, 0), (1, 0), (1, 1)])];
+        let shape1 = vec![
+            make_contour(&[(2, 2), (3, 2), (3, 3)]),
+            make_contour(&[(4, 4), (5, 4), (5, 5)]),
+        ];
+
+        flat.add_shape(&shape0);
+        flat.add_shape(&shape1);
+
+        assert_eq!(flat.shape_ranges, vec![0..1, 1..3]);
+        assert_eq!(flat.contour_ranges, vec![0..3, 3..6, 6..9]);
+        assert_eq!(flat.to_shapes(), vec![shape0, shape1]);
     }
 }
