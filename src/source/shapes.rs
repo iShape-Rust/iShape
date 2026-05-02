@@ -1,7 +1,6 @@
 use crate::source::resource::ShapeResource;
 use alloc::vec::Vec;
 use i_float::float::compatible::FloatPointCompatible;
-use i_float::float::number::FloatNumber;
 
 pub struct ShapesResourceIterator<'a, P> {
     slice: &'a [Vec<Vec<P>>],
@@ -45,10 +44,9 @@ impl<'a, P> Iterator for ShapesResourceIterator<'a, P> {
     }
 }
 
-impl<P, T> ShapeResource<P, T> for [Vec<Vec<P>>]
+impl<P> ShapeResource<P> for [Vec<Vec<P>>]
 where
-    P: FloatPointCompatible<T>,
-    T: FloatNumber,
+    P: FloatPointCompatible,
 {
     type ResourceIter<'a>
         = ShapesResourceIterator<'a, P>
@@ -62,10 +60,9 @@ where
     }
 }
 
-impl<P, T, const N: usize> ShapeResource<P, T> for [Vec<Vec<P>>; N]
+impl<P, const N: usize> ShapeResource<P> for [Vec<Vec<P>>; N]
 where
-    P: FloatPointCompatible<T>,
-    T: FloatNumber,
+    P: FloatPointCompatible,
 {
     type ResourceIter<'a>
         = ShapesResourceIterator<'a, P>
@@ -79,10 +76,9 @@ where
     }
 }
 
-impl<P, T> ShapeResource<P, T> for Vec<Vec<Vec<P>>>
+impl<P> ShapeResource<P> for Vec<Vec<Vec<P>>>
 where
-    P: FloatPointCompatible<T>,
-    T: FloatNumber,
+    P: FloatPointCompatible,
 {
     type ResourceIter<'a>
         = ShapesResourceIterator<'a, P>

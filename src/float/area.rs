@@ -2,14 +2,14 @@ use crate::base::data::{Contour, Shape};
 use i_float::float::compatible::FloatPointCompatible;
 use i_float::float::number::FloatNumber;
 
-pub trait Area<P: FloatPointCompatible<T>, T: FloatNumber> {
-    fn area(&self) -> T;
+pub trait Area<P: FloatPointCompatible> {
+    fn area(&self) -> P::Scalar;
 }
 
-impl<P: FloatPointCompatible<T>, T: FloatNumber> Area<P, T> for [P] {
+impl<P: FloatPointCompatible> Area<P> for [P] {
     #[inline]
-    fn area(&self) -> T {
-        let mut area = T::from_float(0.0);
+    fn area(&self) -> P::Scalar {
+        let mut area = P::Scalar::from_float(0.0);
 
         let mut a = if let Some(p) = self.last() {
             *p
@@ -23,14 +23,14 @@ impl<P: FloatPointCompatible<T>, T: FloatNumber> Area<P, T> for [P] {
             a = b;
         }
 
-        T::from_float(0.5) * area
+        P::Scalar::from_float(0.5) * area
     }
 }
 
-impl<P: FloatPointCompatible<T>, T: FloatNumber> Area<P, T> for [Contour<P>] {
+impl<P: FloatPointCompatible> Area<P> for [Contour<P>] {
     #[inline]
-    fn area(&self) -> T {
-        let mut area = T::from_float(0.0);
+    fn area(&self) -> P::Scalar {
+        let mut area = P::Scalar::from_float(0.0);
         for contour in self.iter() {
             area = area + contour.area();
         }
@@ -38,10 +38,10 @@ impl<P: FloatPointCompatible<T>, T: FloatNumber> Area<P, T> for [Contour<P>] {
     }
 }
 
-impl<P: FloatPointCompatible<T>, T: FloatNumber> Area<P, T> for [Shape<P>] {
+impl<P: FloatPointCompatible> Area<P> for [Shape<P>] {
     #[inline]
-    fn area(&self) -> T {
-        let mut area = T::from_float(0.0);
+    fn area(&self) -> P::Scalar {
+        let mut area = P::Scalar::from_float(0.0);
         for shape in self.iter() {
             area = area + shape.area();
         }

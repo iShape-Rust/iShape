@@ -1,25 +1,22 @@
 use crate::base::data::{Contour, Shape};
 use i_float::float::compatible::FloatPointCompatible;
-use i_float::float::number::FloatNumber;
 
-pub trait PointsCount<P, T> {
+pub trait PointsCount<P> {
     fn points_count(&self) -> usize;
 }
 
-impl<P, T> PointsCount<P, T> for [Contour<P>]
+impl<P> PointsCount<P> for [Contour<P>]
 where
-    P: FloatPointCompatible<T>,
-    T: FloatNumber,
+    P: FloatPointCompatible,
 {
     fn points_count(&self) -> usize {
         self.iter().fold(0, |acc, list| acc + list.len())
     }
 }
 
-impl<P, T> PointsCount<P, T> for [Shape<P>]
+impl<P> PointsCount<P> for [Shape<P>]
 where
-    P: FloatPointCompatible<T>,
-    T: FloatNumber,
+    P: FloatPointCompatible,
 {
     fn points_count(&self) -> usize {
         self.iter().fold(0, |acc, lists| acc + lists.points_count())

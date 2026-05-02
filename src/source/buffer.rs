@@ -1,7 +1,6 @@
 use crate::flat::float::{FloatFlatContoursBuffer, FloatFlatShapesBuffer};
 use crate::source::resource::ShapeResource;
 use i_float::float::compatible::FloatPointCompatible;
-use i_float::float::number::FloatNumber;
 
 pub struct FloatContoursBufferResourceIterator<'a, P> {
     buffer: &'a FloatFlatContoursBuffer<P>,
@@ -44,7 +43,7 @@ impl<'a, P> Iterator for FloatContoursBufferResourceIterator<'a, P> {
     }
 }
 
-impl<P: FloatPointCompatible<T>, T: FloatNumber> ShapeResource<P, T> for FloatFlatContoursBuffer<P> {
+impl<P: FloatPointCompatible> ShapeResource<P> for FloatFlatContoursBuffer<P> {
     type ResourceIter<'a>
         = FloatContoursBufferResourceIterator<'a, P>
     where
@@ -56,7 +55,7 @@ impl<P: FloatPointCompatible<T>, T: FloatNumber> ShapeResource<P, T> for FloatFl
     }
 }
 
-impl<P: FloatPointCompatible<T>, T: FloatNumber> ShapeResource<P, T> for FloatFlatShapesBuffer<P> {
+impl<P: FloatPointCompatible> ShapeResource<P> for FloatFlatShapesBuffer<P> {
     type ResourceIter<'a>
         = FloatShapesBufferResourceIterator<'a, P>
     where

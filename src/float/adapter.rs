@@ -5,65 +5,64 @@ use crate::int::path::IntPath;
 use crate::int::shape::{IntContour, IntShape, IntShapes};
 use i_float::adapter::FloatPointAdapter;
 use i_float::float::compatible::FloatPointCompatible;
-use i_float::float::number::FloatNumber;
 use i_float::int::point::IntPoint;
 
-pub trait PathToFloat<P: FloatPointCompatible<T>, T: FloatNumber> {
-    fn to_float(&self, adapter: &FloatPointAdapter<P, T>) -> Path<P>;
+pub trait PathToFloat<P: FloatPointCompatible> {
+    fn to_float(&self, adapter: &FloatPointAdapter<P>) -> Path<P>;
 }
 
-pub trait ShapeToFloat<P: FloatPointCompatible<T>, T: FloatNumber> {
-    fn to_float(&self, adapter: &FloatPointAdapter<P, T>) -> Shape<P>;
+pub trait ShapeToFloat<P: FloatPointCompatible> {
+    fn to_float(&self, adapter: &FloatPointAdapter<P>) -> Shape<P>;
 }
 
-pub trait ShapesToFloat<P: FloatPointCompatible<T>, T: FloatNumber> {
-    fn to_float(&self, adapter: &FloatPointAdapter<P, T>) -> Shapes<P>;
+pub trait ShapesToFloat<P: FloatPointCompatible> {
+    fn to_float(&self, adapter: &FloatPointAdapter<P>) -> Shapes<P>;
 }
 
-pub trait BufferToFloat<P: FloatPointCompatible<T>, T: FloatNumber> {
-    fn to_float(&self, adapter: &FloatPointAdapter<P, T>) -> FloatFlatContoursBuffer<P>;
+pub trait BufferToFloat<P: FloatPointCompatible> {
+    fn to_float(&self, adapter: &FloatPointAdapter<P>) -> FloatFlatContoursBuffer<P>;
 }
 
-pub trait PathToInt<P: FloatPointCompatible<T>, T: FloatNumber> {
-    fn to_int(&self, adapter: &FloatPointAdapter<P, T>) -> IntPath;
+pub trait PathToInt<P: FloatPointCompatible> {
+    fn to_int(&self, adapter: &FloatPointAdapter<P>) -> IntPath;
 }
 
-pub trait ShapeToInt<P: FloatPointCompatible<T>, T: FloatNumber> {
-    fn to_int(&self, adapter: &FloatPointAdapter<P, T>) -> IntShape;
+pub trait ShapeToInt<P: FloatPointCompatible> {
+    fn to_int(&self, adapter: &FloatPointAdapter<P>) -> IntShape;
 }
 
-pub trait ShapesToInt<P: FloatPointCompatible<T>, T: FloatNumber> {
-    fn to_int(&self, adapter: &FloatPointAdapter<P, T>) -> IntShapes;
+pub trait ShapesToInt<P: FloatPointCompatible> {
+    fn to_int(&self, adapter: &FloatPointAdapter<P>) -> IntShapes;
 }
 
-pub trait BufferToInt<P: FloatPointCompatible<T>, T: FloatNumber> {
-    fn to_int(&self, adapter: &FloatPointAdapter<P, T>) -> FlatContoursBuffer;
+pub trait BufferToInt<P: FloatPointCompatible> {
+    fn to_int(&self, adapter: &FloatPointAdapter<P>) -> FlatContoursBuffer;
 }
 
-impl<P: FloatPointCompatible<T>, T: FloatNumber> PathToFloat<P, T> for [IntPoint] {
+impl<P: FloatPointCompatible> PathToFloat<P> for [IntPoint] {
     #[inline(always)]
-    fn to_float(&self, adapter: &FloatPointAdapter<P, T>) -> Path<P> {
+    fn to_float(&self, adapter: &FloatPointAdapter<P>) -> Path<P> {
         self.iter().map(|p| adapter.int_to_float(p)).collect()
     }
 }
 
-impl<P: FloatPointCompatible<T>, T: FloatNumber> ShapeToFloat<P, T> for [IntContour] {
+impl<P: FloatPointCompatible> ShapeToFloat<P> for [IntContour] {
     #[inline(always)]
-    fn to_float(&self, adapter: &FloatPointAdapter<P, T>) -> Shape<P> {
+    fn to_float(&self, adapter: &FloatPointAdapter<P>) -> Shape<P> {
         self.iter().map(|path| path.to_float(adapter)).collect()
     }
 }
 
-impl<P: FloatPointCompatible<T>, T: FloatNumber> ShapesToFloat<P, T> for [IntShape] {
+impl<P: FloatPointCompatible> ShapesToFloat<P> for [IntShape] {
     #[inline(always)]
-    fn to_float(&self, adapter: &FloatPointAdapter<P, T>) -> Shapes<P> {
+    fn to_float(&self, adapter: &FloatPointAdapter<P>) -> Shapes<P> {
         self.iter().map(|shape| shape.to_float(adapter)).collect()
     }
 }
 
-impl<P: FloatPointCompatible<T>, T: FloatNumber> BufferToFloat<P, T> for FlatContoursBuffer {
+impl<P: FloatPointCompatible> BufferToFloat<P> for FlatContoursBuffer {
     #[inline(always)]
-    fn to_float(&self, adapter: &FloatPointAdapter<P, T>) -> FloatFlatContoursBuffer<P> {
+    fn to_float(&self, adapter: &FloatPointAdapter<P>) -> FloatFlatContoursBuffer<P> {
         FloatFlatContoursBuffer {
             points: self.points.to_float(adapter),
             ranges: self.ranges.clone(),
@@ -71,30 +70,30 @@ impl<P: FloatPointCompatible<T>, T: FloatNumber> BufferToFloat<P, T> for FlatCon
     }
 }
 
-impl<P: FloatPointCompatible<T>, T: FloatNumber> PathToInt<P, T> for [P] {
+impl<P: FloatPointCompatible> PathToInt<P> for [P] {
     #[inline(always)]
-    fn to_int(&self, adapter: &FloatPointAdapter<P, T>) -> IntPath {
+    fn to_int(&self, adapter: &FloatPointAdapter<P>) -> IntPath {
         self.iter().map(|p| adapter.float_to_int(p)).collect()
     }
 }
 
-impl<P: FloatPointCompatible<T>, T: FloatNumber> ShapeToInt<P, T> for [Contour<P>] {
+impl<P: FloatPointCompatible> ShapeToInt<P> for [Contour<P>] {
     #[inline(always)]
-    fn to_int(&self, adapter: &FloatPointAdapter<P, T>) -> IntShape {
+    fn to_int(&self, adapter: &FloatPointAdapter<P>) -> IntShape {
         self.iter().map(|path| path.to_int(adapter)).collect()
     }
 }
 
-impl<P: FloatPointCompatible<T>, T: FloatNumber> ShapesToInt<P, T> for [Shape<P>] {
+impl<P: FloatPointCompatible> ShapesToInt<P> for [Shape<P>] {
     #[inline(always)]
-    fn to_int(&self, adapter: &FloatPointAdapter<P, T>) -> IntShapes {
+    fn to_int(&self, adapter: &FloatPointAdapter<P>) -> IntShapes {
         self.iter().map(|shape| shape.to_int(adapter)).collect()
     }
 }
 
-impl<P: FloatPointCompatible<T>, T: FloatNumber> BufferToInt<P, T> for FloatFlatContoursBuffer<P> {
+impl<P: FloatPointCompatible> BufferToInt<P> for FloatFlatContoursBuffer<P> {
     #[inline(always)]
-    fn to_int(&self, adapter: &FloatPointAdapter<P, T>) -> FlatContoursBuffer {
+    fn to_int(&self, adapter: &FloatPointAdapter<P>) -> FlatContoursBuffer {
         FlatContoursBuffer {
             points: self.points.to_int(adapter),
             ranges: self.ranges.clone(),

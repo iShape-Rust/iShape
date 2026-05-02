@@ -1,33 +1,29 @@
 use crate::base::data::{Path, Shape};
 use alloc::vec::Vec;
 use i_float::float::compatible::FloatPointCompatible;
-use i_float::float::number::FloatNumber;
 use i_float::float::rect::FloatRect;
 
-pub trait RectInit<P, T>
+pub trait RectInit<P>
 where
-    P: FloatPointCompatible<T>,
-    T: FloatNumber,
+    P: FloatPointCompatible,
 {
-    fn with_path(path: &[P]) -> Option<FloatRect<T>>;
-    fn with_paths(paths: &[Vec<P>]) -> Option<FloatRect<T>>;
-    fn with_list_of_paths(list: &[Vec<Vec<P>>]) -> Option<FloatRect<T>>;
+    fn with_path(path: &[P]) -> Option<FloatRect<P::Scalar>>;
+    fn with_paths(paths: &[Vec<P>]) -> Option<FloatRect<P::Scalar>>;
+    fn with_list_of_paths(list: &[Vec<Vec<P>>]) -> Option<FloatRect<P::Scalar>>;
 }
 
-trait FirstPoint<P, T>
+trait FirstPoint<P>
 where
-    P: FloatPointCompatible<T>,
-    T: FloatNumber,
+    P: FloatPointCompatible,
 {
     fn first_point(&self) -> Option<P>;
 }
 
-impl<P, T> RectInit<P, T> for FloatRect<T>
+impl<P> RectInit<P> for FloatRect<P::Scalar>
 where
-    P: FloatPointCompatible<T>,
-    T: FloatNumber,
+    P: FloatPointCompatible,
 {
-    fn with_path(path: &[P]) -> Option<FloatRect<T>> {
+    fn with_path(path: &[P]) -> Option<FloatRect<P::Scalar>> {
         let &first_point = path.first()?;
 
         let mut rect = Self::with_point(first_point);
@@ -39,7 +35,7 @@ where
         Some(rect)
     }
 
-    fn with_paths(paths: &[Path<P>]) -> Option<FloatRect<T>> {
+    fn with_paths(paths: &[Path<P>]) -> Option<FloatRect<P::Scalar>> {
         let first_point = paths.first_point()?;
 
         let mut rect = Self::with_point(first_point);
@@ -53,7 +49,7 @@ where
         Some(rect)
     }
 
-    fn with_list_of_paths(list: &[Vec<Path<P>>]) -> Option<FloatRect<T>> {
+    fn with_list_of_paths(list: &[Vec<Path<P>>]) -> Option<FloatRect<P::Scalar>> {
         let first_point = list.first_point()?;
 
         let mut rect = Self::with_point(first_point);
@@ -70,10 +66,9 @@ where
     }
 }
 
-impl<P, T> FirstPoint<P, T> for [Path<P>]
+impl<P> FirstPoint<P> for [Path<P>]
 where
-    P: FloatPointCompatible<T>,
-    T: FloatNumber,
+    P: FloatPointCompatible,
 {
     fn first_point(&self) -> Option<P> {
         for path in self.iter() {
@@ -85,10 +80,9 @@ where
     }
 }
 
-impl<P, T> FirstPoint<P, T> for [Shape<P>]
+impl<P> FirstPoint<P> for [Shape<P>]
 where
-    P: FloatPointCompatible<T>,
-    T: FloatNumber,
+    P: FloatPointCompatible,
 {
     fn first_point(&self) -> Option<P> {
         for paths in self.iter() {

@@ -3,7 +3,6 @@ use crate::source::resource::ShapeResource;
 use alloc::vec::Vec;
 use core::ops::Range;
 use i_float::float::compatible::FloatPointCompatible;
-use i_float::float::number::FloatNumber;
 
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Debug, Clone, Default)]
@@ -67,11 +66,10 @@ impl<P> FloatFlatContoursBuffer<P> {
     }
 
     #[inline]
-    pub fn set_with_resource<R, T>(&mut self, resource: &R)
+    pub fn set_with_resource<R>(&mut self, resource: &R)
     where
-        R: ShapeResource<P, T> + ?Sized,
-        P: FloatPointCompatible<T>,
-        T: FloatNumber,
+        R: ShapeResource<P> + ?Sized,
+        P: FloatPointCompatible,
     {
         let mut contours_count = 0;
         let mut points_count = 0;
@@ -191,11 +189,10 @@ impl<P> FloatFlatShapesBuffer<P> {
     }
 
     #[inline]
-    pub fn set_with_resource<R, T>(&mut self, resource: &R)
+    pub fn set_with_resource<R>(&mut self, resource: &R)
     where
-        R: ShapeResource<P, T> + ?Sized,
-        P: FloatPointCompatible<T>,
-        T: FloatNumber,
+        R: ShapeResource<P> + ?Sized,
+        P: FloatPointCompatible,
     {
         let mut contours_count = 0;
         let mut points_count = 0;

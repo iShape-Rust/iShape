@@ -1,10 +1,8 @@
 use i_float::float::compatible::FloatPointCompatible;
-use i_float::float::number::FloatNumber;
 
-pub trait ShapeResource<P, T>
+pub trait ShapeResource<P>
 where
-    P: FloatPointCompatible<T>,
-    T: FloatNumber,
+    P: FloatPointCompatible,
 {
     type ResourceIter<'a>: Iterator<Item = &'a [P]>
     where

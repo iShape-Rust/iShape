@@ -6,21 +6,20 @@ use crate::float::adapter::{
 use crate::int::simple::Simplify as IntSimplify;
 use i_float::adapter::FloatPointAdapter;
 use i_float::float::compatible::FloatPointCompatible;
-use i_float::float::number::FloatNumber;
 
 /// A trait that provides methods for simplifying complex geometrical structures.
-pub trait SimplifyContour<P: FloatPointCompatible<T>, T: FloatNumber> {
+pub trait SimplifyContour<P: FloatPointCompatible> {
     /// Simplifies the structure in-place if it is not already simple.
     ///
     /// # Returns
     ///
     /// - `true` if the structure was simplified successfully.
     /// - `false` if the structure was already simple and no modification was made.
-    fn simplify_contour(&mut self, adapter: &FloatPointAdapter<P, T>) -> bool;
+    fn simplify_contour(&mut self, adapter: &FloatPointAdapter<P>) -> bool;
 }
 
-impl<P: FloatPointCompatible<T>, T: FloatNumber> SimplifyContour<P, T> for Contour<P> {
-    fn simplify_contour(&mut self, adapter: &FloatPointAdapter<P, T>) -> bool {
+impl<P: FloatPointCompatible> SimplifyContour<P> for Contour<P> {
+    fn simplify_contour(&mut self, adapter: &FloatPointAdapter<P>) -> bool {
         let mut int_contour = self.to_int(adapter);
         if !int_contour.simplify_contour() {
             return false;
@@ -35,8 +34,8 @@ impl<P: FloatPointCompatible<T>, T: FloatNumber> SimplifyContour<P, T> for Conto
     }
 }
 
-impl<P: FloatPointCompatible<T>, T: FloatNumber> SimplifyContour<P, T> for Shape<P> {
-    fn simplify_contour(&mut self, adapter: &FloatPointAdapter<P, T>) -> bool {
+impl<P: FloatPointCompatible> SimplifyContour<P> for Shape<P> {
+    fn simplify_contour(&mut self, adapter: &FloatPointAdapter<P>) -> bool {
         let mut int_shape = self.to_int(adapter);
         if !int_shape.simplify_contour() {
             return false;
@@ -51,8 +50,8 @@ impl<P: FloatPointCompatible<T>, T: FloatNumber> SimplifyContour<P, T> for Shape
     }
 }
 
-impl<P: FloatPointCompatible<T>, T: FloatNumber> SimplifyContour<P, T> for Shapes<P> {
-    fn simplify_contour(&mut self, adapter: &FloatPointAdapter<P, T>) -> bool {
+impl<P: FloatPointCompatible> SimplifyContour<P> for Shapes<P> {
+    fn simplify_contour(&mut self, adapter: &FloatPointAdapter<P>) -> bool {
         let mut int_shapes = self.to_int(adapter);
         if !int_shapes.simplify_contour() {
             return false;
@@ -67,8 +66,8 @@ impl<P: FloatPointCompatible<T>, T: FloatNumber> SimplifyContour<P, T> for Shape
     }
 }
 
-impl<P: FloatPointCompatible<T>, T: FloatNumber> SimplifyContour<P, T> for FloatFlatContoursBuffer<P> {
-    fn simplify_contour(&mut self, adapter: &FloatPointAdapter<P, T>) -> bool {
+impl<P: FloatPointCompatible> SimplifyContour<P> for FloatFlatContoursBuffer<P> {
+    fn simplify_contour(&mut self, adapter: &FloatPointAdapter<P>) -> bool {
         let int_buffer = self.to_int(adapter);
         self.clear_and_reserve(int_buffer.ranges.len(), int_buffer.ranges.len());
         let mut changed = false;

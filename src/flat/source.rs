@@ -7,18 +7,17 @@ use i_float::float::rect::FloatRect;
 
 impl FlatContoursBuffer {
     #[inline]
-    pub fn set_with_resource<P, T, R>(&mut self, resource: &R) -> FloatPointAdapter<P, T>
+    pub fn set_with_resource<P, R>(&mut self, resource: &R) -> FloatPointAdapter<P>
     where
-        T: FloatNumber,
-        P: FloatPointCompatible<T>,
-        R: ShapeResource<P, T> + ?Sized,
+        P: FloatPointCompatible,
+        R: ShapeResource<P> + ?Sized,
     {
         let mut contours_count = 0;
         let mut points_count = 0;
-        let mut min_x = T::MAX;
-        let mut max_x = T::MIN;
-        let mut min_y = T::MAX;
-        let mut max_y = T::MIN;
+        let mut min_x = P::Scalar::MAX;
+        let mut max_x = P::Scalar::MIN;
+        let mut min_y = P::Scalar::MAX;
+        let mut max_y = P::Scalar::MIN;
         for contour in resource.iter_paths() {
             contours_count += 1;
             points_count += contour.len();
@@ -52,11 +51,10 @@ impl FlatContoursBuffer {
     }
 
     #[inline]
-    pub fn set_with_resource_and_adapter<P, T, R>(&mut self, resource: &R, adapter: FloatPointAdapter<P, T>)
+    pub fn set_with_resource_and_adapter<P, R>(&mut self, resource: &R, adapter: FloatPointAdapter<P>)
     where
-        T: FloatNumber,
-        P: FloatPointCompatible<T>,
-        R: ShapeResource<P, T> + ?Sized,
+        P: FloatPointCompatible,
+        R: ShapeResource<P> + ?Sized,
     {
         let mut contours_count = 0;
         let mut points_count = 0;
@@ -84,18 +82,17 @@ impl FlatContoursBuffer {
 
 impl FlatShapesBuffer {
     #[inline]
-    pub fn set_with_resource<P, T, R>(&mut self, resource: &R) -> FloatPointAdapter<P, T>
+    pub fn set_with_resource<P, R>(&mut self, resource: &R) -> FloatPointAdapter<P>
     where
-        T: FloatNumber,
-        P: FloatPointCompatible<T>,
-        R: ShapeResource<P, T> + ?Sized,
+        P: FloatPointCompatible,
+        R: ShapeResource<P> + ?Sized,
     {
         let mut contours_count = 0;
         let mut points_count = 0;
-        let mut min_x = T::MAX;
-        let mut max_x = T::MIN;
-        let mut min_y = T::MAX;
-        let mut max_y = T::MIN;
+        let mut min_x = P::Scalar::MAX;
+        let mut max_x = P::Scalar::MIN;
+        let mut min_y = P::Scalar::MAX;
+        let mut max_y = P::Scalar::MIN;
         for contour in resource.iter_paths() {
             contours_count += 1;
             points_count += contour.len();
@@ -131,11 +128,10 @@ impl FlatShapesBuffer {
     }
 
     #[inline]
-    pub fn set_with_resource_and_adapter<P, T, R>(&mut self, resource: &R, adapter: FloatPointAdapter<P, T>)
+    pub fn set_with_resource_and_adapter<P, R>(&mut self, resource: &R, adapter: FloatPointAdapter<P>)
     where
-        T: FloatNumber,
-        P: FloatPointCompatible<T>,
-        R: ShapeResource<P, T> + ?Sized,
+        P: FloatPointCompatible,
+        R: ShapeResource<P> + ?Sized,
     {
         let mut contours_count = 0;
         let mut points_count = 0;

@@ -1,7 +1,6 @@
 use crate::source::resource::ShapeResource;
 use alloc::vec::Vec;
 use i_float::float::compatible::FloatPointCompatible;
-use i_float::float::number::FloatNumber;
 
 pub struct ShapeResourceIterator<'a, P> {
     slice: &'a [Vec<P>],
@@ -39,10 +38,9 @@ impl<'a, P> Iterator for ShapeResourceIterator<'a, P> {
     }
 }
 
-impl<P, T> ShapeResource<P, T> for [Vec<P>]
+impl<P> ShapeResource<P> for [Vec<P>]
 where
-    P: FloatPointCompatible<T>,
-    T: FloatNumber,
+    P: FloatPointCompatible,
 {
     type ResourceIter<'a>
         = ShapeResourceIterator<'a, P>
@@ -56,10 +54,9 @@ where
     }
 }
 
-impl<P, T, const N: usize> ShapeResource<P, T> for [Vec<P>; N]
+impl<P, const N: usize> ShapeResource<P> for [Vec<P>; N]
 where
-    P: FloatPointCompatible<T>,
-    T: FloatNumber,
+    P: FloatPointCompatible,
 {
     type ResourceIter<'a>
         = ShapeResourceIterator<'a, P>
@@ -73,10 +70,9 @@ where
     }
 }
 
-impl<P, T> ShapeResource<P, T> for Vec<Vec<P>>
+impl<P> ShapeResource<P> for Vec<Vec<P>>
 where
-    P: FloatPointCompatible<T>,
-    T: FloatNumber,
+    P: FloatPointCompatible,
 {
     type ResourceIter<'a>
         = ShapeResourceIterator<'a, P>
@@ -90,10 +86,9 @@ where
     }
 }
 
-impl<'b, P, T> ShapeResource<P, T> for &'b [Vec<P>]
+impl<'b, P> ShapeResource<P> for &'b [Vec<P>]
 where
-    P: FloatPointCompatible<T>,
-    T: FloatNumber,
+    P: FloatPointCompatible,
 {
     type ResourceIter<'a>
         = ShapeResourceIterator<'a, P>

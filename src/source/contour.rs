@@ -1,7 +1,6 @@
 use crate::source::resource::ShapeResource;
 use alloc::vec::Vec;
 use i_float::float::compatible::FloatPointCompatible;
-use i_float::float::number::FloatNumber;
 
 pub struct ContourResourceIterator<'a, P> {
     slice: &'a [P],
@@ -39,10 +38,9 @@ impl<'a, P> Iterator for ContourResourceIterator<'a, P> {
     }
 }
 
-impl<P, T> ShapeResource<P, T> for [P]
+impl<P> ShapeResource<P> for [P]
 where
-    P: FloatPointCompatible<T>,
-    T: FloatNumber,
+    P: FloatPointCompatible,
 {
     type ResourceIter<'a>
         = ContourResourceIterator<'a, P>
@@ -56,10 +54,9 @@ where
     }
 }
 
-impl<P, T, const N: usize> ShapeResource<P, T> for [P; N]
+impl<P, const N: usize> ShapeResource<P> for [P; N]
 where
-    P: FloatPointCompatible<T>,
-    T: FloatNumber,
+    P: FloatPointCompatible,
 {
     type ResourceIter<'a>
         = ContourResourceIterator<'a, P>
@@ -73,10 +70,9 @@ where
     }
 }
 
-impl<P, T> ShapeResource<P, T> for Vec<P>
+impl<P> ShapeResource<P> for Vec<P>
 where
-    P: FloatPointCompatible<T>,
-    T: FloatNumber,
+    P: FloatPointCompatible,
 {
     type ResourceIter<'a>
         = ContourResourceIterator<'a, P>
@@ -90,10 +86,9 @@ where
     }
 }
 
-impl<'b, P, T> ShapeResource<P, T> for &'b [P]
+impl<'b, P> ShapeResource<P> for &'b [P]
 where
-    P: FloatPointCompatible<T>,
-    T: FloatNumber,
+    P: FloatPointCompatible,
 {
     type ResourceIter<'a>
         = ContourResourceIterator<'a, P>
