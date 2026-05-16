@@ -1,28 +1,29 @@
 use crate::int::path::ContourExtension;
 use crate::int::shape::{IntContour, IntShape};
+use i_float::int::number::{IntNumber, WideIntNumber};
 use i_float::int::point::IntPoint;
 
-pub trait Area {
-    fn area_two(&self) -> i64;
-    fn area(&self) -> i64;
+pub trait Area<I: IntNumber> {
+    fn area_two(&self) -> I::Wide;
+    fn area(&self) -> I::Wide;
 }
 
-impl Area for [IntPoint] {
+impl<I: IntNumber> Area<I> for [IntPoint<I>] {
     #[inline]
-    fn area_two(&self) -> i64 {
+    fn area_two(&self) -> I::Wide {
         self.unsafe_area()
     }
 
     #[inline]
-    fn area(&self) -> i64 {
-        self.area_two() / 2
+    fn area(&self) -> I::Wide {
+        self.area_two() / I::Wide::from_usize(2)
     }
 }
 
-impl Area for [IntContour] {
+impl<I: IntNumber> Area<I> for [IntContour<I>] {
     #[inline]
-    fn area_two(&self) -> i64 {
-        let mut s: i64 = 0;
+    fn area_two(&self) -> I::Wide {
+        let mut s = I::WIDE_ZERO;
         for path in self.iter() {
             s = s.wrapping_add(path.area_two())
         }
@@ -30,15 +31,15 @@ impl Area for [IntContour] {
     }
 
     #[inline]
-    fn area(&self) -> i64 {
-        self.area_two() / 2
+    fn area(&self) -> I::Wide {
+        self.area_two() / I::Wide::from_usize(2)
     }
 }
 
-impl Area for [IntShape] {
+impl<I: IntNumber> Area<I> for [IntShape<I>] {
     #[inline]
-    fn area_two(&self) -> i64 {
-        let mut s: i64 = 0;
+    fn area_two(&self) -> I::Wide {
+        let mut s = I::WIDE_ZERO;
         for shape in self.iter() {
             s = s.wrapping_add(shape.area_two())
         }
@@ -46,8 +47,8 @@ impl Area for [IntShape] {
     }
 
     #[inline]
-    fn area(&self) -> i64 {
-        self.area_two() / 2
+    fn area(&self) -> I::Wide {
+        self.area_two() / I::Wide::from_usize(2)
     }
 }
 
@@ -61,6 +62,6 @@ mod tests {
         let square = int_path![[-1, -1], [1, -1], [1, 1], [-1, 1],];
 
         let area = square.area_two();
-        assert_eq!(area, -8);
+        assert_eq!(area, -8i64);
     }
 }

@@ -4,11 +4,13 @@ use i_float::adapter::FloatPointAdapter;
 use i_float::float::compatible::FloatPointCompatible;
 use i_float::float::number::FloatNumber;
 use i_float::float::rect::FloatRect;
+use i_float::int::number::IntNumber;
 
-impl FlatContoursBuffer {
+impl<I: IntNumber> FlatContoursBuffer<I> {
     #[inline]
-    pub fn set_with_resource<P, R>(&mut self, resource: &R) -> FloatPointAdapter<P>
+    pub fn set_with_resource<P, R>(&mut self, resource: &R) -> FloatPointAdapter<P, I>
     where
+        I: IntNumber,
         P: FloatPointCompatible,
         R: ShapeResource<P> + ?Sized,
     {
@@ -51,7 +53,7 @@ impl FlatContoursBuffer {
     }
 
     #[inline]
-    pub fn set_with_resource_and_adapter<P, R>(&mut self, resource: &R, adapter: FloatPointAdapter<P>)
+    pub fn set_with_resource_and_adapter<P, R>(&mut self, resource: &R, adapter: FloatPointAdapter<P, I>)
     where
         P: FloatPointCompatible,
         R: ShapeResource<P> + ?Sized,
@@ -80,9 +82,9 @@ impl FlatContoursBuffer {
     }
 }
 
-impl FlatShapesBuffer {
+impl<I: IntNumber> FlatShapesBuffer<I> {
     #[inline]
-    pub fn set_with_resource<P, R>(&mut self, resource: &R) -> FloatPointAdapter<P>
+    pub fn set_with_resource<P, R>(&mut self, resource: &R) -> FloatPointAdapter<P, I>
     where
         P: FloatPointCompatible,
         R: ShapeResource<P> + ?Sized,
@@ -128,7 +130,7 @@ impl FlatShapesBuffer {
     }
 
     #[inline]
-    pub fn set_with_resource_and_adapter<P, R>(&mut self, resource: &R, adapter: FloatPointAdapter<P>)
+    pub fn set_with_resource_and_adapter<P, R>(&mut self, resource: &R, adapter: FloatPointAdapter<P, I>)
     where
         P: FloatPointCompatible,
         R: ShapeResource<P> + ?Sized,
@@ -172,7 +174,7 @@ mod tests {
             vec![[1.0, 1.0], [1.5, 1.0], [1.5, 1.5]],
         ];
 
-        let mut buffer = FlatShapesBuffer::default();
+        let mut buffer = FlatShapesBuffer::<i32>::default();
         let adapter = buffer.set_with_resource(&shape);
         let restored: Vec<Vec<[f64; 2]>> = buffer
             .to_shapes()
@@ -191,7 +193,7 @@ mod tests {
     #[test]
     fn test_shapes_buffer_set_with_resource_and_adapter() {
         let contour: Vec<[f64; 2]> = vec![[10.0, 10.0], [11.0, 10.0], [11.0, 11.0]];
-        let adapter = FloatPointAdapter::new(FloatRect::new(10.0, 11.0, 10.0, 11.0));
+        let adapter = FloatPointAdapter::<_, i32>::new(FloatRect::new(10.0, 11.0, 10.0, 11.0));
 
         let mut buffer = FlatShapesBuffer::default();
         buffer.set_with_resource_and_adapter(&contour, adapter);

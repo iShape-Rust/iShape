@@ -2,7 +2,6 @@
 extern crate alloc;
 
 pub mod base;
-pub mod fix;
 pub mod flat;
 pub mod float;
 pub mod int;

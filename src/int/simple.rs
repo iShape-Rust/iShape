@@ -1,6 +1,7 @@
 use crate::int::shape::{IntContour, IntShape, IntShapes};
 use alloc::vec;
 use alloc::vec::Vec;
+use i_float::int::number::IntNumber;
 use i_float::int::point::IntPoint;
 
 /// A trait that provides methods for simplifying complex geometrical structures.
@@ -15,7 +16,7 @@ pub trait Simplify {
 }
 
 /// A trait for determining if a contour is simple and for obtaining a simplified version.
-pub trait SimpleContour {
+pub trait SimpleContour<I: IntNumber> {
     /// Checks if the contour is already simple, meaning it has no self-intersections
     /// and meets the minimum complexity required.
     ///
@@ -31,12 +32,12 @@ pub trait SimpleContour {
     ///
     /// - `Some(IntContour)` containing the simplified contour if simplification is possible.
     /// - `None` if the contour is degenerate or empty.
-    fn simplified(&self) -> Option<IntContour>;
+    fn simplified(&self) -> Option<IntContour<I>>;
 }
 
 /// A trait for determining if a shape, composed of multiple contours, is simple,
 /// and for obtaining a simplified version.
-pub trait SimpleShape {
+pub trait SimpleShape<I: IntNumber> {
     /// Checks if the shape is simple, meaning all its contours are simple.
     ///
     /// # Returns
@@ -51,12 +52,12 @@ pub trait SimpleShape {
     ///
     /// - `Some(IntShape)` containing the simplified shape if simplification is possible.
     /// - `None` if the shape is degenerate or empty.
-    fn simplified(&self) -> Option<IntShape>;
+    fn simplified(&self) -> Option<IntShape<I>>;
 }
 
 /// A trait for determining if a collection of shapes is simple, and for obtaining
 /// a simplified version of the entire collection.
-pub trait SimpleShapes {
+pub trait SimpleShapes<I: IntNumber> {
     /// Checks if all shapes in the collection are simple.
     ///
     /// # Returns
@@ -70,10 +71,10 @@ pub trait SimpleShapes {
     /// # Returns
     ///
     /// - `IntShapes` the simplified shapes.
-    fn simplified(&self) -> IntShapes;
+    fn simplified(&self) -> IntShapes<I>;
 }
 
-impl Simplify for IntContour {
+impl<I: IntNumber> Simplify for IntContour<I> {
     #[inline]
     fn simplify_contour(&mut self) -> bool {
         if self.is_simple() {
@@ -89,7 +90,7 @@ impl Simplify for IntContour {
     }
 }
 
-impl Simplify for IntShape {
+impl<I: IntNumber> Simplify for IntShape<I> {
     fn simplify_contour(&mut self) -> bool {
         let mut any_simplified = false;
         let mut any_empty = false;
@@ -121,7 +122,7 @@ impl Simplify for IntShape {
     }
 }
 
-impl Simplify for IntShapes {
+impl<I: IntNumber> Simplify for IntShapes<I> {
     fn simplify_contour(&mut self) -> bool {
         let mut any_simplified = false;
         let mut any_empty = false;
@@ -146,7 +147,7 @@ impl Simplify for IntShapes {
         any_simplified
     }
 }
-impl SimpleShape for [IntContour] {
+impl<I: IntNumber> SimpleShape<I> for [IntContour<I>] {
     #[inline]
     fn is_simple(&self) -> bool {
         for contour in self.iter() {
@@ -157,7 +158,7 @@ impl SimpleShape for [IntContour] {
         true
     }
 
-    fn simplified(&self) -> Option<IntShape> {
+    fn simplified(&self) -> Option<IntShape<I>> {
         let mut contours = Vec::with_capacity(self.len());
         for (i, contour) in self.iter().enumerate() {
             if contour.is_simple() {
@@ -173,7 +174,7 @@ impl SimpleShape for [IntContour] {
     }
 }
 
-impl SimpleShapes for [IntShape] {
+impl<I: IntNumber> SimpleShapes<I> for [IntShape<I>] {
     #[inline]
     fn is_simple(&self) -> bool {
         for shape in self.iter() {
@@ -184,7 +185,7 @@ impl SimpleShapes for [IntShape] {
         true
     }
 
-    fn simplified(&self) -> IntShapes {
+    fn simplified(&self) -> IntShapes<I> {
         let mut shapes = Vec::with_capacity(self.len());
         for shape in self.iter() {
             if shape.is_simple() {
@@ -198,7 +199,7 @@ impl SimpleShapes for [IntShape] {
     }
 }
 
-impl SimpleContour for [IntPoint] {
+impl<I: IntNumber> SimpleContour<I> for [IntPoint<I>] {
     fn is_simple(&self) -> bool {
         let count = self.len();
 
@@ -209,13 +210,13 @@ impl SimpleContour for [IntPoint] {
         let mut p0 = self[count - 2];
         let p1 = self[count - 1];
 
-        let mut v0 = p1.subtract(p0);
+        let mut v0 = p1 - p0;
         p0 = p1;
 
         for &pi in self.iter() {
-            let vi = pi.subtract(p0);
+            let vi = pi - p0;
             let prod = vi.cross_product(v0);
-            if prod == 0 {
+            if prod == I::WIDE_ZERO {
                 return false;
             }
             v0 = vi;
@@ -226,7 +227,7 @@ impl SimpleContour for [IntPoint] {
     }
 
     #[inline]
-    fn simplified(&self) -> Option<IntContour> {
+    fn simplified(&self) -> Option<IntContour<I>> {
         ContourSimplifier::default().simplify_contour(self)
     }
 }
@@ -238,7 +239,7 @@ pub struct ContourSimplifier {
 }
 
 impl ContourSimplifier {
-    pub fn simplify_contour(&mut self, contour: &[IntPoint]) -> Option<IntContour> {
+    pub fn simplify_contour<I: IntNumber>(&mut self, contour: &[IntPoint<I>]) -> Option<IntContour<I>> {
         let mut n = contour.len();
 
         if n < 3 {
@@ -278,7 +279,7 @@ impl ContourSimplifier {
             let p1 = contour[node.index];
             let p2 = contour[node.next];
 
-            if p1.subtract(p0).cross_product(p2.subtract(p1)) == 0 {
+            if (p1 - p0).cross_product(p2 - p1) == I::WIDE_ZERO {
                 n -= 1;
                 if n < 3 {
                     return None;
@@ -315,7 +316,7 @@ impl ContourSimplifier {
             }
         }
 
-        let mut buffer = vec![IntPoint::ZERO; n];
+        let mut buffer = vec![IntPoint::<I>::ZERO; n];
         node = self.nodes[first];
 
         for item in buffer.iter_mut().take(n) {

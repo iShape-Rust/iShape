@@ -2,7 +2,7 @@
 macro_rules! int_path {
     ( $( [$x:expr, $y:expr] ),* $(,)? ) => {
         {
-            let mut path: $crate::int::path::IntPath = ::core::default::Default::default();
+            let mut path: $crate::base::data::Path<_> = ::core::default::Default::default();
             $(
                 path.push($crate::int::IntPoint::new($x, $y));
             )*
@@ -15,9 +15,9 @@ macro_rules! int_path {
 macro_rules! int_shape {
     ( $( [ $( [$x:expr, $y:expr] ),* $(,)? ] ),* $(,)? ) => {
         {
-            let mut shape: $crate::int::shape::IntShape = ::core::default::Default::default();
+            let mut shape: $crate::base::data::Shape<_> = ::core::default::Default::default();
             $(
-                let mut contour: $crate::int::shape::IntContour = ::core::default::Default::default();
+                let mut contour: $crate::base::data::Contour<_> = ::core::default::Default::default();
                 $(
                     contour.push($crate::int::IntPoint::new($x, $y));
                 )*
@@ -32,11 +32,11 @@ macro_rules! int_shape {
 macro_rules! int_shapes {
     ( $( [ $( [ $( [$x:expr, $y:expr] ),* $(,)? ] ),* $(,)? ] ),* $(,)? ) => {
         {
-            let mut shapes: $crate::int::shape::IntShapes = ::core::default::Default::default();
+            let mut shapes: $crate::base::data::Shapes<_> = ::core::default::Default::default();
             $(
-                let mut shape: $crate::int::shape::IntShape = ::core::default::Default::default();
+                let mut shape: $crate::base::data::Shape<_> = ::core::default::Default::default();
                 $(
-                    let mut contour: $crate::int::shape::IntContour = ::core::default::Default::default();
+                    let mut contour: $crate::base::data::Contour<_> = ::core::default::Default::default();
                     $(
                         contour.push($crate::int::IntPoint::new($x, $y));
                     )*

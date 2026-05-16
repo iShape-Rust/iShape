@@ -1,3 +1,4 @@
+use i_float::int::number::IntNumber;
 use crate::int::shape::IntContour;
 
 /// Trait for removing redundant points from a contour.
@@ -9,7 +10,7 @@ pub trait DedupContour {
     fn dedup_contour(&mut self) -> bool;
 }
 
-impl DedupContour for IntContour {
+impl<I: IntNumber> DedupContour for IntContour<I> {
     fn dedup_contour(&mut self) -> bool {
         let n = self.len();
         self.dedup();

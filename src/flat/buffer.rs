@@ -3,24 +3,25 @@ use crate::int::shape::{IntContour, IntShape};
 use crate::util::reserve::Reserve;
 use alloc::vec::Vec;
 use core::ops::Range;
+use i_float::int::number::IntNumber;
 use i_float::int::point::IntPoint;
 
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Debug, Clone, Default)]
-pub struct FlatContoursBuffer {
-    pub points: Vec<IntPoint>,
+pub struct FlatContoursBuffer<T: IntNumber> {
+    pub points: Vec<IntPoint<T>>,
     pub ranges: Vec<Range<usize>>,
 }
 
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Debug, Clone, Default)]
-pub struct FlatShapesBuffer {
-    pub points: Vec<IntPoint>,
+pub struct FlatShapesBuffer<T: IntNumber> {
+    pub points: Vec<IntPoint<T>>,
     pub contour_ranges: Vec<Range<usize>>,
     pub shape_ranges: Vec<Range<usize>>,
 }
 
-impl FlatContoursBuffer {
+impl<T: IntNumber> FlatContoursBuffer<T> {
     #[inline]
     pub fn with_capacity(capacity: usize) -> Self {
         Self {
@@ -40,7 +41,7 @@ impl FlatContoursBuffer {
     }
 
     #[inline]
-    pub fn as_first_contour(&self) -> &[IntPoint] {
+    pub fn as_first_contour(&self) -> &[IntPoint<T>] {
         if let Some(first_contour_range) = self.ranges.first() {
             &self.points[first_contour_range.clone()]
         } else {
@@ -49,7 +50,7 @@ impl FlatContoursBuffer {
     }
 
     #[inline]
-    pub fn as_first_contour_mut(&mut self) -> &mut [IntPoint] {
+    pub fn as_first_contour_mut(&mut self) -> &mut [IntPoint<T>] {
         if let Some(first_contour_range) = self.ranges.first() {
             &mut self.points[first_contour_range.clone()]
         } else {
@@ -58,7 +59,7 @@ impl FlatContoursBuffer {
     }
 
     #[inline]
-    pub fn set_with_contour(&mut self, contour: &[IntPoint]) {
+    pub fn set_with_contour(&mut self, contour: &[IntPoint<T>]) {
         let points_len = contour.len();
         self.clear_and_reserve(points_len, 1);
 
@@ -67,7 +68,7 @@ impl FlatContoursBuffer {
     }
 
     #[inline]
-    pub fn set_with_shape(&mut self, shape: &[IntContour]) {
+    pub fn set_with_shape(&mut self, shape: &[IntContour<T>]) {
         let points_len = shape.points_count();
         let contours_len = shape.len();
         self.clear_and_reserve(points_len, contours_len);
@@ -82,7 +83,7 @@ impl FlatContoursBuffer {
     }
 
     #[inline]
-    pub fn set_with_shapes(&mut self, shapes: &[IntShape]) {
+    pub fn set_with_shapes(&mut self, shapes: &[IntShape<T>]) {
         let points_len = shapes.points_count();
         let contours_len = shapes.iter().map(Vec::len).sum();
         self.clear_and_reserve(points_len, contours_len);
@@ -108,7 +109,7 @@ impl FlatContoursBuffer {
     }
 
     #[inline]
-    pub fn add_contour(&mut self, contour: &[IntPoint]) {
+    pub fn add_contour(&mut self, contour: &[IntPoint<T>]) {
         let start = self.points.len();
         let end = start + contour.len();
         self.ranges.push(start..end);
@@ -116,7 +117,7 @@ impl FlatContoursBuffer {
     }
 
     #[inline]
-    pub fn to_contours(&self) -> Vec<IntContour> {
+    pub fn to_contours(&self) -> Vec<IntContour<T>> {
         let mut contours = Vec::with_capacity(self.ranges.len());
 
         for range in self.ranges.iter() {
@@ -127,7 +128,7 @@ impl FlatContoursBuffer {
     }
 }
 
-impl FlatShapesBuffer {
+impl<T: IntNumber> FlatShapesBuffer<T> {
     #[inline]
     pub fn with_capacity(points: usize, contours: usize, shapes: usize) -> Self {
         Self {
@@ -143,7 +144,7 @@ impl FlatShapesBuffer {
     }
 
     #[inline]
-    pub fn set_with_contour(&mut self, contour: &[IntPoint]) {
+    pub fn set_with_contour(&mut self, contour: &[IntPoint<T>]) {
         let points_len = contour.len();
         self.clear_and_reserve(points_len, 1, 1);
 
@@ -153,7 +154,7 @@ impl FlatShapesBuffer {
     }
 
     #[inline]
-    pub fn set_with_shape(&mut self, shape: &[IntContour]) {
+    pub fn set_with_shape(&mut self, shape: &[IntContour<T>]) {
         let points_len = shape.points_count();
         let contours_len = shape.len();
         self.clear_and_reserve(points_len, contours_len, 1);
@@ -170,7 +171,7 @@ impl FlatShapesBuffer {
     }
 
     #[inline]
-    pub fn set_with_shapes(&mut self, shapes: &[IntShape]) {
+    pub fn set_with_shapes(&mut self, shapes: &[IntShape<T>]) {
         let points_len = shapes.points_count();
         let contours_len = shapes.iter().map(Vec::len).sum();
         let shapes_len = shapes.len();
@@ -204,7 +205,7 @@ impl FlatShapesBuffer {
     }
 
     #[inline]
-    pub fn add_shape(&mut self, shape: &[IntContour]) {
+    pub fn add_shape(&mut self, shape: &[IntContour<T>]) {
         let shape_start = self.contour_ranges.len();
         let mut points_offset = self.points.len();
         for contour in shape.iter() {
@@ -217,7 +218,7 @@ impl FlatShapesBuffer {
     }
 
     #[inline]
-    pub fn to_shapes(&self) -> Vec<IntShape> {
+    pub fn to_shapes(&self) -> Vec<IntShape<T>> {
         let mut shapes = Vec::with_capacity(self.shape_ranges.len());
 
         for shape_range in self.shape_ranges.iter() {
@@ -238,11 +239,10 @@ mod tests {
     use super::*;
     use crate::int::shape::{IntContour, IntShape, IntShapes};
     use alloc::vec;
-    use i_float::int_pnt;
     use rand::RngExt;
 
-    fn make_contour(p: &[(i32, i32)]) -> IntContour {
-        p.iter().map(|&(x, y)| int_pnt!(x, y)).collect()
+    fn make_contour(p: &[(i32, i32)]) -> IntContour<i32> {
+        p.iter().map(|&(x, y)| IntPoint::new(x, y)).collect()
     }
 
     #[test]
@@ -293,13 +293,13 @@ mod tests {
     #[test]
     fn test_random_shapes_round_trip() {
         let mut rng = rand::rng();
-        let mut shapes: IntShapes = Vec::new();
+        let mut shapes: IntShapes<i32> = Vec::new();
 
         for _ in 0..5 {
-            let mut shape: IntShape = Vec::new();
+            let mut shape: IntShape<i32> = Vec::new();
             let contour_count = rng.random_range(1..4);
             for _ in 0..contour_count {
-                let mut contour: IntContour = Vec::new();
+                let mut contour: IntContour<i32> = Vec::new();
                 let point_count = rng.random_range(3..7);
                 for _ in 0..point_count {
                     let x = rng.random_range(-100..100);

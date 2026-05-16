@@ -1,6 +1,7 @@
 use crate::int::shape::{IntContour, IntShape, IntShapes};
 use alloc::vec;
 use alloc::vec::Vec;
+use i_float::int::number::IntNumber;
 use i_float::int::point::IntPoint;
 
 /// A trait for removing spike artifacts from polygon contours.
@@ -14,7 +15,7 @@ pub trait DeSpike {
     fn remove_spikes(&mut self) -> bool;
 }
 
-pub trait DeSpikeContour {
+pub trait DeSpikeContour<I: IntNumber> {
     /// Checks whether the contour has no spikes.
     ///
     /// A contour with no spikes is considered clean and valid
@@ -32,10 +33,10 @@ pub trait DeSpikeContour {
     ///
     /// - `Some(IntContour)` if a valid, despiked contour can be produced.
     /// - `None` if the contour is degenerate after spike removal.
-    fn despiked_contour(&self) -> Option<IntContour>;
+    fn despiked_contour(&self) -> Option<IntContour<I>>;
 }
 
-pub trait DeSpikeShape {
+pub trait DeSpikeShape<I: IntNumber> {
     /// Checks whether the shape has no spikes.
     ///
     /// A contour with no spikes is considered clean and valid
@@ -53,10 +54,10 @@ pub trait DeSpikeShape {
     ///
     /// - `Some(IntShape)` containing the simplified shape if simplification is possible.
     /// - `None` if the shape is degenerate or empty.
-    fn despiked_shape(&self) -> Option<IntShape>;
+    fn despiked_shape(&self) -> Option<IntShape<I>>;
 }
 
-pub trait DeSpikeShapes {
+pub trait DeSpikeShapes<I: IntNumber> {
     /// Checks whether the shapes have no spikes.
     ///
     /// A contour with no spikes is considered clean and valid
@@ -73,10 +74,10 @@ pub trait DeSpikeShapes {
     /// # Returns
     ///
     /// - `IntShapes` the simplified shapes.
-    fn despiked_shapes(&self) -> IntShapes;
+    fn despiked_shapes(&self) -> IntShapes<I>;
 }
 
-impl DeSpike for IntContour {
+impl<I: IntNumber> DeSpike for IntContour<I> {
     fn remove_spikes(&mut self) -> bool {
         if self.has_no_spikes() {
             return false;
@@ -90,7 +91,7 @@ impl DeSpike for IntContour {
     }
 }
 
-impl DeSpikeContour for IntContour {
+impl<I: IntNumber> DeSpikeContour<I> for IntContour<I> {
     fn has_no_spikes(&self) -> bool {
         let count = self.len();
 
@@ -101,14 +102,14 @@ impl DeSpikeContour for IntContour {
         let mut p0 = self[count - 2];
         let p1 = self[count - 1];
 
-        let mut v0 = p1.subtract(p0);
+        let mut v0 = p1 - p0;
         p0 = p1;
 
         for &pi in self.iter() {
-            let vi = pi.subtract(p0);
+            let vi = pi - p0;
             let cross = vi.cross_product(v0);
             let dot = vi.dot_product(v0);
-            if cross == 0 && dot < 0 {
+            if cross == I::WIDE_ZERO && dot < I::WIDE_ZERO {
                 return false;
             }
             v0 = vi;
@@ -118,7 +119,7 @@ impl DeSpikeContour for IntContour {
         true
     }
 
-    fn despiked_contour(&self) -> Option<IntContour> {
+    fn despiked_contour(&self) -> Option<IntContour<I>> {
         if self.len() < 3 {
             return None;
         }
@@ -159,12 +160,12 @@ impl DeSpikeContour for IntContour {
             let p1 = self[node.index];
             let p2 = self[node.next];
 
-            let v10 = p1.subtract(p0);
-            let v21 = p2.subtract(p1);
+            let v10 = p1 - p0;
+            let v21 = p2 - p1;
             let cross = v10.cross_product(v21);
             let dot = v10.dot_product(v21);
 
-            if cross == 0 && dot < 0 {
+            if cross == I::WIDE_ZERO && dot < I::WIDE_ZERO {
                 n -= 1;
                 if n < 3 {
                     return None;
@@ -201,7 +202,7 @@ impl DeSpikeContour for IntContour {
             }
         }
 
-        let mut buffer = vec![IntPoint::ZERO; n];
+        let mut buffer = vec![IntPoint::<I>::ZERO; n];
         node = nodes[first];
 
         for item in buffer.iter_mut().take(n) {
@@ -213,7 +214,7 @@ impl DeSpikeContour for IntContour {
     }
 }
 
-impl DeSpike for IntShape {
+impl<I: IntNumber> DeSpike for IntShape<I> {
     fn remove_spikes(&mut self) -> bool {
         let mut any_simplified = false;
         let mut any_empty = false;
@@ -244,7 +245,7 @@ impl DeSpike for IntShape {
     }
 }
 
-impl DeSpikeShape for IntShape {
+impl<I: IntNumber> DeSpikeShape<I> for IntShape<I> {
     fn has_no_spikes(&self) -> bool {
         for contour in self.iter() {
             if !contour.has_no_spikes() {
@@ -254,7 +255,7 @@ impl DeSpikeShape for IntShape {
         true
     }
 
-    fn despiked_shape(&self) -> Option<IntShape> {
+    fn despiked_shape(&self) -> Option<IntShape<I>> {
         let mut contours = Vec::with_capacity(self.len());
         for (i, contour) in self.iter().enumerate() {
             if contour.has_no_spikes() {
@@ -270,7 +271,7 @@ impl DeSpikeShape for IntShape {
     }
 }
 
-impl DeSpike for IntShapes {
+impl<I: IntNumber> DeSpike for IntShapes<I> {
     fn remove_spikes(&mut self) -> bool {
         let mut any_simplified = false;
         let mut any_empty = false;
@@ -296,7 +297,7 @@ impl DeSpike for IntShapes {
     }
 }
 
-impl DeSpikeShapes for IntShapes {
+impl<I: IntNumber> DeSpikeShapes<I> for IntShapes<I> {
     fn has_no_spikes(&self) -> bool {
         for shape in self.iter() {
             if !shape.has_no_spikes() {
@@ -306,7 +307,7 @@ impl DeSpikeShapes for IntShapes {
         true
     }
 
-    fn despiked_shapes(&self) -> IntShapes {
+    fn despiked_shapes(&self) -> IntShapes<I> {
         let mut shapes = Vec::with_capacity(self.len());
         for shape in self.iter() {
             if shape.has_no_spikes() {

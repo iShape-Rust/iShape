@@ -1,10 +1,11 @@
 use crate::int::shape::{IntShape, IntShapes};
+use i_float::int::number::IntNumber;
 
 pub trait IntContourReverse {
     fn reverse_contours(&mut self);
 }
 
-impl IntContourReverse for IntShape {
+impl<I: IntNumber> IntContourReverse for IntShape<I> {
     #[inline]
     fn reverse_contours(&mut self) {
         for path in self {
@@ -13,7 +14,7 @@ impl IntContourReverse for IntShape {
     }
 }
 
-impl IntContourReverse for IntShapes {
+impl<I: IntNumber> IntContourReverse for IntShapes<I> {
     #[inline]
     fn reverse_contours(&mut self) {
         for shape in self {

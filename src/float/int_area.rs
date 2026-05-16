@@ -1,22 +1,23 @@
 use i_float::adapter::FloatPointAdapter;
 use i_float::float::compatible::FloatPointCompatible;
+use i_float::int::number::{IntNumber, WideIntNumber};
 
-pub trait IntArea<P: FloatPointCompatible> {
+pub trait IntArea<P: FloatPointCompatible, I: IntNumber> {
     /// The area of the `Path`.
     /// - Returns: A positive double area if path is clockwise and negative double area otherwise.
-    fn unsafe_int_area(&self, adapter: &FloatPointAdapter<P>) -> i64;
+    fn unsafe_int_area(&self, adapter: &FloatPointAdapter<P, I>) -> I::Wide;
 }
 
-impl<P: FloatPointCompatible> IntArea<P> for [P] {
-    fn unsafe_int_area(&self, adapter: &FloatPointAdapter<P>) -> i64 {
+impl<P: FloatPointCompatible, I: IntNumber> IntArea<P, I> for [P] {
+    fn unsafe_int_area(&self, adapter: &FloatPointAdapter<P, I>) -> I::Wide {
         let n = self.len();
         let mut p0 = adapter.float_to_int(&self[n - 1]);
-        let mut area: i64 = 0;
+        let mut area = I::WIDE_ZERO;
 
         for pi in self.iter() {
             let p1 = adapter.float_to_int(pi);
-            let a = (p1.x as i64).wrapping_mul(p0.y as i64);
-            let b = (p1.y as i64).wrapping_mul(p0.x as i64);
+            let a = p1.x.wide().wrapping_mul(p0.y.wide());
+            let b = p1.y.wide().wrapping_mul(p0.x.wide());
             area = area.wrapping_add(a).wrapping_sub(b);
             p0 = p1;
         }
@@ -34,9 +35,9 @@ mod tests {
     #[test]
     fn test_0() {
         let square = path![[-1f32, -1f32], [1f32, -1f32], [1f32, 1f32], [-1f32, 1f32],];
-        let adapter = FloatPointAdapter::with_iter(square.iter());
+        let adapter = FloatPointAdapter::<_, i32>::with_iter(square.iter());
 
         let area = square.unsafe_int_area(&adapter);
-        assert!(area < 0);
+        assert!(area < 0i64);
     }
 }

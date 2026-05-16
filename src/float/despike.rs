@@ -7,20 +7,21 @@ use crate::float::adapter::{
 use crate::int::despike::DeSpike;
 use i_float::adapter::FloatPointAdapter;
 use i_float::float::compatible::FloatPointCompatible;
+use i_float::int::number::IntNumber;
 
 /// A trait that provides methods for despike complex geometrical structures.
-pub trait DeSpikeContour<P: FloatPointCompatible> {
+pub trait DeSpikeContour<P: FloatPointCompatible, I: IntNumber> {
     /// Simplifies the structure in-place if it is not already simple.
     ///
     /// # Returns
     ///
     /// - `true` if the structure was simplified successfully.
     /// - `false` if the structure was already simple and no modification was made.
-    fn despike_contour(&mut self, adapter: &FloatPointAdapter<P>) -> bool;
+    fn despike_contour(&mut self, adapter: &FloatPointAdapter<P, I>) -> bool;
 }
 
-impl<P: FloatPointCompatible> DeSpikeContour<P> for Contour<P> {
-    fn despike_contour(&mut self, adapter: &FloatPointAdapter<P>) -> bool {
+impl<P: FloatPointCompatible, I: IntNumber> DeSpikeContour<P, I> for Contour<P> {
+    fn despike_contour(&mut self, adapter: &FloatPointAdapter<P, I>) -> bool {
         let mut int_contour = self.to_int(adapter);
         if !int_contour.remove_spikes() {
             return false;
@@ -35,8 +36,8 @@ impl<P: FloatPointCompatible> DeSpikeContour<P> for Contour<P> {
     }
 }
 
-impl<P: FloatPointCompatible> DeSpikeContour<P> for Shape<P> {
-    fn despike_contour(&mut self, adapter: &FloatPointAdapter<P>) -> bool {
+impl<P: FloatPointCompatible, I: IntNumber> DeSpikeContour<P, I> for Shape<P> {
+    fn despike_contour(&mut self, adapter: &FloatPointAdapter<P, I>) -> bool {
         let mut int_shape = self.to_int(adapter);
         if !int_shape.remove_spikes() {
             return false;
@@ -51,8 +52,8 @@ impl<P: FloatPointCompatible> DeSpikeContour<P> for Shape<P> {
     }
 }
 
-impl<P: FloatPointCompatible> DeSpikeContour<P> for Shapes<P> {
-    fn despike_contour(&mut self, adapter: &FloatPointAdapter<P>) -> bool {
+impl<P: FloatPointCompatible, I: IntNumber> DeSpikeContour<P, I> for Shapes<P> {
+    fn despike_contour(&mut self, adapter: &FloatPointAdapter<P, I>) -> bool {
         let mut int_shapes = self.to_int(adapter);
         if !int_shapes.remove_spikes() {
             return false;
@@ -67,8 +68,8 @@ impl<P: FloatPointCompatible> DeSpikeContour<P> for Shapes<P> {
     }
 }
 
-impl<P: FloatPointCompatible> DeSpikeContour<P> for FloatFlatContoursBuffer<P> {
-    fn despike_contour(&mut self, adapter: &FloatPointAdapter<P>) -> bool {
+impl<P: FloatPointCompatible, I: IntNumber> DeSpikeContour<P, I> for FloatFlatContoursBuffer<P> {
+    fn despike_contour(&mut self, adapter: &FloatPointAdapter<P, I>) -> bool {
         let int_buffer = self.to_int(adapter);
         let mut out = FlatContoursBuffer::with_capacity(int_buffer.points.len());
         let mut changed = false;
