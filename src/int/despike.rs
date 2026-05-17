@@ -2,6 +2,7 @@ use crate::int::shape::{IntContour, IntShape, IntShapes};
 use alloc::vec;
 use alloc::vec::Vec;
 use i_float::int::number::int::IntNumber;
+use i_float::int::number::wide_int::WideIntNumber;
 use i_float::int::point::IntPoint;
 
 /// A trait for removing spike artifacts from polygon contours.
@@ -109,7 +110,7 @@ impl<I: IntNumber> DeSpikeContour<I> for IntContour<I> {
             let vi = pi - p0;
             let cross = vi.cross_product(v0);
             let dot = vi.dot_product(v0);
-            if cross == I::WIDE_ZERO && dot < I::WIDE_ZERO {
+            if cross == I::Wide::ZERO && dot < I::Wide::ZERO {
                 return false;
             }
             v0 = vi;
@@ -165,7 +166,7 @@ impl<I: IntNumber> DeSpikeContour<I> for IntContour<I> {
             let cross = v10.cross_product(v21);
             let dot = v10.dot_product(v21);
 
-            if cross == I::WIDE_ZERO && dot < I::WIDE_ZERO {
+            if cross == I::Wide::ZERO && dot < I::Wide::ZERO {
                 n -= 1;
                 if n < 3 {
                     return None;

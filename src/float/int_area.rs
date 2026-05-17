@@ -13,7 +13,7 @@ impl<P: FloatPointCompatible, I: IntNumber> IntArea<P, I> for [P] {
     fn unsafe_int_area(&self, adapter: &FloatPointAdapter<P, I>) -> I::Wide {
         let n = self.len();
         let mut p0 = adapter.float_to_int(&self[n - 1]);
-        let mut area = I::WIDE_ZERO;
+        let mut area = I::Wide::ZERO;
 
         for pi in self.iter() {
             let p1 = adapter.float_to_int(pi);

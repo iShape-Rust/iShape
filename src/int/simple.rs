@@ -2,6 +2,7 @@ use crate::int::shape::{IntContour, IntShape, IntShapes};
 use alloc::vec;
 use alloc::vec::Vec;
 use i_float::int::number::int::IntNumber;
+use i_float::int::number::wide_int::WideIntNumber;
 use i_float::int::point::IntPoint;
 
 /// A trait that provides methods for simplifying complex geometrical structures.
@@ -216,7 +217,7 @@ impl<I: IntNumber> SimpleContour<I> for [IntPoint<I>] {
         for &pi in self.iter() {
             let vi = pi - p0;
             let prod = vi.cross_product(v0);
-            if prod == I::WIDE_ZERO {
+            if prod == I::Wide::ZERO {
                 return false;
             }
             v0 = vi;
@@ -279,7 +280,7 @@ impl ContourSimplifier {
             let p1 = contour[node.index];
             let p2 = contour[node.next];
 
-            if (p1 - p0).cross_product(p2 - p1) == I::WIDE_ZERO {
+            if (p1 - p0).cross_product(p2 - p1) == I::Wide::ZERO {
                 n -= 1;
                 if n < 3 {
                     return None;

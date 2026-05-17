@@ -17,14 +17,14 @@ impl<I: IntNumber> Area<I> for [IntPoint<I>] {
 
     #[inline]
     fn area(&self) -> I::Wide {
-        self.area_two() / I::WIDE_TWO
+        self.area_two() / I::Wide::TWO
     }
 }
 
 impl<I: IntNumber> Area<I> for [IntContour<I>] {
     #[inline]
     fn area_two(&self) -> I::Wide {
-        let mut s = I::WIDE_ZERO;
+        let mut s = I::Wide::ZERO;
         for path in self.iter() {
             s = s.wrapping_add(path.area_two())
         }
@@ -33,14 +33,14 @@ impl<I: IntNumber> Area<I> for [IntContour<I>] {
 
     #[inline]
     fn area(&self) -> I::Wide {
-        self.area_two() / I::WIDE_TWO
+        self.area_two() / I::Wide::TWO
     }
 }
 
 impl<I: IntNumber> Area<I> for [IntShape<I>] {
     #[inline]
     fn area_two(&self) -> I::Wide {
-        let mut s = I::WIDE_ZERO;
+        let mut s = I::Wide::ZERO;
         for shape in self.iter() {
             s = s.wrapping_add(shape.area_two())
         }
@@ -49,7 +49,7 @@ impl<I: IntNumber> Area<I> for [IntShape<I>] {
 
     #[inline]
     fn area(&self) -> I::Wide {
-        self.area_two() / I::WIDE_TWO
+        self.area_two() / I::Wide::TWO
     }
 }
 

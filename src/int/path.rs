@@ -21,7 +21,7 @@ impl<I: IntNumber> ContourExtension<I> for [IntPoint<I>] {
     fn unsafe_area(&self) -> I::Wide {
         let n = self.len();
         let mut p0 = self[n - 1];
-        let mut area = I::WIDE_ZERO;
+        let mut area = I::Wide::ZERO;
 
         for &p1 in self.iter() {
             let a = p1.x.wide().wrapping_mul(p0.y.wide());
@@ -54,16 +54,16 @@ impl<I: IntNumber> ContourExtension<I> for [IntPoint<I>] {
         let mut p1 = self[n - 1];
         let mut e0 = p1 - p0;
 
-        let mut sign = I::WIDE_ZERO;
+        let mut sign = I::Wide::ZERO;
         for &p2 in self.iter() {
             let e1 = p2 - p1;
             let cross = e1.cross_product(e0).signum();
-            if cross == I::WIDE_ZERO {
+            if cross == I::Wide::ZERO {
                 let dot = e1.dot_product(e0);
-                if dot < I::WIDE_ZERO {
+                if dot < I::Wide::ZERO {
                     return false;
                 }
-            } else if sign == I::WIDE_ZERO {
+            } else if sign == I::Wide::ZERO {
                 sign = cross
             } else if sign != cross {
                 return false;
@@ -82,7 +82,7 @@ impl<I: IntNumber> ContourExtension<I> for [IntPoint<I>] {
     ///  - Returns `false` otherwise.
     #[inline(always)]
     fn is_clockwise_ordered(&self) -> bool {
-        self.unsafe_area() >= I::WIDE_ZERO
+        self.unsafe_area() >= I::Wide::ZERO
     }
 
     /// Checks if a point is contained within the `Path`.
