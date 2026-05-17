@@ -7,7 +7,7 @@ use crate::float::adapter::{
 use crate::int::despike::DeSpike;
 use i_float::adapter::FloatPointAdapter;
 use i_float::float::compatible::FloatPointCompatible;
-use i_float::int::number::IntNumber;
+use i_float::int::number::int::IntNumber;
 
 /// A trait that provides methods for despike complex geometrical structures.
 pub trait DeSpikeContour<P: FloatPointCompatible, I: IntNumber> {

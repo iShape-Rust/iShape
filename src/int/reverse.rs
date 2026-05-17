@@ -1,5 +1,5 @@
 use crate::int::shape::{IntShape, IntShapes};
-use i_float::int::number::IntNumber;
+use i_float::int::number::int::IntNumber;
 
 pub trait IntContourReverse {
     fn reverse_contours(&mut self);

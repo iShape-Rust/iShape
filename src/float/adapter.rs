@@ -5,7 +5,7 @@ use crate::int::path::IntPath;
 use crate::int::shape::{IntContour, IntShape, IntShapes};
 use i_float::adapter::FloatPointAdapter;
 use i_float::float::compatible::FloatPointCompatible;
-use i_float::int::number::IntNumber;
+use i_float::int::number::int::IntNumber;
 use i_float::int::point::IntPoint;
 
 pub trait PathToFloat<P: FloatPointCompatible, I: IntNumber> {

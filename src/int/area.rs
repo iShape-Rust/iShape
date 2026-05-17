@@ -1,6 +1,7 @@
 use crate::int::path::ContourExtension;
 use crate::int::shape::{IntContour, IntShape};
-use i_float::int::number::{IntNumber, WideIntNumber};
+use i_float::int::number::int::IntNumber;
+use i_float::int::number::wide_int::WideIntNumber;
 use i_float::int::point::IntPoint;
 
 pub trait Area<I: IntNumber> {
@@ -16,7 +17,7 @@ impl<I: IntNumber> Area<I> for [IntPoint<I>] {
 
     #[inline]
     fn area(&self) -> I::Wide {
-        self.area_two() / I::Wide::from_usize(2)
+        self.area_two() / I::WIDE_TWO
     }
 }
 
@@ -32,7 +33,7 @@ impl<I: IntNumber> Area<I> for [IntContour<I>] {
 
     #[inline]
     fn area(&self) -> I::Wide {
-        self.area_two() / I::Wide::from_usize(2)
+        self.area_two() / I::WIDE_TWO
     }
 }
 
@@ -48,7 +49,7 @@ impl<I: IntNumber> Area<I> for [IntShape<I>] {
 
     #[inline]
     fn area(&self) -> I::Wide {
-        self.area_two() / I::Wide::from_usize(2)
+        self.area_two() / I::WIDE_TWO
     }
 }
 

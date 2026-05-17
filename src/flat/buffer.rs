@@ -3,7 +3,7 @@ use crate::int::shape::{IntContour, IntShape};
 use crate::util::reserve::Reserve;
 use alloc::vec::Vec;
 use core::ops::Range;
-use i_float::int::number::IntNumber;
+use i_float::int::number::int::IntNumber;
 use i_float::int::point::IntPoint;
 
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]

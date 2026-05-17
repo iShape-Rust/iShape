@@ -1,6 +1,7 @@
 use i_float::adapter::FloatPointAdapter;
 use i_float::float::compatible::FloatPointCompatible;
-use i_float::int::number::{IntNumber, WideIntNumber};
+use i_float::int::number::int::IntNumber;
+use i_float::int::number::wide_int::WideIntNumber;
 
 pub trait IntArea<P: FloatPointCompatible, I: IntNumber> {
     /// The area of the `Path`.

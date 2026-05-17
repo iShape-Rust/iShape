@@ -1,6 +1,7 @@
 use crate::int::shape::IntContour;
 use alloc::vec::Vec;
-use i_float::int::number::{IntNumber, WideIntNumber};
+use i_float::int::number::int::IntNumber;
+use i_float::int::number::wide_int::WideIntNumber;
 use i_float::int::point::IntPoint;
 
 pub type IntPath<I> = Vec<IntPoint<I>>;

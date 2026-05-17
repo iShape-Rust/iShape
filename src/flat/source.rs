@@ -4,7 +4,7 @@ use i_float::adapter::FloatPointAdapter;
 use i_float::float::compatible::FloatPointCompatible;
 use i_float::float::number::FloatNumber;
 use i_float::float::rect::FloatRect;
-use i_float::int::number::IntNumber;
+use i_float::int::number::int::IntNumber;
 
 impl<I: IntNumber> FlatContoursBuffer<I> {
     #[inline]

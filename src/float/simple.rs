@@ -6,7 +6,7 @@ use crate::float::adapter::{
 use crate::int::simple::Simplify as IntSimplify;
 use i_float::adapter::FloatPointAdapter;
 use i_float::float::compatible::FloatPointCompatible;
-use i_float::int::number::IntNumber;
+use i_float::int::number::int::IntNumber;
 
 /// A trait that provides methods for simplifying complex geometrical structures.
 pub trait SimplifyContour<P: FloatPointCompatible, I: IntNumber> {

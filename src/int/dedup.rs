@@ -1,5 +1,5 @@
-use i_float::int::number::IntNumber;
 use crate::int::shape::IntContour;
+use i_float::int::number::int::IntNumber;
 
 /// Trait for removing redundant points from a contour.
 pub trait DedupContour {

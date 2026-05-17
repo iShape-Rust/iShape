@@ -1,7 +1,7 @@
 use crate::int::path::IntPath;
 use crate::int::shape::IntShape;
 use alloc::vec::Vec;
-use i_float::int::number::IntNumber;
+use i_float::int::number::int::IntNumber;
 
 pub type IntShapes<I> = Vec<IntShape<I>>;
 

@@ -1,7 +1,7 @@
 use crate::int::shape::{IntContour, IntShape, IntShapes};
 use alloc::vec;
 use alloc::vec::Vec;
-use i_float::int::number::IntNumber;
+use i_float::int::number::int::IntNumber;
 use i_float::int::point::IntPoint;
 
 /// A trait for removing spike artifacts from polygon contours.

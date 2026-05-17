@@ -3,7 +3,7 @@ use crate::int::shape::IntContour;
 use crate::util::reserve::Reserve;
 use i_float::adapter::FloatPointAdapter;
 use i_float::float::compatible::FloatPointCompatible;
-use i_float::int::number::IntNumber;
+use i_float::int::number::int::IntNumber;
 
 pub trait IntContourInit<P: FloatPointCompatible, I: IntNumber> {
     fn set_with_float(&mut self, contour: &Contour<P>, adapter: &FloatPointAdapter<P, I>);
