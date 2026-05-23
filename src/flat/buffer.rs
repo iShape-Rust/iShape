@@ -7,18 +7,37 @@ use i_float::int::number::int::IntNumber;
 use i_float::int::point::IntPoint;
 
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone)]
 pub struct FlatContoursBuffer<T: IntNumber> {
     pub points: Vec<IntPoint<T>>,
     pub ranges: Vec<Range<usize>>,
 }
 
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone)]
 pub struct FlatShapesBuffer<T: IntNumber> {
     pub points: Vec<IntPoint<T>>,
     pub contour_ranges: Vec<Range<usize>>,
     pub shape_ranges: Vec<Range<usize>>,
+}
+
+impl<T: IntNumber> Default for FlatContoursBuffer<T> {
+    fn default() -> Self {
+        Self {
+            points: Vec::new(),
+            ranges: Vec::new(),
+        }
+    }
+}
+
+impl<T: IntNumber> Default for FlatShapesBuffer<T> {
+    fn default() -> Self {
+        Self {
+            points: Vec::new(),
+            contour_ranges: Vec::new(),
+            shape_ranges: Vec::new(),
+        }
+    }
 }
 
 impl<T: IntNumber> FlatContoursBuffer<T> {
