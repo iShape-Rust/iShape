@@ -17,15 +17,15 @@ pub trait ContourExtension<I: IntNumber> {
 
 impl<I: IntNumber> ContourExtension<I> for [IntPoint<I>] {
     /// The area of the `Path`.
-    /// - Returns: A positive double area if path is clockwise and negative double area otherwise.
+    /// - Returns: A positive double area if path is counter-clockwise and negative double area otherwise.
     fn unsafe_area(&self) -> I::Wide {
         let n = self.len();
         let mut p0 = self[n - 1];
         let mut area = I::Wide::ZERO;
 
         for &p1 in self.iter() {
-            let a = p1.x.wide().wrapping_mul(p0.y.wide());
-            let b = p1.y.wide().wrapping_mul(p0.x.wide());
+            let a = p0.x.wide().wrapping_mul(p1.y.wide());
+            let b = p0.y.wide().wrapping_mul(p1.x.wide());
             area = area.wrapping_add(a).wrapping_sub(b);
             p0 = p1;
         }
@@ -82,7 +82,7 @@ impl<I: IntNumber> ContourExtension<I> for [IntPoint<I>] {
     ///  - Returns `false` otherwise.
     #[inline(always)]
     fn is_clockwise_ordered(&self) -> bool {
-        self.unsafe_area() >= I::Wide::ZERO
+        self.unsafe_area() <= I::Wide::ZERO
     }
 
     /// Checks if a point is contained within the `Path`.
@@ -136,7 +136,7 @@ mod tests {
 
         let area: i64 = contour.unsafe_area();
         let abs_area = area.unsigned_abs() as usize >> 1;
-        assert!(area < 0);
+        assert!(area > 0);
         assert!(abs_area > 1);
     }
 }

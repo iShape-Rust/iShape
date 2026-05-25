@@ -115,8 +115,8 @@ mod tests {
 
         let area_2 = path.unsafe_area();
 
-        assert_eq!(area_1, 2i64);
-        assert_eq!(area_2, -2i64);
+        assert_eq!(area_1, -2i64);
+        assert_eq!(area_2, 2i64);
     }
 
     #[test]
