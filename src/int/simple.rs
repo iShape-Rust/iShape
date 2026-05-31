@@ -256,6 +256,7 @@ impl ContourSimplifier {
         let mut prev = n - 1;
         let mut next = 1;
         let last = n - 1;
+        #[allow(clippy::explicit_counter_loop)]
         for index in 0..last {
             self.nodes.push(Node { next, index, prev });
             prev = index;
