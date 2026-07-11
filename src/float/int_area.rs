@@ -17,8 +17,8 @@ impl<P: FloatPointCompatible, I: IntNumber> IntArea<P, I> for [P] {
 
         for pi in self.iter() {
             let p1 = adapter.float_to_int(pi);
-            let a = p0.x.wide().wrapping_mul(p1.y.wide());
-            let b = p0.y.wide().wrapping_mul(p1.x.wide());
+            let a = p0.x.to_wide().wrapping_mul(p1.y.to_wide());
+            let b = p0.y.to_wide().wrapping_mul(p1.x.to_wide());
             area = area.wrapping_add(a).wrapping_sub(b);
             p0 = p1;
         }
