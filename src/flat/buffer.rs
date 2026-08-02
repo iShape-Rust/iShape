@@ -1,20 +1,19 @@
 use crate::int::count::PointsCount;
 use crate::int::shape::{IntContour, IntShape};
-use crate::util::reserve::Reserve;
 use alloc::vec::Vec;
 use core::ops::Range;
 use i_float::int::number::int::IntNumber;
 use i_float::int::point::IntPoint;
 
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct FlatContoursBuffer<T: IntNumber> {
     pub points: Vec<IntPoint<T>>,
     pub ranges: Vec<Range<usize>>,
 }
 
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct FlatShapesBuffer<T: IntNumber> {
     pub points: Vec<IntPoint<T>>,
     pub contour_ranges: Vec<Range<usize>>,
@@ -120,11 +119,11 @@ impl<T: IntNumber> FlatContoursBuffer<T> {
 
     #[inline]
     pub fn clear_and_reserve(&mut self, points: usize, contours: usize) {
-        self.points.reserve_capacity(points);
         self.points.clear();
+        self.points.reserve(points);
 
-        self.ranges.reserve_capacity(contours);
         self.ranges.clear();
+        self.ranges.reserve(contours);
     }
 
     #[inline]
@@ -213,14 +212,14 @@ impl<T: IntNumber> FlatShapesBuffer<T> {
 
     #[inline]
     pub fn clear_and_reserve(&mut self, points: usize, contours: usize, shapes: usize) {
-        self.points.reserve_capacity(points);
         self.points.clear();
+        self.points.reserve(points);
 
-        self.contour_ranges.reserve_capacity(contours);
         self.contour_ranges.clear();
+        self.contour_ranges.reserve(contours);
 
-        self.shape_ranges.reserve_capacity(shapes);
         self.shape_ranges.clear();
+        self.shape_ranges.reserve(shapes);
     }
 
     #[inline]

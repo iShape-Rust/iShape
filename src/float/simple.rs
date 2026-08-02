@@ -70,19 +70,43 @@ impl<P: FloatPointCompatible, I: IntNumber> SimplifyContour<P, I> for Shapes<P> 
 impl<P: FloatPointCompatible, I: IntNumber> SimplifyContour<P, I> for FloatFlatContoursBuffer<P> {
     fn simplify_contour(&mut self, adapter: &FloatPointAdapter<P, I>) -> bool {
         let int_buffer = self.to_int(adapter);
-        self.clear_and_reserve(int_buffer.ranges.len(), int_buffer.ranges.len());
+        let mut output =
+            FloatFlatContoursBuffer::with_capacity(int_buffer.points.len(), int_buffer.ranges.len());
         let mut changed = false;
 
         for mut contour in int_buffer.to_contours().into_iter() {
             changed |= contour.simplify_contour();
             if !contour.is_empty() {
-                self.add_contour_iter(contour.iter().map(|p| adapter.int_to_float(p)));
+                output.add_contour_iter(contour.iter().map(|p| adapter.int_to_float(p)));
             }
         }
 
-        if !changed {
-            return false;
+        if changed {
+            *self = output;
         }
-        true
+
+        changed
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::SimplifyContour;
+    use crate::flat::float::FloatFlatContoursBuffer;
+    use i_float::adapter::FloatPointAdapter;
+    use i_float::float::rect::FloatRect;
+
+    #[test]
+    fn unchanged_buffer_is_not_quantized() {
+        let contour = [[0.13, 0.13], [1.13, 0.13], [0.13, 1.13]];
+        let mut buffer = FloatFlatContoursBuffer::default();
+        buffer.add_contour(&contour);
+        let original = buffer.clone();
+        let adapter = FloatPointAdapter::<_, i32>::with_scale(FloatRect::new(0.0, 2.0, 0.0, 2.0), 10.0);
+
+        let changed = buffer.simplify_contour(&adapter);
+
+        assert!(!changed);
+        assert_eq!(buffer, original);
     }
 }

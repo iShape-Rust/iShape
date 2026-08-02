@@ -5,14 +5,14 @@ use core::ops::Range;
 use i_float::float::compatible::FloatPointCompatible;
 
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct FloatFlatContoursBuffer<P> {
     pub points: Vec<P>,
     pub ranges: Vec<Range<usize>>,
 }
 
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct FloatFlatShapesBuffer<P> {
     pub points: Vec<P>,
     pub contour_ranges: Vec<Range<usize>>,
@@ -23,7 +23,7 @@ impl<P> FloatFlatContoursBuffer<P> {
     #[inline]
     pub fn with_capacity(points: usize, contours: usize) -> Self {
         Self {
-            points: Vec::with_capacity(points.saturating_mul(2)),
+            points: Vec::with_capacity(points),
             ranges: Vec::with_capacity(contours),
         }
     }
@@ -57,7 +57,6 @@ impl<P> FloatFlatContoursBuffer<P> {
     pub fn add_contour_iter<I>(&mut self, contour_iter: I)
     where
         I: IntoIterator<Item = P>,
-        P: Clone,
     {
         let start = self.points.len();
         let mut iter = contour_iter.into_iter();
@@ -126,7 +125,7 @@ impl<P> FloatFlatContoursBuffer<P> {
     #[inline]
     pub(crate) fn contour_pairs_at(&self, index: usize) -> Option<&[P]> {
         let range = self.ranges.get(index)?;
-        if range.start >= range.end || range.end > self.points.len() {
+        if range.start > range.end || range.end > self.points.len() {
             return None;
         }
         Some(&self.points[range.clone()])
@@ -137,7 +136,7 @@ impl<P> FloatFlatShapesBuffer<P> {
     #[inline]
     pub fn with_capacity(points: usize, contours: usize, shapes: usize) -> Self {
         Self {
-            points: Vec::with_capacity(points.saturating_mul(2)),
+            points: Vec::with_capacity(points),
             contour_ranges: Vec::with_capacity(contours),
             shape_ranges: Vec::with_capacity(shapes),
         }
@@ -177,7 +176,6 @@ impl<P> FloatFlatShapesBuffer<P> {
     pub fn add_contour_iter<I>(&mut self, contour_iter: I)
     where
         I: IntoIterator<Item = P>,
-        P: Clone,
     {
         let contour_start = self.points.len();
         let mut iter = contour_iter.into_iter();
@@ -283,7 +281,7 @@ impl<P> FloatFlatShapesBuffer<P> {
     #[inline]
     pub(crate) fn contour_pairs_at(&self, index: usize) -> Option<&[P]> {
         let range = self.contour_ranges.get(index)?;
-        if range.start >= range.end || range.end > self.points.len() {
+        if range.start > range.end || range.end > self.points.len() {
             return None;
         }
         Some(&self.points[range.clone()])

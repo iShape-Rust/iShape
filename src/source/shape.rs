@@ -24,9 +24,7 @@ impl<'a, P> Iterator for ShapeResourceIterator<'a, P> {
         }
         let i = self.index;
         self.index += 1;
-        let it = unsafe { self.slice.get_unchecked(i) };
-
-        Some(it.as_slice())
+        self.slice.get(i).map(Vec::as_slice)
     }
 
     #[inline]
@@ -34,7 +32,7 @@ impl<'a, P> Iterator for ShapeResourceIterator<'a, P> {
     where
         Self: Sized,
     {
-        self.slice.len()
+        self.slice.len().saturating_sub(self.index)
     }
 }
 
@@ -132,5 +130,14 @@ mod tests {
         let count = array.iter_paths().fold(0, |s, it| s + it.len());
 
         assert_eq!(count, 2);
+    }
+
+    #[test]
+    fn count_reports_remaining_contours() {
+        let shape = [vec![[0.0, 0.0]], vec![[1.0, 1.0]]];
+        let mut iter = shape.iter_paths();
+
+        assert!(iter.next().is_some());
+        assert_eq!(iter.count(), 1);
     }
 }

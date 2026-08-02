@@ -123,70 +123,70 @@ mod tests {
     fn test_order_00() {
         let path = int_path![[-10, -10], [-10, 10], [10, 10], [10, -10],];
 
-        assert_eq!(path.is_clockwise_ordered(), true);
+        assert!(path.is_clockwise_ordered());
     }
 
     #[test]
     fn test_order_01() {
         let path = int_path![[-10, -10], [10, -10], [10, 10], [-10, 10],];
 
-        assert_eq!(path.is_clockwise_ordered(), false);
+        assert!(!path.is_clockwise_ordered());
     }
 
     #[test]
     fn test_convex_00() {
         let mut path = int_path![[-10, -10], [-10, 10], [10, 10], [10, -10],];
 
-        assert_eq!(path.is_convex(), true);
+        assert!(path.is_convex());
         path.reverse();
-        assert_eq!(path.is_convex(), true);
+        assert!(path.is_convex());
     }
 
     #[test]
     fn test_convex_01() {
         let mut path = int_path![[-10, -10], [0, 10], [10, -10], [0, -5],];
 
-        assert_eq!(path.is_convex(), false);
+        assert!(!path.is_convex());
         path.reverse();
-        assert_eq!(path.is_convex(), false);
+        assert!(!path.is_convex());
     }
 
     #[test]
     fn test_convex_02() {
         let mut path = int_path![[0, 0], [1, 2], [3, 3], [4, 1], [2, 0],];
 
-        assert_eq!(path.is_convex(), true);
+        assert!(path.is_convex());
         path.reverse();
-        assert_eq!(path.is_convex(), true);
+        assert!(path.is_convex());
     }
 
     #[test]
     fn test_convex_03() {
         let mut path = int_path![[0, 0], [1, 2], [0, 4], [4, 2], [2, 0],];
 
-        assert_eq!(path.is_convex(), false);
+        assert!(!path.is_convex());
         path.reverse();
-        assert_eq!(path.is_convex(), false);
+        assert!(!path.is_convex());
     }
 
     #[test]
     fn test_convex_04() {
         let path1 = int_path![[0, 0]];
 
-        assert_eq!(path1.is_convex(), true);
+        assert!(path1.is_convex());
 
         let path2 = int_path![[0, 0], [1, 0],];
 
-        assert_eq!(path2.is_convex(), true);
+        assert!(path2.is_convex());
     }
 
     #[test]
     fn test_convex_05() {
         let mut path = int_path![[0, 0], [1, 2], [2, 3], [3, 2], [4, 1], [2, 0],];
 
-        assert_eq!(path.is_convex(), true);
+        assert!(path.is_convex());
         path.reverse();
-        assert_eq!(path.is_convex(), true);
+        assert!(path.is_convex());
     }
 
     #[test]
@@ -202,9 +202,9 @@ mod tests {
             [0, -10],
         ];
 
-        assert_eq!(path.is_convex(), true);
+        assert!(path.is_convex());
         path.reverse();
-        assert_eq!(path.is_convex(), true);
+        assert!(path.is_convex());
     }
 
     #[test]
@@ -220,8 +220,8 @@ mod tests {
             [0, -10],
         ];
 
-        assert_eq!(path.is_convex(), false);
+        assert!(!path.is_convex());
         path.reverse();
-        assert_eq!(path.is_convex(), false);
+        assert!(!path.is_convex());
     }
 }
