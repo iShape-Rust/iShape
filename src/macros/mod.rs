@@ -1,81 +1,61 @@
 #[macro_export]
 macro_rules! int_path {
     ( $( [$x:expr, $y:expr] ),* $(,)? ) => {
-        {
-            let mut path: $crate::base::data::Path<_> = ::core::default::Default::default();
-            $(
-                path.push($crate::int::IntPoint::new($x, $y));
-            )*
-            path
-        }
+        [$( $crate::int::IntPoint::new($x, $y) ),*]
+            .into_iter()
+            .collect::<$crate::base::data::Path<_>>()
     };
 }
 
 #[macro_export]
 macro_rules! int_shape {
     ( $( [ $( [$x:expr, $y:expr] ),* $(,)? ] ),* $(,)? ) => {
-        {
-            let mut shape: $crate::base::data::Shape<_> = ::core::default::Default::default();
-            $(
-                let mut contour: $crate::base::data::Contour<_> = ::core::default::Default::default();
-                $(
-                    contour.push($crate::int::IntPoint::new($x, $y));
-                )*
-                shape.push(contour);
-            )*
-            shape
-        }
+        [$(
+            [$( $crate::int::IntPoint::new($x, $y) ),*]
+                .into_iter()
+                .collect::<$crate::base::data::Contour<_>>()
+        ),*]
+            .into_iter()
+            .collect::<$crate::base::data::Shape<_>>()
     };
 }
 
 #[macro_export]
 macro_rules! int_shapes {
     ( $( [ $( [ $( [$x:expr, $y:expr] ),* $(,)? ] ),* $(,)? ] ),* $(,)? ) => {
-        {
-            let mut shapes: $crate::base::data::Shapes<_> = ::core::default::Default::default();
-            $(
-                let mut shape: $crate::base::data::Shape<_> = ::core::default::Default::default();
-                $(
-                    let mut contour: $crate::base::data::Contour<_> = ::core::default::Default::default();
-                    $(
-                        contour.push($crate::int::IntPoint::new($x, $y));
-                    )*
-                    shape.push(contour);
-                )*
-                shapes.push(shape);
-            )*
-            shapes
-        }
+        [$(
+            [$(
+                [$( $crate::int::IntPoint::new($x, $y) ),*]
+                    .into_iter()
+                    .collect::<$crate::base::data::Contour<_>>()
+            ),*]
+                .into_iter()
+                .collect::<$crate::base::data::Shape<_>>()
+        ),*]
+            .into_iter()
+            .collect::<$crate::base::data::Shapes<_>>()
     };
 }
 
 #[macro_export]
 macro_rules! path {
     ( $( $point:expr ),* $(,)? ) => {
-        {
-            let mut path: $crate::base::data::Path<_> = ::core::default::Default::default();
-            $(
-                path.push($point);
-            )*
-            path
-        }
+        [$( $point ),*]
+            .into_iter()
+            .collect::<$crate::base::data::Path<_>>()
     };
 }
 
 #[macro_export]
 macro_rules! paths {
     ( $( [ $( $point:expr ),* $(,)? ] ),* $(,)? ) => {
-        {
-            let mut paths: $crate::base::data::Paths<_> = ::core::default::Default::default();
-            $(
-                let mut path: $crate::base::data::Path<_> = ::core::default::Default::default();
-                $(
-                    path.push($point);
-                )*
-                paths.push(path);
-            )*
-            paths
-        }
+        [$(
+            [$( $point ),*]
+                .into_iter()
+                .collect::<$crate::base::data::Path<_>>()
+        ),*]
+            .into_iter()
+            .collect::<$crate::base::data::Paths<_>>()
     };
 }
 

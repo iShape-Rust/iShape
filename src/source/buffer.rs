@@ -147,12 +147,24 @@ mod tests {
             [11.0, 11.0],
         ];
         let contour_ranges: [Range<usize>; 2] = [0..3, 3..6];
-        let shape_ranges: [Range<usize>; 1] = [0..2];
-        buffer.set_flat(&points, &contour_ranges, &shape_ranges);
+        let shape_range = 0..2;
+        buffer.set_flat(&points, &contour_ranges, core::slice::from_ref(&shape_range));
 
         let mut iter = buffer.iter_paths();
         assert_eq!(iter.next().unwrap(), &points[0..3]);
         assert_eq!(iter.next().unwrap(), &points[3..6]);
+        assert!(iter.next().is_none());
+    }
+
+    #[test]
+    fn iter_paths_preserves_empty_contours() {
+        let mut buffer = FloatFlatContoursBuffer::<[f64; 2]>::default();
+        let empty_range = 0..0;
+        buffer.set_flat(&[], core::slice::from_ref(&empty_range));
+
+        let mut iter = buffer.iter_paths();
+
+        assert_eq!(iter.next(), Some([].as_slice()));
         assert!(iter.next().is_none());
     }
 }

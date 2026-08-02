@@ -52,11 +52,10 @@ impl<P: FloatPointCompatible> Area<P> for [Shape<P>] {
 #[cfg(test)]
 mod tests {
     use crate::float::area::Area;
-    use alloc::vec;
 
     #[test]
     fn test_0() {
-        let square = vec![[-1.0, -1.0], [1.0, -1.0], [1.0, 1.0], [-1.0, 1.0]];
+        let square = [[-1.0, -1.0], [1.0, -1.0], [1.0, 1.0], [-1.0, 1.0]];
 
         let area = square.area();
         assert_eq!(area, 4.0);

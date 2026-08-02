@@ -11,13 +11,22 @@ pub trait ContourExtension<I: IntNumber> {
     fn unsafe_area(&self) -> I::Wide;
     fn is_convex(&self) -> bool;
     fn is_clockwise_ordered(&self) -> bool;
-    fn contains(&self, point: IntPoint<I>) -> bool;
+    fn contains_point(&self, point: IntPoint<I>) -> bool;
     fn to_reversed(&self) -> IntContour<I>;
 }
 
 impl<I: IntNumber> ContourExtension<I> for [IntPoint<I>] {
-    /// The area of the `Path`.
-    /// - Returns: A positive double area if path is counter-clockwise and negative double area otherwise.
+    /// Returns the signed double area of the path.
+    ///
+    /// The result is positive for a counter-clockwise path and negative for a
+    /// clockwise path. A non-empty simple path whose coordinates satisfy the
+    /// conservative range documented by `i_float::int::point::IntPoint` fits
+    /// in `I::Wide`. Paths with self-intersections or repeated winding require
+    /// a separate bound on the accumulated area.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the path is empty.
     fn unsafe_area(&self) -> I::Wide {
         let n = self.len();
         let mut p0 = self[n - 1];
@@ -88,17 +97,21 @@ impl<I: IntNumber> ContourExtension<I> for [IntPoint<I>] {
     /// Checks if a point is contained within the `Path`.
     /// - Parameter p: The `IntPoint` point to check.
     /// - Returns: A boolean value indicating whether the point is within the path.
-    fn contains(&self, point: IntPoint<I>) -> bool {
-        let n = self.len();
+    fn contains_point(&self, point: IntPoint<I>) -> bool {
+        let Some(&last) = self.last() else {
+            return false;
+        };
         let mut is_contain = false;
-        let mut b = self[n - 1];
+        let mut b = last;
         for &a in self.iter() {
             let is_in_range = (a.y > point.y) != (b.y > point.y);
             if is_in_range {
-                let dx = b.x - a.x;
-                let dy = b.y - a.y;
-                let sx = (point.y - a.y) * dx / dy + a.x;
-                if point.x < sx {
+                let ax = a.x.to_wide();
+                let ay = a.y.to_wide();
+                let dx = b.x.to_wide() - ax;
+                let dy = b.y.to_wide() - ay;
+                let sx = (point.y.to_wide() - ay) * dx / dy + ax;
+                if point.x.to_wide() < sx {
                     is_contain = !is_contain;
                 }
             }
@@ -118,8 +131,10 @@ impl<I: IntNumber> ContourExtension<I> for [IntPoint<I>] {
 
 #[cfg(test)]
 mod tests {
+    use crate::int::IntPoint;
     use crate::int::path::ContourExtension;
     use crate::int_path;
+    use alloc::vec::Vec;
 
     #[test]
     fn test_0() {
@@ -138,5 +153,20 @@ mod tests {
         let abs_area = area.unsigned_abs() as usize >> 1;
         assert!(area > 0);
         assert!(abs_area > 1);
+    }
+
+    #[test]
+    fn empty_contour_contains_nothing() {
+        let contour = Vec::<IntPoint<i32>>::new();
+
+        assert!(!contour.contains_point(IntPoint::new(0, 0)));
+    }
+
+    #[test]
+    fn contains_point_uses_wide_intermediates() {
+        let contour = int_path![[0, 0], [100_000, 100_000], [200_000, 0]];
+
+        assert!(contour.contains_point(IntPoint::new(100_000, 50_000)));
+        assert!(!contour.contains_point(IntPoint::new(100_000, 150_000)));
     }
 }

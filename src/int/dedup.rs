@@ -15,10 +15,10 @@ impl<I: IntNumber> DedupContour for IntContour<I> {
         let n = self.len();
         self.dedup();
 
-        if let (Some(&first), Some(&last)) = (self.first(), self.last())
-            && last == first
-        {
-            self.pop();
+        if let (Some(&first), Some(&last)) = (self.first(), self.last()) {
+            if last == first {
+                self.pop();
+            }
         }
 
         self.len() < n
@@ -37,7 +37,7 @@ mod tests {
         let modified = contour.dedup_contour();
 
         assert_eq!(contour.len(), 2);
-        assert_eq!(modified, false);
+        assert!(!modified);
     }
 
     #[test]
@@ -47,7 +47,7 @@ mod tests {
         let modified = contour.dedup_contour();
 
         assert_eq!(contour.len(), 2);
-        assert_eq!(modified, true);
+        assert!(modified);
     }
 
     #[test]
@@ -57,6 +57,6 @@ mod tests {
         let modified = contour.dedup_contour();
 
         assert_eq!(contour.len(), 2);
-        assert_eq!(modified, true);
+        assert!(modified);
     }
 }

@@ -341,7 +341,7 @@ mod tests {
         let modified = contour.remove_spikes();
 
         assert_eq!(contour.len(), 4);
-        assert_eq!(modified, false);
+        assert!(!modified);
     }
 
     #[test]
@@ -351,7 +351,7 @@ mod tests {
         let modified = contour.remove_spikes();
 
         assert_eq!(contour.len(), 4);
-        assert_eq!(modified, true);
+        assert!(modified);
     }
 
     #[test]
@@ -361,7 +361,7 @@ mod tests {
         let modified = contour.remove_spikes();
 
         assert_eq!(contour.len(), 4);
-        assert_eq!(modified, true);
+        assert!(modified);
     }
 
     #[test]
@@ -371,7 +371,7 @@ mod tests {
         let modified = contour.remove_spikes();
 
         assert_eq!(contour.len(), 5);
-        assert_eq!(modified, true);
+        assert!(modified);
     }
 
     #[test]
@@ -381,7 +381,7 @@ mod tests {
         let modified = contour.remove_spikes();
 
         assert_eq!(contour.len(), 5);
-        assert_eq!(modified, true);
+        assert!(modified);
     }
 
     #[test]
@@ -400,6 +400,6 @@ mod tests {
         let modified = contour.remove_spikes();
 
         assert_eq!(contour.len(), 8);
-        assert_eq!(modified, false);
+        assert!(!modified);
     }
 }

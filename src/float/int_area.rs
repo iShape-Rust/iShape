@@ -11,8 +11,10 @@ pub trait IntArea<P: FloatPointCompatible, I: IntNumber> {
 
 impl<P: FloatPointCompatible, I: IntNumber> IntArea<P, I> for [P] {
     fn unsafe_int_area(&self, adapter: &FloatPointAdapter<P, I>) -> I::Wide {
-        let n = self.len();
-        let mut p0 = adapter.float_to_int(&self[n - 1]);
+        let Some(last) = self.last() else {
+            return I::Wide::ZERO;
+        };
+        let mut p0 = adapter.float_to_int(last);
         let mut area = I::Wide::ZERO;
 
         for pi in self.iter() {
@@ -31,7 +33,9 @@ impl<P: FloatPointCompatible, I: IntNumber> IntArea<P, I> for [P] {
 mod tests {
     use crate::float::int_area::IntArea;
     use crate::path;
+    use alloc::vec::Vec;
     use i_float::adapter::FloatPointAdapter;
+    use i_float::float::rect::FloatRect;
 
     #[test]
     fn test_0() {
@@ -40,5 +44,13 @@ mod tests {
 
         let area = square.unsafe_int_area(&adapter);
         assert!(area > 0i64);
+    }
+
+    #[test]
+    fn empty_contour_has_zero_area() {
+        let contour = Vec::<[f32; 2]>::new();
+        let adapter = FloatPointAdapter::<_, i32>::new(FloatRect::zero());
+
+        assert_eq!(contour.unsafe_int_area(&adapter), 0);
     }
 }

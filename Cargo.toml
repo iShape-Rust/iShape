@@ -3,9 +3,14 @@ name = "i_shape"
 version = "4.0.0"
 authors = ["Nail Sharipov <nailxsharipov@gmail.com>"]
 edition = "2024"
+rust-version = "1.85"
 description = "iShape is a compact and efficient library specifically designed for representing 2D data structures using IntPoint."
 license = "MIT"
-repository = "https://github.com/iShape-Rust/iShape"
+repository = "https://github.com/iShape-Rust/i_shape"
+homepage = "https://github.com/iShape-Rust/i_shape"
+documentation = "https://docs.rs/i_shape"
+readme = "README.md"
+keywords = ["geometry", "polygon", "shape", "no-std"]
 
 categories = ["no-std", "data-structures"]
 
@@ -13,8 +18,7 @@ categories = ["no-std", "data-structures"]
 serde = ["dep:serde", "i_float/serde"]
 
 [dependencies]
-#i_float = { version = "^4.0.0"}
-i_float = { path = "../iFloat" }
+i_float = { version = "^4.0.0", path = "../iFloat" }
 serde = { version = "^1.0", default-features = false, features = ["derive", "alloc"], optional = true }
 
 [dev-dependencies]

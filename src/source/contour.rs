@@ -34,7 +34,7 @@ impl<'a, P> Iterator for ContourResourceIterator<'a, P> {
     where
         Self: Sized,
     {
-        1
+        usize::from(!self.finished)
     }
 }
 
@@ -132,5 +132,14 @@ mod tests {
         let count = array.iter_paths().fold(0, |s, it| s + it.len());
 
         assert_eq!(count, 2);
+    }
+
+    #[test]
+    fn count_reports_remaining_contours() {
+        let contour = [[0.0, 0.0], [0.0, 1.0]];
+        let mut iter = contour.iter_paths();
+
+        assert!(iter.next().is_some());
+        assert_eq!(iter.count(), 0);
     }
 }

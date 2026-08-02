@@ -21,12 +21,11 @@ impl<'a, P> Iterator for ShapesResourceIterator<'a, P> {
     #[inline]
     fn next(&mut self) -> Option<Self::Item> {
         while self.i < self.slice.len() {
-            let sub_slice = unsafe { self.slice.get_unchecked(self.i) };
+            let sub_slice = self.slice.get(self.i)?;
             if self.j < sub_slice.len() {
                 let j = self.j;
                 self.j += 1;
-                let it = unsafe { sub_slice.get_unchecked(j) };
-                return Some(it.as_slice());
+                return sub_slice.get(j).map(Vec::as_slice);
             }
             self.i += 1;
             self.j = 0;
@@ -40,7 +39,12 @@ impl<'a, P> Iterator for ShapesResourceIterator<'a, P> {
     where
         Self: Sized,
     {
-        self.slice.iter().fold(0, |s, shape| s + shape.len())
+        let Some((current, remaining)) = self.slice.get(self.i..).and_then(|slice| slice.split_first())
+        else {
+            return 0;
+        };
+
+        current.len().saturating_sub(self.j) + remaining.iter().map(Vec::len).sum::<usize>()
     }
 }
 
@@ -122,5 +126,14 @@ mod tests {
         let count = array.iter_paths().fold(0, |s, it| s + it.len());
 
         assert_eq!(count, 2);
+    }
+
+    #[test]
+    fn count_reports_remaining_contours() {
+        let shapes = [vec![vec![[0.0, 0.0]], vec![[1.0, 1.0]]], vec![vec![[2.0, 2.0]]]];
+        let mut iter = shapes.iter_paths();
+
+        assert!(iter.next().is_some());
+        assert_eq!(iter.count(), 2);
     }
 }
