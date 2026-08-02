@@ -3,6 +3,7 @@ use alloc::vec::Vec;
 use i_float::int::number::int::IntNumber;
 use i_float::int::number::wide_int::WideIntNumber;
 use i_float::int::point::IntPoint;
+use i_float::triangle::Triangle;
 
 pub type IntPath<I> = Vec<IntPoint<I>>;
 pub type IntPaths<I> = Vec<IntPath<I>>;
@@ -106,12 +107,12 @@ impl<I: IntNumber> ContourExtension<I> for [IntPoint<I>] {
         for &a in self.iter() {
             let is_in_range = (a.y > point.y) != (b.y > point.y);
             if is_in_range {
-                let ax = a.x.to_wide();
-                let ay = a.y.to_wide();
-                let dx = b.x.to_wide() - ax;
-                let dy = b.y.to_wide() - ay;
-                let sx = (point.y.to_wide() - ay) * dx / dy + ax;
-                if point.x.to_wide() < sx {
+                let is_intersection_right = if a.y < b.y {
+                    Triangle::is_clockwise(a, point, b)
+                } else {
+                    Triangle::is_clockwise(b, point, a)
+                };
+                if is_intersection_right {
                     is_contain = !is_contain;
                 }
             }
@@ -168,5 +169,14 @@ mod tests {
 
         assert!(contour.contains_point(IntPoint::new(100_000, 50_000)));
         assert!(!contour.contains_point(IntPoint::new(100_000, 150_000)));
+    }
+
+    #[test]
+    fn contains_point_does_not_round_edge_intersection() {
+        let contour = int_path![[0, 0], [2, 0], [1, 2]];
+        let reversed = contour.to_reversed();
+
+        assert!(!contour.contains_point(IntPoint::new(0, 1)));
+        assert!(!reversed.contains_point(IntPoint::new(0, 1)));
     }
 }

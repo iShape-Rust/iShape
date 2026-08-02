@@ -19,7 +19,8 @@ All notable changes to this project are documented in this file.
 - Prevented `FloatFlatContoursBuffer::simplify_contour` from quantizing an unchanged buffer.
 - Fixed `ShapeResource` iterator counts after partial consumption.
 - Made integer containment handle empty contours without panicking.
-- Moved point-in-contour intersection arithmetic to the associated wide integer type.
+- Removed integer-division rounding from point-in-contour tests by comparing
+  edge topology with a wide cross product.
 - Removed unnecessary unchecked indexing from shape resource iterators.
 - Corrected floating-point flat-buffer capacity allocation.
 
