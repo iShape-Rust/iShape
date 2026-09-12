@@ -1,5 +1,5 @@
 use crate::flat::buffer::{FlatContoursBuffer, FlatShapesBuffer};
-use crate::source::resource::ShapeResource;
+use crate::source::float::resource::ShapeResource;
 use i_float::adapter::FloatPointAdapter;
 use i_float::float::compatible::FloatPointCompatible;
 use i_float::float::number::FloatNumber;

@@ -18,7 +18,8 @@ categories = ["no-std", "data-structures"]
 serde = ["dep:serde", "i_float/serde"]
 
 [dependencies]
-i_float = { version = "^4.0.0", path = "../iFloat" }
+#i_float = { version = "^4.0.0", path = "../iFloat" }
+i_float = { path = "../iFloat"}
 serde = { version = "^1.0", default-features = false, features = ["derive", "alloc"], optional = true }
 
 [dev-dependencies]
