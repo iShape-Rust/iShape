@@ -1,8 +1,9 @@
 use crate::base::data::{Contour, Path, Shape, Shapes};
 use crate::flat::buffer::FlatContoursBuffer;
 use crate::flat::float::FloatFlatContoursBuffer;
-use crate::int::path::IntPath;
+use crate::int::path::{IntPath, IntPaths};
 use crate::int::shape::{IntContour, IntShape, IntShapes};
+use crate::source::float::resource::ShapeResource;
 use i_float::adapter::FloatPointAdapter;
 use i_float::float::compatible::FloatPointCompatible;
 use i_float::int::number::int::IntNumber;
@@ -27,6 +28,18 @@ pub trait BufferToFloat<P: FloatPointCompatible, I: IntNumber> {
 pub trait PathToInt<P: FloatPointCompatible, I: IntNumber> {
     fn to_int(&self, adapter: &FloatPointAdapter<P, I>) -> IntPath<I>;
 }
+
+/// Converts the paths of any floating-point shape resource to integer coordinates.
+pub trait ResourceToInt<P: FloatPointCompatible>: ShapeResource<P> {
+    /// Preserves path order, point order, and empty paths. Nested shapes are
+    /// flattened, so shape boundaries are not retained.
+    #[inline]
+    fn to_int_paths<I: IntNumber>(&self, adapter: &FloatPointAdapter<P, I>) -> IntPaths<I> {
+        self.iter_paths().map(|path| path.to_int(adapter)).collect()
+    }
+}
+
+impl<P: FloatPointCompatible, S: ShapeResource<P> + ?Sized> ResourceToInt<P> for S {}
 
 pub trait ShapeToInt<P: FloatPointCompatible, I: IntNumber> {
     fn to_int(&self, adapter: &FloatPointAdapter<P, I>) -> IntShape<I>;

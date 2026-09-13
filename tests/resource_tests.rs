@@ -182,3 +182,45 @@ fn downstream_resource_borrows_local_storage() {
     assert_eq!(int_paths(&&resource), vec![first]);
     assert_eq!(first.as_ptr(), points.as_ptr());
 }
+
+#[test]
+fn float_resource_conversion_flattens_shapes_and_preserves_empty_paths() {
+    use i_float::adapter::FloatPointAdapter;
+    use i_float::float::rect::FloatRect;
+    use i_shape::float::adapter::{PathToInt, ResourceToInt};
+
+    let adapter =
+        FloatPointAdapter::<[f64; 2], i32>::with_scale(FloatRect::new(-10.0, 10.0, -10.0, 10.0), 2.0);
+    let path = vec![[1.5, -2.0], [-3.0, 4.5]];
+    let expected = vec![IntPoint::new(3, -4), IntPoint::new(-6, 9)];
+    // Both conversion traits remain usable, including on unsized slices.
+    assert_eq!(path.to_int(&adapter), expected);
+    assert_eq!(path[..].to_int_paths(&adapter), vec![expected.clone()]);
+    let shapes = vec![vec![], vec![path, vec![]], vec![vec![[0.0, 0.0]]]];
+    assert_eq!(
+        shapes[..].to_int_paths(&adapter),
+        vec![expected, vec![], vec![IntPoint::new(0, 0)]]
+    );
+    assert!(shapes[..0].to_int_paths(&adapter).is_empty());
+}
+
+#[test]
+fn float_resource_conversion_respects_flat_buffer_ranges() {
+    use i_float::adapter::FloatPointAdapter;
+    use i_float::float::rect::FloatRect;
+    use i_shape::float::adapter::ResourceToInt;
+
+    let buffer = FloatFlatContoursBuffer {
+        points: vec![[1.0_f32, 2.0], [-3.0, 4.0]],
+        ranges: vec![1..2, 0..0, 0..2],
+    };
+    let adapter = FloatPointAdapter::<_, i16>::with_scale(FloatRect::new(-10.0, 10.0, -10.0, 10.0), 1.0);
+    assert_eq!(
+        buffer.to_int_paths(&adapter),
+        vec![
+            vec![IntPoint::new(-3, 4)],
+            vec![],
+            vec![IntPoint::new(1, 2), IntPoint::new(-3, 4)],
+        ]
+    );
+}
