@@ -1,7 +1,7 @@
 use crate::base::data::{Contour, Path, Shape, Shapes};
 use crate::flat::buffer::FlatContoursBuffer;
 use crate::flat::float::FloatFlatContoursBuffer;
-use crate::int::path::{IntPath, IntPaths};
+use crate::int::path::IntPath;
 use crate::int::shape::{IntContour, IntShape, IntShapes};
 use crate::source::float::resource::ShapeResource;
 use i_float::adapter::FloatPointAdapter;
@@ -29,17 +29,22 @@ pub trait PathToInt<P: FloatPointCompatible, I: IntNumber> {
     fn to_int(&self, adapter: &FloatPointAdapter<P, I>) -> IntPath<I>;
 }
 
-/// Converts the paths of any floating-point shape resource to integer coordinates.
-pub trait ResourceToInt<P: FloatPointCompatible>: ShapeResource<P> {
+/// Lazily converts the paths of a floating-point shape resource to integer coordinates.
+pub trait ResourceToIntIter<P: FloatPointCompatible>: ShapeResource<P> {
     /// Preserves path order, point order, and empty paths. Nested shapes are
-    /// flattened, so shape boundaries are not retained.
+    /// flattened, so shape boundaries are not retained. Points are converted
+    /// only as the returned iterators are consumed.
     #[inline]
-    fn to_int_paths<I: IntNumber>(&self, adapter: &FloatPointAdapter<P, I>) -> IntPaths<I> {
-        self.iter_paths().map(|path| path.to_int(adapter)).collect()
+    fn iter_int_paths<'a, I: IntNumber>(
+        &'a self,
+        adapter: &'a FloatPointAdapter<P, I>,
+    ) -> impl Iterator<Item = impl Iterator<Item = IntPoint<I>> + 'a> + 'a {
+        self.iter_paths()
+            .map(|path| path.iter().map(|point| adapter.float_to_int(point)))
     }
 }
 
-impl<P: FloatPointCompatible, S: ShapeResource<P> + ?Sized> ResourceToInt<P> for S {}
+impl<P: FloatPointCompatible, S: ShapeResource<P> + ?Sized> ResourceToIntIter<P> for S {}
 
 pub trait ShapeToInt<P: FloatPointCompatible, I: IntNumber> {
     fn to_int(&self, adapter: &FloatPointAdapter<P, I>) -> IntShape<I>;

@@ -187,7 +187,7 @@ fn downstream_resource_borrows_local_storage() {
 fn float_resource_conversion_flattens_shapes_and_preserves_empty_paths() {
     use i_float::adapter::FloatPointAdapter;
     use i_float::float::rect::FloatRect;
-    use i_shape::float::adapter::{PathToInt, ResourceToInt};
+    use i_shape::float::adapter::{PathToInt, ResourceToIntIter};
 
     let adapter =
         FloatPointAdapter::<[f64; 2], i32>::with_scale(FloatRect::new(-10.0, 10.0, -10.0, 10.0), 2.0);
@@ -195,20 +195,29 @@ fn float_resource_conversion_flattens_shapes_and_preserves_empty_paths() {
     let expected = vec![IntPoint::new(3, -4), IntPoint::new(-6, 9)];
     // Both conversion traits remain usable, including on unsized slices.
     assert_eq!(path.to_int(&adapter), expected);
-    assert_eq!(path[..].to_int_paths(&adapter), vec![expected.clone()]);
+    assert_eq!(
+        path[..]
+            .iter_int_paths(&adapter)
+            .map(|path| path.collect::<Vec<_>>())
+            .collect::<Vec<_>>(),
+        vec![expected.clone()]
+    );
     let shapes = vec![vec![], vec![path, vec![]], vec![vec![[0.0, 0.0]]]];
     assert_eq!(
-        shapes[..].to_int_paths(&adapter),
+        shapes[..]
+            .iter_int_paths(&adapter)
+            .map(|path| path.collect::<Vec<_>>())
+            .collect::<Vec<_>>(),
         vec![expected, vec![], vec![IntPoint::new(0, 0)]]
     );
-    assert!(shapes[..0].to_int_paths(&adapter).is_empty());
+    assert!(shapes[..0].iter_int_paths(&adapter).next().is_none());
 }
 
 #[test]
 fn float_resource_conversion_respects_flat_buffer_ranges() {
     use i_float::adapter::FloatPointAdapter;
     use i_float::float::rect::FloatRect;
-    use i_shape::float::adapter::ResourceToInt;
+    use i_shape::float::adapter::ResourceToIntIter;
 
     let buffer = FloatFlatContoursBuffer {
         points: vec![[1.0_f32, 2.0], [-3.0, 4.0]],
@@ -216,7 +225,10 @@ fn float_resource_conversion_respects_flat_buffer_ranges() {
     };
     let adapter = FloatPointAdapter::<_, i16>::with_scale(FloatRect::new(-10.0, 10.0, -10.0, 10.0), 1.0);
     assert_eq!(
-        buffer.to_int_paths(&adapter),
+        buffer
+            .iter_int_paths(&adapter)
+            .map(|path| path.collect::<Vec<_>>())
+            .collect::<Vec<_>>(),
         vec![
             vec![IntPoint::new(-3, 4)],
             vec![],

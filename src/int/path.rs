@@ -9,7 +9,6 @@ pub type IntPath<I> = Vec<IntPoint<I>>;
 pub type IntPaths<I> = Vec<IntPath<I>>;
 
 pub trait ContourExtension<I: IntNumber> {
-    fn unsafe_area(&self) -> I::Wide;
     fn is_convex(&self) -> bool;
     fn is_clockwise_ordered(&self) -> bool;
     fn contains_point(&self, point: IntPoint<I>) -> bool;
@@ -17,32 +16,6 @@ pub trait ContourExtension<I: IntNumber> {
 }
 
 impl<I: IntNumber> ContourExtension<I> for [IntPoint<I>] {
-    /// Returns the signed double area of the path.
-    ///
-    /// The result is positive for a counter-clockwise path and negative for a
-    /// clockwise path. A non-empty simple path whose coordinates satisfy the
-    /// conservative range documented by `i_float::int::point::IntPoint` fits
-    /// in `I::Wide`. Paths with self-intersections or repeated winding require
-    /// a separate bound on the accumulated area.
-    ///
-    /// # Panics
-    ///
-    /// Panics if the path is empty.
-    fn unsafe_area(&self) -> I::Wide {
-        let n = self.len();
-        let mut p0 = self[n - 1];
-        let mut area = I::Wide::ZERO;
-
-        for &p1 in self.iter() {
-            let a = p0.x.to_wide().wrapping_mul(p1.y.to_wide());
-            let b = p0.y.to_wide().wrapping_mul(p1.x.to_wide());
-            area = area.wrapping_add(a).wrapping_sub(b);
-            p0 = p1;
-        }
-
-        area
-    }
-
     /// Determines if the `Path` is convex.
     ///
     /// A convex polygon is a simple polygon (not self-intersecting) in which
@@ -92,7 +65,7 @@ impl<I: IntNumber> ContourExtension<I> for [IntPoint<I>] {
     ///  - Returns `false` otherwise.
     #[inline(always)]
     fn is_clockwise_ordered(&self) -> bool {
-        self.unsafe_area() <= I::Wide::ZERO
+        crate::int::area::UnsafeArea::unsafe_area(self.iter().copied()) <= I::Wide::ZERO
     }
 
     /// Checks if a point is contained within the `Path`.
@@ -133,6 +106,7 @@ impl<I: IntNumber> ContourExtension<I> for [IntPoint<I>] {
 #[cfg(test)]
 mod tests {
     use crate::int::IntPoint;
+    use crate::int::area::UnsafeArea;
     use crate::int::path::ContourExtension;
     use crate::int_path;
     use alloc::vec::Vec;
@@ -150,7 +124,7 @@ mod tests {
             [-209715200, 314572800],
         ];
 
-        let area: i64 = contour.unsafe_area();
+        let area: i64 = contour.into_iter().unsafe_area();
         let abs_area = area.unsigned_abs() as usize >> 1;
         assert!(area > 0);
         assert!(abs_area > 1);
