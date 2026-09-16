@@ -38,7 +38,7 @@ pub trait ResourceToIntIter<P: FloatPointCompatible>: ShapeResource<P> {
     fn iter_int_paths<'a, I: IntNumber>(
         &'a self,
         adapter: &'a FloatPointAdapter<P, I>,
-    ) -> impl Iterator<Item = impl Iterator<Item = IntPoint<I>> + 'a> + 'a {
+    ) -> impl Iterator<Item = impl ExactSizeIterator<Item = IntPoint<I>> + Clone + 'a> + 'a {
         self.iter_paths()
             .map(|path| path.iter().map(|point| adapter.float_to_int(point)))
     }
