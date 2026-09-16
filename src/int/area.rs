@@ -41,6 +41,32 @@ where
     }
 }
 
+pub trait IteratorArea<I: IntNumber>: Iterator<Item = IntPoint<I>> + Sized {
+    /// Returns the signed double area of the path.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the iterator is empty.
+    fn area_two(self) -> I::Wide;
+    fn area(self) -> I::Wide;
+}
+
+impl<I, T> IteratorArea<I> for T
+where
+    I: IntNumber,
+    T: Iterator<Item = IntPoint<I>>,
+{
+    #[inline]
+    fn area_two(self) -> I::Wide {
+        self.unsafe_area()
+    }
+
+    #[inline]
+    fn area(self) -> I::Wide {
+        self.area_two() / I::Wide::TWO
+    }
+}
+
 pub trait Area<I: IntNumber> {
     fn area_two(&self) -> I::Wide;
     fn area(&self) -> I::Wide;
@@ -92,7 +118,7 @@ impl<I: IntNumber> Area<I> for [IntShape<I>] {
 
 #[cfg(test)]
 mod tests {
-    use crate::int::area::Area;
+    use crate::int::area::{Area, IteratorArea};
     use crate::int_path;
 
     #[test]
@@ -101,5 +127,12 @@ mod tests {
 
         let area = square.area_two();
         assert_eq!(area, 8i64);
+    }
+
+    #[test]
+    fn iterator_area_is_half_of_double_area() {
+        let square = int_path![[-1, -1], [1, -1], [1, 1], [-1, 1]];
+
+        assert_eq!(square.into_iter().area(), 4i64);
     }
 }
