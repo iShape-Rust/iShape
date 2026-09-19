@@ -14,6 +14,14 @@ All notable changes to this project are documented in this file.
 - Added `PartialEq` and `Eq` implementations for flat buffer types.
 - Preserved empty contours when iterating a floating-point flat buffer as a `ShapeResource`.
 
+### Removed
+
+- Removed the unused `float::count`, `float::init`, `float::int_area`,
+  `float::reverse`, `int::dedup`, and `int::reverse` modules.
+- Removed `int::count::BiggestShapePoints` and `ContourExtension::to_reversed`.
+  Use `to_vec()` followed by `reverse()` to create a reversed contour copy.
+- Removed `set_with_resource_and_adapter` from both integer flat-buffer types.
+
 ### Fixed
 
 - Prevented `FloatFlatContoursBuffer::simplify_contour` from quantizing an unchanged buffer.

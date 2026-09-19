@@ -1,4 +1,3 @@
-use crate::int::shape::IntContour;
 use alloc::vec::Vec;
 use i_float::int::number::int::IntNumber;
 use i_float::int::number::wide_int::WideIntNumber;
@@ -12,7 +11,6 @@ pub trait ContourExtension<I: IntNumber> {
     fn is_convex(&self) -> bool;
     fn is_clockwise_ordered(&self) -> bool;
     fn contains_point(&self, point: IntPoint<I>) -> bool;
-    fn to_reversed(&self) -> IntContour<I>;
 }
 
 impl<I: IntNumber> ContourExtension<I> for [IntPoint<I>] {
@@ -94,13 +92,6 @@ impl<I: IntNumber> ContourExtension<I> for [IntPoint<I>] {
 
         is_contain
     }
-
-    #[inline]
-    fn to_reversed(&self) -> IntContour<I> {
-        let mut contour = self.to_vec();
-        contour.reverse();
-        contour
-    }
 }
 
 #[cfg(test)]
@@ -148,7 +139,8 @@ mod tests {
     #[test]
     fn contains_point_does_not_round_edge_intersection() {
         let contour = int_path![[0, 0], [2, 0], [1, 2]];
-        let reversed = contour.to_reversed();
+        let mut reversed = contour.clone();
+        reversed.reverse();
 
         assert!(!contour.contains_point(IntPoint::new(0, 1)));
         assert!(!reversed.contains_point(IntPoint::new(0, 1)));

@@ -8,7 +8,7 @@
 
 - integer and floating-point path, contour, shape, and shapes aliases;
 - flat contour and shape buffers for allocation-efficient geometry pipelines;
-- area, winding, convexity, simplification, despiking, and deduplication helpers;
+- area, winding, convexity, simplification, and despiking helpers;
 - conversion between floating-point and integer coordinates through `i_float`;
 - `IntShapeResource` and `ShapeResource` interfaces for borrowing integer and floating-point contours, shapes, and flat buffers.
 

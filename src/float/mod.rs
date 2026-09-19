@@ -1,9 +1,5 @@
 pub mod adapter;
 pub mod area;
-pub mod count;
 pub mod despike;
-pub mod init;
-pub mod int_area;
 pub mod rect;
-pub mod reverse;
 pub mod simple;

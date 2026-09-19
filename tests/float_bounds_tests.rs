@@ -105,3 +105,36 @@ fn invalid_bounds_return_errors_without_changing_buffers() {
         assert_eq!(shapes, original_shapes);
     }
 }
+
+#[test]
+fn resource_adapters_use_the_conservative_coordinate_budget() {
+    use i_float::int::number::int::IntNumber;
+
+    fn check<I: IntNumber>() {
+        let radius = 1.999_999_f64;
+        let path = [
+            [-radius, -radius],
+            [radius, -radius],
+            [radius, radius],
+            [-radius, radius],
+        ];
+        let mut contours = FlatContoursBuffer::<I>::default();
+        let mut shapes = FlatShapesBuffer::<I>::default();
+        let contour_adapter = contours.set_with_resource(&path).unwrap();
+        let shape_adapter = shapes.set_with_resource(&path).unwrap();
+        let limit = I::ONE << (I::BITS - 3);
+        for point in contours.points.iter().chain(&shapes.points) {
+            assert!(point.x >= -limit && point.x <= limit);
+            assert!(point.y >= -limit && point.y <= limit);
+        }
+        assert_eq!(contour_adapter.dir_scale(), shape_adapter.dir_scale());
+        for (original, point) in path.iter().zip(&contours.points) {
+            let restored = contour_adapter.int_to_float(point);
+            assert!((restored[0] - original[0]).abs() <= contour_adapter.inv_scale());
+            assert!((restored[1] - original[1]).abs() <= contour_adapter.inv_scale());
+        }
+    }
+    check::<i16>();
+    check::<i32>();
+    check::<i64>();
+}
