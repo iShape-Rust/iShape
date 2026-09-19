@@ -8,11 +8,15 @@
 
 - integer and floating-point path, contour, shape, and shapes aliases;
 - flat contour and shape buffers for allocation-efficient geometry pipelines;
-- area, winding, convexity, simplification, despiking, and deduplication helpers;
+- area, winding, convexity, simplification, and despiking helpers;
 - conversion between floating-point and integer coordinates through `i_float`;
-- a common `ShapeResource` interface for accepting contours, shapes, and flat buffers.
+- `IntShapeResource` and `ShapeResource` interfaces for borrowing integer and floating-point contours, shapes, and flat buffers.
 
 The crate is `no_std`, uses `alloc`, and supports `i16`, `i32`, and `i64` integer coordinates.
+
+The `int::simple` and `float::simple` helpers remove collinear and consecutive
+duplicate vertices. They do not check or resolve self-intersections;
+`SimpleContour::is_simple` checks only vertex count and adjacent edge cross products.
 
 ## Installation
 
@@ -63,6 +67,45 @@ assert_eq!(buffer.to_contours(), vec![contour]);
 ```
 
 Floating-point equivalents are available as `FloatFlatContoursBuffer<P>` and `FloatFlatShapesBuffer<P>`, where `P` can be any `FloatPointCompatible` type such as `[f32; 2]` or `[f64; 2]`.
+
+## Borrowed resources
+
+Integer and floating-point resources expose the same `iter_paths()` operation:
+
+```rust
+use i_shape::int_path;
+use i_shape::source::int::resource::IntShapeResource;
+use i_shape::source::float::resource::ShapeResource;
+
+let integers = int_path![[0_i32, 0], [4, 0], [4, 4]];
+let floats = vec![vec![[0.0_f64, 0.0], [4.0, 0.0], [4.0, 4.0]]];
+
+assert_eq!(integers.iter_paths().next(), Some(integers.as_slice()));
+assert_eq!(floats.iter_paths().count(), 1);
+
+// Borrow multiple contours without copying points.
+let borrowed = [integers.as_slice(), &integers[1..]];
+assert_eq!(borrowed.iter_paths().count(), 2);
+```
+
+Both interfaces support a single path, a collection of paths, and a collection
+of shapes, using slices, vectors, or outer fixed-size arrays. Collections of
+borrowed path slices, shared/mutable references to resources, and the corresponding
+flat buffers are also supported. Iteration borrows the original points, preserves
+path and vertex order, includes empty paths, and can be restarted without allocating.
+
+Shape grouping is flattened: `FlatShapesBuffer` and `FloatFlatShapesBuffer` visit
+`contour_ranges` independently of `shape_ranges`. These interfaces do not impose
+winding, closure, or geometric validity requirements; consuming operations define
+their own requirements. Invalid integer flat-buffer contour ranges panic when
+visited. Floating-point flat buffers retain their existing behavior of skipping
+invalid ranges.
+
+**Breaking migration:** replace `source::resource::ShapeResource` imports with
+`source::float::resource::ShapeResource`. The other previous `source` modules
+(`contour`, `shape`, `shapes`, and `buffer`) have also moved under `source::float`.
+There are no compatibility re-exports at the old paths. Integer consumers use
+`source::int::resource::IntShapeResource`.
 
 ## License
 

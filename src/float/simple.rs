@@ -8,14 +8,25 @@ use i_float::adapter::FloatPointAdapter;
 use i_float::float::compatible::FloatPointCompatible;
 use i_float::int::number::int::IntNumber;
 
-/// A trait that provides methods for simplifying complex geometrical structures.
+/// Removes collinear and duplicate vertices using the adapter's integer coordinates.
+///
+/// Uses [`IntSimplify`] after conversion to integers. Collinearity and degeneracy
+/// are therefore determined at the adapter's precision. Does not check or resolve
+/// self-intersections, or validate winding or hole placement.
 pub trait SimplifyContour<P: FloatPointCompatible, I: IntNumber> {
-    /// Simplifies the structure in-place if it is not already simple.
+    /// Cleans contours in integer coordinates and converts the result back when
+    /// cleanup is needed.
     ///
-    /// # Returns
+    /// Contours with fewer than three remaining vertices are discarded. For a
+    /// shape, collapse of its first contour discards the whole shape; collapsed
+    /// later contours are removed. Flat contour buffers clean each contour
+    /// independently. Already empty shapes and collections are preserved.
     ///
-    /// - `true` if the structure was simplified successfully.
-    /// - `false` if the structure was already simple and no modification was made.
+    /// Returns `true` if any converted contour required cleanup, including an
+    /// already empty contour. In that case, the surviving output is converted
+    /// back through the adapter, which may also quantize otherwise unchanged
+    /// contours. Returns `false` and preserves the original floating-point data
+    /// if no contour required cleanup.
     fn simplify_contour(&mut self, adapter: &FloatPointAdapter<P, I>) -> bool;
 }
 
@@ -102,7 +113,8 @@ mod tests {
         let mut buffer = FloatFlatContoursBuffer::default();
         buffer.add_contour(&contour);
         let original = buffer.clone();
-        let adapter = FloatPointAdapter::<_, i32>::with_scale(FloatRect::new(0.0, 2.0, 0.0, 2.0), 10.0);
+        let adapter =
+            FloatPointAdapter::<_, i32>::with_scale(FloatRect::new(0.0, 2.0, 0.0, 2.0).unwrap(), 10.0);
 
         let changed = buffer.simplify_contour(&adapter);
 

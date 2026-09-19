@@ -3,6 +3,7 @@ use crate::flat::buffer::FlatContoursBuffer;
 use crate::flat::float::FloatFlatContoursBuffer;
 use crate::int::path::IntPath;
 use crate::int::shape::{IntContour, IntShape, IntShapes};
+use crate::source::float::resource::ShapeResource;
 use i_float::adapter::FloatPointAdapter;
 use i_float::float::compatible::FloatPointCompatible;
 use i_float::int::number::int::IntNumber;
@@ -27,6 +28,23 @@ pub trait BufferToFloat<P: FloatPointCompatible, I: IntNumber> {
 pub trait PathToInt<P: FloatPointCompatible, I: IntNumber> {
     fn to_int(&self, adapter: &FloatPointAdapter<P, I>) -> IntPath<I>;
 }
+
+/// Lazily converts the paths of a floating-point shape resource to integer coordinates.
+pub trait ResourceToIntIter<P: FloatPointCompatible>: ShapeResource<P> {
+    /// Preserves path order, point order, and empty paths. Nested shapes are
+    /// flattened, so shape boundaries are not retained. Points are converted
+    /// only as the returned iterators are consumed.
+    #[inline]
+    fn iter_int_paths<'a, I: IntNumber>(
+        &'a self,
+        adapter: &'a FloatPointAdapter<P, I>,
+    ) -> impl Iterator<Item = impl ExactSizeIterator<Item = IntPoint<I>> + Clone + 'a> + 'a {
+        self.iter_paths()
+            .map(|path| path.iter().map(|point| adapter.float_to_int(point)))
+    }
+}
+
+impl<P: FloatPointCompatible, S: ShapeResource<P> + ?Sized> ResourceToIntIter<P> for S {}
 
 pub trait ShapeToInt<P: FloatPointCompatible, I: IntNumber> {
     fn to_int(&self, adapter: &FloatPointAdapter<P, I>) -> IntShape<I>;

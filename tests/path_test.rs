@@ -1,5 +1,6 @@
 #[cfg(test)]
 mod tests {
+    use i_shape::int::area::IteratorArea;
     use i_shape::int::path::ContourExtension;
     use i_shape::int::simple::{SimpleContour, SimpleShape, SimpleShapes};
     use i_shape::{int_path, int_shape, int_shapes};
@@ -110,10 +111,10 @@ mod tests {
     fn test_area_1() {
         let mut path = int_path![[0, 0], [0, 1], [1, 1], [1, 0],];
 
-        let area_1 = path.unsafe_area();
+        let area_1 = path.iter().copied().area_two();
         path.reverse();
 
-        let area_2 = path.unsafe_area();
+        let area_2 = path.into_iter().area_two();
 
         assert_eq!(area_1, -2i64);
         assert_eq!(area_2, 2i64);

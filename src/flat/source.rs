@@ -1,14 +1,18 @@
 use crate::flat::buffer::{FlatContoursBuffer, FlatShapesBuffer};
-use crate::source::resource::ShapeResource;
+use crate::source::float::resource::ShapeResource;
 use i_float::adapter::FloatPointAdapter;
 use i_float::float::compatible::FloatPointCompatible;
 use i_float::float::number::FloatNumber;
-use i_float::float::rect::FloatRect;
+use i_float::float::rect::{FloatRect, FloatRectError};
 use i_float::int::number::int::IntNumber;
 
 impl<I: IntNumber> FlatContoursBuffer<I> {
+    /// Replaces the buffer, leaving it unchanged if the bounds are invalid.
+    /// Points must satisfy the `i_float::float` coordinate contract; per-point checks
+    /// run only in debug builds. Uses the conservative adapter coordinate budget.
+    /// Empty input clears the buffer and returns a zero-bounds adapter.
     #[inline]
-    pub fn set_with_resource<P, R>(&mut self, resource: &R) -> FloatPointAdapter<P, I>
+    pub fn set_with_resource<P, R>(&mut self, resource: &R) -> Result<FloatPointAdapter<P, I>, FloatRectError>
     where
         I: IntNumber,
         P: FloatPointCompatible,
@@ -24,6 +28,7 @@ impl<I: IntNumber> FlatContoursBuffer<I> {
             contours_count += 1;
             points_count += contour.len();
             for p in contour.iter() {
+                debug_assert!(p.is_in_safe_range(), "FloatPoint coordinates out of range");
                 min_x = min_x.min(p.x());
                 max_x = max_x.max(p.x());
                 min_y = min_y.min(p.y());
@@ -31,13 +36,14 @@ impl<I: IntNumber> FlatContoursBuffer<I> {
             }
         }
 
-        self.clear_and_reserve(points_count, contours_count);
         if points_count == 0 {
-            return FloatPointAdapter::new(FloatRect::zero());
+            self.clear_and_reserve(points_count, contours_count);
+            return Ok(FloatPointAdapter::new_conservative(FloatRect::zero()));
         }
 
-        let rect = FloatRect::new(min_x, max_x, min_y, max_y);
-        let adapter = FloatPointAdapter::new(rect);
+        let rect = FloatRect::new(min_x, max_x, min_y, max_y)?;
+        let adapter = FloatPointAdapter::new_conservative(rect);
+        self.clear_and_reserve(points_count, contours_count);
 
         let mut offset = 0;
         for contour in resource.iter_paths() {
@@ -49,42 +55,17 @@ impl<I: IntNumber> FlatContoursBuffer<I> {
             offset += contour_len;
         }
 
-        adapter
-    }
-
-    #[inline]
-    pub fn set_with_resource_and_adapter<P, R>(&mut self, resource: &R, adapter: FloatPointAdapter<P, I>)
-    where
-        P: FloatPointCompatible,
-        R: ShapeResource<P> + ?Sized,
-    {
-        let mut contours_count = 0;
-        let mut points_count = 0;
-        for contour in resource.iter_paths() {
-            contours_count += 1;
-            points_count += contour.len();
-        }
-
-        self.clear_and_reserve(points_count, contours_count);
-        if points_count == 0 {
-            return;
-        }
-
-        let mut offset = 0;
-        for contour in resource.iter_paths() {
-            for p in contour.iter() {
-                self.points.push(adapter.float_to_int(p));
-            }
-            let contour_len = contour.len();
-            self.ranges.push(offset..offset + contour_len);
-            offset += contour_len;
-        }
+        Ok(adapter)
     }
 }
 
 impl<I: IntNumber> FlatShapesBuffer<I> {
+    /// Replaces the buffer, leaving it unchanged if the bounds are invalid.
+    /// Points must satisfy the `i_float::float` coordinate contract; per-point checks
+    /// run only in debug builds. Uses the conservative adapter coordinate budget.
+    /// Empty input clears the buffer and returns a zero-bounds adapter.
     #[inline]
-    pub fn set_with_resource<P, R>(&mut self, resource: &R) -> FloatPointAdapter<P, I>
+    pub fn set_with_resource<P, R>(&mut self, resource: &R) -> Result<FloatPointAdapter<P, I>, FloatRectError>
     where
         P: FloatPointCompatible,
         R: ShapeResource<P> + ?Sized,
@@ -99,6 +80,7 @@ impl<I: IntNumber> FlatShapesBuffer<I> {
             contours_count += 1;
             points_count += contour.len();
             for p in contour.iter() {
+                debug_assert!(p.is_in_safe_range(), "FloatPoint coordinates out of range");
                 min_x = min_x.min(p.x());
                 max_x = max_x.max(p.x());
                 min_y = min_y.min(p.y());
@@ -106,13 +88,14 @@ impl<I: IntNumber> FlatShapesBuffer<I> {
             }
         }
 
-        self.clear_and_reserve(points_count, contours_count, usize::from(contours_count > 0));
         if points_count == 0 {
-            return FloatPointAdapter::new(FloatRect::zero());
+            self.clear_and_reserve(points_count, contours_count, usize::from(contours_count > 0));
+            return Ok(FloatPointAdapter::new_conservative(FloatRect::zero()));
         }
 
-        let rect = FloatRect::new(min_x, max_x, min_y, max_y);
-        let adapter = FloatPointAdapter::new(rect);
+        let rect = FloatRect::new(min_x, max_x, min_y, max_y)?;
+        let adapter = FloatPointAdapter::new_conservative(rect);
+        self.clear_and_reserve(points_count, contours_count, usize::from(contours_count > 0));
 
         let mut offset = 0;
         for contour in resource.iter_paths() {
@@ -126,38 +109,7 @@ impl<I: IntNumber> FlatShapesBuffer<I> {
 
         self.shape_ranges.push(0..contours_count);
 
-        adapter
-    }
-
-    #[inline]
-    pub fn set_with_resource_and_adapter<P, R>(&mut self, resource: &R, adapter: FloatPointAdapter<P, I>)
-    where
-        P: FloatPointCompatible,
-        R: ShapeResource<P> + ?Sized,
-    {
-        let mut contours_count = 0;
-        let mut points_count = 0;
-        for contour in resource.iter_paths() {
-            contours_count += 1;
-            points_count += contour.len();
-        }
-
-        self.clear_and_reserve(points_count, contours_count, usize::from(contours_count > 0));
-        if points_count == 0 {
-            return;
-        }
-
-        let mut offset = 0;
-        for contour in resource.iter_paths() {
-            for p in contour.iter() {
-                self.points.push(adapter.float_to_int(p));
-            }
-            let contour_len = contour.len();
-            self.contour_ranges.push(offset..offset + contour_len);
-            offset += contour_len;
-        }
-
-        self.shape_ranges.push(0..contours_count);
+        Ok(adapter)
     }
 }
 
@@ -175,7 +127,7 @@ mod tests {
         ];
 
         let mut buffer = FlatShapesBuffer::<i32>::default();
-        let adapter = buffer.set_with_resource(&shape);
+        let adapter = buffer.set_with_resource(&shape).unwrap();
         let restored: Vec<Vec<[f64; 2]>> = buffer
             .to_shapes()
             .into_iter()
@@ -188,18 +140,5 @@ mod tests {
         assert_eq!(buffer.shape_ranges, vec![0..2]);
         assert_eq!(buffer.contour_ranges, vec![0..3, 3..6]);
         assert_eq!(restored, shape);
-    }
-
-    #[test]
-    fn test_shapes_buffer_set_with_resource_and_adapter() {
-        let contour: Vec<[f64; 2]> = vec![[10.0, 10.0], [11.0, 10.0], [11.0, 11.0]];
-        let adapter = FloatPointAdapter::<_, i32>::new(FloatRect::new(10.0, 11.0, 10.0, 11.0));
-
-        let mut buffer = FlatShapesBuffer::default();
-        buffer.set_with_resource_and_adapter(&contour, adapter);
-
-        assert_eq!(buffer.shape_ranges, vec![0..1]);
-        assert_eq!(buffer.contour_ranges, vec![0..3]);
-        assert_eq!(buffer.to_shapes().len(), 1);
     }
 }

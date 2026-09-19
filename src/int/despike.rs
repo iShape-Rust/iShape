@@ -19,16 +19,21 @@ pub trait DeSpike {
 pub trait DeSpikeContour<I: IntNumber> {
     /// Checks whether the contour has no spikes.
     ///
-    /// A contour with no spikes is considered clean and valid
-    /// for most geometric operations.
+    /// Consecutive duplicate vertices, including repeated closing vertices, are
+    /// ignored when comparing edge directions. Collinear vertices that continue
+    /// in the same direction are allowed. This does not validate self-intersections.
     ///
     /// # Returns
     ///
     /// - `true` if the contour has no spike patterns.
-    /// - `false` if any spike-like edge reversal is detected.
+    /// - `false` if an edge reversal is detected or fewer than three vertices
+    ///   remain after ignoring consecutive duplicates.
     fn has_no_spikes(&self) -> bool;
 
     /// Returns a copy of the contour with spikes removed.
+    ///
+    /// Also removes consecutive duplicate vertices, including duplicates created
+    /// by spike removal. Other collinear vertices are preserved.
     ///
     /// # Returns
     ///
@@ -100,13 +105,17 @@ impl<I: IntNumber> DeSpikeContour<I> for IntContour<I> {
             return false;
         }
 
-        let mut p0 = self[count - 2];
-        let p1 = self[count - 1];
-
-        let mut v0 = p1 - p0;
-        p0 = p1;
+        let mut p0 = self[count - 1];
+        let Some(&previous) = self[..count - 1].iter().rev().find(|&&point| point != p0) else {
+            return false;
+        };
+        let mut v0 = p0 - previous;
 
         for &pi in self.iter() {
+            if pi == p0 {
+                continue;
+            }
+
             let vi = pi - p0;
             let cross = vi.cross_product(v0);
             let dot = vi.dot_product(v0);
@@ -166,7 +175,7 @@ impl<I: IntNumber> DeSpikeContour<I> for IntContour<I> {
             let cross = v10.cross_product(v21);
             let dot = v10.dot_product(v21);
 
-            if cross == I::Wide::ZERO && dot < I::Wide::ZERO {
+            if p0 == p1 || p1 == p2 || (cross == I::Wide::ZERO && dot < I::Wide::ZERO) {
                 n -= 1;
                 if n < 3 {
                     return None;
@@ -331,8 +340,75 @@ struct Node {
 
 #[cfg(test)]
 mod tests {
-    use crate::int::despike::DeSpike;
+    use crate::int::despike::{DeSpike, DeSpikeContour};
     use crate::int_path;
+
+    #[test]
+    fn detects_spikes_hidden_by_duplicate_vertices() {
+        let mut contour = int_path![[0, 0], [4, 0], [4, 0], [2, 0], [2, 2], [0, 2]];
+        for _ in 0..2 {
+            for _ in 0..contour.len() {
+                assert!(!contour.has_no_spikes(), "{contour:?}");
+                contour.rotate_left(1);
+            }
+            contour.reverse();
+        }
+    }
+
+    #[test]
+    fn removes_spikes_hidden_by_duplicate_vertices() {
+        let mut contour = int_path![[0, 0], [4, 0], [4, 0], [2, 0], [2, 2], [0, 2]];
+        let mut expected = int_path![[0, 0], [2, 0], [2, 2], [0, 2]];
+        for _ in 0..2 {
+            let start = expected.iter().enumerate().min_by_key(|(_, p)| **p).unwrap().0;
+            expected.rotate_left(start);
+            for _ in 0..contour.len() {
+                let mut result = contour.despiked_contour().unwrap();
+                let start = result.iter().enumerate().min_by_key(|(_, p)| **p).unwrap().0;
+                result.rotate_left(start);
+                assert_eq!(result, expected);
+
+                let mut in_place = contour.clone();
+                assert!(in_place.remove_spikes());
+                let start = in_place.iter().enumerate().min_by_key(|(_, p)| **p).unwrap().0;
+                in_place.rotate_left(start);
+                assert_eq!(in_place, expected);
+                assert!(!in_place.remove_spikes());
+                contour.rotate_left(1);
+            }
+            contour.reverse();
+            expected.reverse();
+        }
+    }
+
+    #[test]
+    fn removes_duplicates_created_by_spike_removal() {
+        let mut contour = int_path![[0, 0], [2, 0], [4, 0], [2, 0], [2, 2], [0, 2]];
+        assert!(contour.remove_spikes());
+        assert_eq!(contour, int_path![[0, 0], [2, 0], [2, 2], [0, 2]]);
+    }
+
+    #[test]
+    fn repeated_degenerate_contours_collapse() {
+        for mut contour in [
+            int_path![[0, 0], [0, 0], [0, 0]],
+            int_path![[0, 0], [2, 0], [2, 0], [0, 0]],
+        ] {
+            assert!(!contour.has_no_spikes());
+            assert!(contour.despiked_contour().is_none());
+            assert!(contour.remove_spikes());
+            assert!(contour.is_empty());
+        }
+    }
+
+    #[test]
+    fn clean_contour_keeps_collinear_and_duplicate_vertices() {
+        let mut contour = int_path![[0, 0], [1, 0], [1, 0], [2, 0], [2, 2], [0, 2], [0, 0]];
+        let original = contour.clone();
+        assert!(contour.has_no_spikes());
+        assert!(!contour.remove_spikes());
+        assert_eq!(contour, original);
+    }
 
     #[test]
     fn test_0() {

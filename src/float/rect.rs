@@ -1,97 +1,31 @@
-use crate::base::data::{Path, Shape};
+use crate::base::data::Path;
 use alloc::vec::Vec;
 use i_float::float::compatible::FloatPointCompatible;
-use i_float::float::rect::FloatRect;
+use i_float::float::rect::{FloatRect, FloatRectError};
 
+/// Builds bounds, returning `Ok(None)` for empty input and an error for invalid coordinates.
 pub trait RectInit<P>
 where
     P: FloatPointCompatible,
 {
-    fn with_path(path: &[P]) -> Option<FloatRect<P::Scalar>>;
-    fn with_paths(paths: &[Vec<P>]) -> Option<FloatRect<P::Scalar>>;
-    fn with_list_of_paths(list: &[Vec<Vec<P>>]) -> Option<FloatRect<P::Scalar>>;
-}
-
-trait FirstPoint<P>
-where
-    P: FloatPointCompatible,
-{
-    fn first_point(&self) -> Option<P>;
+    fn with_path(path: &[P]) -> Result<Option<FloatRect<P::Scalar>>, FloatRectError>;
+    fn with_paths(paths: &[Vec<P>]) -> Result<Option<FloatRect<P::Scalar>>, FloatRectError>;
+    fn with_list_of_paths(list: &[Vec<Vec<P>>]) -> Result<Option<FloatRect<P::Scalar>>, FloatRectError>;
 }
 
 impl<P> RectInit<P> for FloatRect<P::Scalar>
 where
     P: FloatPointCompatible,
 {
-    fn with_path(path: &[P]) -> Option<FloatRect<P::Scalar>> {
-        let &first_point = path.first()?;
-
-        let mut rect = Self::with_point(first_point);
-
-        for p in path.iter() {
-            rect.unsafe_add_point(p);
-        }
-
-        Some(rect)
+    fn with_path(path: &[P]) -> Result<Option<FloatRect<P::Scalar>>, FloatRectError> {
+        Self::with_iter(path.iter())
     }
 
-    fn with_paths(paths: &[Path<P>]) -> Option<FloatRect<P::Scalar>> {
-        let first_point = paths.first_point()?;
-
-        let mut rect = Self::with_point(first_point);
-
-        for path in paths.iter() {
-            for p in path.iter() {
-                rect.unsafe_add_point(p);
-            }
-        }
-
-        Some(rect)
+    fn with_paths(paths: &[Path<P>]) -> Result<Option<FloatRect<P::Scalar>>, FloatRectError> {
+        Self::with_iter(paths.iter().flatten())
     }
 
-    fn with_list_of_paths(list: &[Vec<Path<P>>]) -> Option<FloatRect<P::Scalar>> {
-        let first_point = list.first_point()?;
-
-        let mut rect = Self::with_point(first_point);
-
-        for paths in list.iter() {
-            for path in paths.iter() {
-                for p in path.iter() {
-                    rect.unsafe_add_point(p);
-                }
-            }
-        }
-
-        Some(rect)
-    }
-}
-
-impl<P> FirstPoint<P> for [Path<P>]
-where
-    P: FloatPointCompatible,
-{
-    fn first_point(&self) -> Option<P> {
-        for path in self.iter() {
-            if let Some(&p) = path.first() {
-                return Some(p);
-            }
-        }
-        None
-    }
-}
-
-impl<P> FirstPoint<P> for [Shape<P>]
-where
-    P: FloatPointCompatible,
-{
-    fn first_point(&self) -> Option<P> {
-        for paths in self.iter() {
-            for path in paths.iter() {
-                if let Some(&p) = path.first() {
-                    return Some(p);
-                }
-            }
-        }
-        None
+    fn with_list_of_paths(list: &[Vec<Path<P>>]) -> Result<Option<FloatRect<P::Scalar>>, FloatRectError> {
+        Self::with_iter(list.iter().flatten().flatten())
     }
 }

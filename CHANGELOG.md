@@ -14,8 +14,22 @@ All notable changes to this project are documented in this file.
 - Added `PartialEq` and `Eq` implementations for flat buffer types.
 - Preserved empty contours when iterating a floating-point flat buffer as a `ShapeResource`.
 
+### Removed
+
+- Removed the unused `float::count`, `float::init`, `float::int_area`,
+  `float::reverse`, `int::dedup`, and `int::reverse` modules.
+- Removed `int::count::BiggestShapePoints` and `ContourExtension::to_reversed`.
+  Use `to_vec()` followed by `reverse()` to create a reversed contour copy.
+- Removed `set_with_resource_and_adapter` from both integer flat-buffer types.
+
 ### Fixed
 
+- Fixed spike detection and removal when consecutive duplicate vertices hide an
+  edge reversal, including duplicates created during spike removal.
+- Made `is_convex` ignore consecutive duplicate vertices, including repeated
+  closing vertices, so they cannot hide concave turns or edge reversals.
+- Clarified simplification documentation: the helpers remove collinear and duplicate
+  vertices, but do not check or resolve self-intersections.
 - Prevented `FloatFlatContoursBuffer::simplify_contour` from quantizing an unchanged buffer.
 - Fixed `ShapeResource` iterator counts after partial consumption.
 - Made integer containment handle empty contours without panicking.

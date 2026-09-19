@@ -1,5 +1,5 @@
 use crate::base::data::{Contour, Shape};
-use crate::source::resource::ShapeResource;
+use crate::source::float::resource::ShapeResource;
 use alloc::vec::Vec;
 use core::ops::Range;
 use i_float::float::compatible::FloatPointCompatible;
