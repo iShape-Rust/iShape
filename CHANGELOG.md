@@ -24,6 +24,10 @@ All notable changes to this project are documented in this file.
 
 ### Fixed
 
+- Made `is_convex` ignore consecutive duplicate vertices, including repeated
+  closing vertices, so they cannot hide concave turns or edge reversals.
+- Clarified simplification documentation: the helpers remove collinear and duplicate
+  vertices, but do not check or resolve self-intersections.
 - Prevented `FloatFlatContoursBuffer::simplify_contour` from quantizing an unchanged buffer.
 - Fixed `ShapeResource` iterator counts after partial consumption.
 - Made integer containment handle empty contours without panicking.

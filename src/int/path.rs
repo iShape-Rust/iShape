@@ -1,3 +1,4 @@
+use crate::int::area::UnsafeArea;
 use alloc::vec::Vec;
 use i_float::int::number::int::IntNumber;
 use i_float::int::number::wide_int::WideIntNumber;
@@ -22,6 +23,9 @@ impl<I: IntNumber> ContourExtension<I> for [IntPoint<I>] {
     /// are ordered (either clockwise or counter-clockwise) and the path is not
     /// self-intersecting.
     ///
+    /// Consecutive duplicate vertices, including repeated closing vertices, are
+    /// ignored. Paths with at most two vertices after this cleanup return `true`.
+    ///
     /// - Returns: A Boolean value indicating whether the path is convex.
     ///   - Returns `true` if the path is convex.
     ///   - Returns `false` otherwise.
@@ -31,19 +35,26 @@ impl<I: IntNumber> ContourExtension<I> for [IntPoint<I>] {
             return true;
         }
 
-        let p0 = self[n - 2];
         let mut p1 = self[n - 1];
+        let Some(&p0) = self[..n - 1].iter().rev().find(|&&point| point != p1) else {
+            return true;
+        };
         let mut e0 = p1 - p0;
 
         let mut sign = I::Wide::ZERO;
+        let mut edge_count = 0;
+        let mut has_reversal = false;
         for &p2 in self.iter() {
+            if p2 == p1 {
+                continue;
+            }
+
+            edge_count += 1;
             let e1 = p2 - p1;
             let cross = e1.cross_product(e0).signum();
             if cross == I::Wide::ZERO {
                 let dot = e1.dot_product(e0);
-                if dot < I::Wide::ZERO {
-                    return false;
-                }
+                has_reversal |= dot < I::Wide::ZERO;
             } else if sign == I::Wide::ZERO {
                 sign = cross
             } else if sign != cross {
@@ -54,7 +65,8 @@ impl<I: IntNumber> ContourExtension<I> for [IntPoint<I>] {
             p1 = p2;
         }
 
-        true
+        // A cyclic path with two distinct vertices necessarily reverses direction.
+        edge_count <= 2 || !has_reversal
     }
 
     /// The wind direction of the `Path`.
@@ -63,7 +75,7 @@ impl<I: IntNumber> ContourExtension<I> for [IntPoint<I>] {
     ///  - Returns `false` otherwise.
     #[inline(always)]
     fn is_clockwise_ordered(&self) -> bool {
-        crate::int::area::UnsafeArea::unsafe_area(self.iter().copied()) <= I::Wide::ZERO
+        self.iter().copied().unsafe_area() <= I::Wide::ZERO
     }
 
     /// Checks if a point is contained within the `Path`.
@@ -126,6 +138,57 @@ mod tests {
         let contour = Vec::<IntPoint<i32>>::new();
 
         assert!(!contour.contains_point(IntPoint::new(0, 0)));
+    }
+
+    #[test]
+    fn convexity_detects_concavity_at_repeated_closing_vertex() {
+        let mut contour = int_path![[2, 2], [0, 4], [0, 0], [4, 0], [4, 4], [2, 2]];
+
+        assert!(!contour.is_convex());
+        contour.reverse();
+        assert!(!contour.is_convex());
+    }
+
+    #[test]
+    fn convexity_ignores_consecutive_duplicates_in_any_position() {
+        let cases = [
+            (int_path![[0, 0], [4, 0], [4, 4], [0, 4]], true),
+            (int_path![[0, 0], [4, 0], [4, 4], [2, 2], [0, 4]], false),
+            (int_path![[0, 0], [4, 0], [2, 0], [2, 2], [0, 2]], false),
+        ];
+
+        for (mut contour, expected) in cases {
+            for _ in 0..2 {
+                for _ in 0..contour.len() {
+                    for repeated_index in 0..contour.len() {
+                        let mut repeated = contour.clone();
+                        repeated.insert(repeated_index, contour[repeated_index]);
+                        repeated.insert(repeated_index, contour[repeated_index]);
+                        assert_eq!(repeated.is_convex(), expected, "{repeated:?}");
+                        repeated.extend_from_slice(&[repeated[0]; 2]);
+                        assert_eq!(repeated.is_convex(), expected, "{repeated:?}");
+                    }
+                    contour.rotate_left(1);
+                }
+                contour.reverse();
+            }
+        }
+    }
+
+    #[test]
+    fn convexity_handles_fewer_than_three_distinct_adjacent_vertices() {
+        let cases = [
+            int_path![],
+            int_path![[0, 0]],
+            int_path![[0, 0], [1, 0]],
+            int_path![[0, 0], [0, 0], [0, 0]],
+            int_path![[0, 0], [0, 0], [1, 0], [1, 0]],
+            int_path![[0, 0], [0, 0], [1, 0], [1, 0], [0, 0]],
+        ];
+
+        for contour in cases {
+            assert!(contour.is_convex(), "{contour:?}");
+        }
     }
 
     #[test]

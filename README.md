@@ -14,6 +14,10 @@
 
 The crate is `no_std`, uses `alloc`, and supports `i16`, `i32`, and `i64` integer coordinates.
 
+The `int::simple` and `float::simple` helpers remove collinear and consecutive
+duplicate vertices. They do not check or resolve self-intersections;
+`SimpleContour::is_simple` checks only vertex count and adjacent edge cross products.
+
 ## Installation
 
 ```toml

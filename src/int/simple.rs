@@ -1,3 +1,12 @@
+//! Removes vertices whose adjacent edges have a zero cross product.
+//!
+//! Contours are treated as cyclic paths. Cleanup includes consecutive duplicate
+//! points, collinear vertices, and collinear edge reversals. In this module,
+//! "simple" means at least three vertices with no such adjacent edges; it does
+//! not mean a polygon without self-intersections. These operations neither check
+//! nor resolve self-intersections, and do not validate winding or hole placement.
+//! Coordinates must satisfy the arithmetic range documented by [`IntPoint`].
+
 use crate::int::shape::{IntContour, IntShape, IntShapes};
 use alloc::vec;
 use alloc::vec::Vec;
@@ -5,73 +14,70 @@ use i_float::int::number::int::IntNumber;
 use i_float::int::number::wide_int::WideIntNumber;
 use i_float::int::point::IntPoint;
 
-/// A trait that provides methods for simplifying complex geometrical structures.
+/// In-place removal of collinear and duplicate vertices from integer contours.
 pub trait Simplify {
-    /// Simplifies the structure in-place if it is not already simple.
+    /// Repeatedly removes vertices whose adjacent edges have a zero cross product.
     ///
-    /// # Returns
+    /// A contour is cleared if fewer than three vertices remain. In a shape, the
+    /// first contour is treated as the outer boundary: if it collapses, the whole
+    /// shape is cleared; collapsed later contours are removed. Collections of
+    /// shapes discard shapes whose outer boundary collapses. Already empty shapes
+    /// and collections are left unchanged.
     ///
-    /// - `true` if the structure was simplified successfully.
-    /// - `false` if the structure was already simple and no modification was made.
+    /// Returns `true` if any contour required cleanup, including an already empty
+    /// contour, or `false` if every contour passed [`SimpleContour::is_simple`].
+    /// Does not check or resolve self-intersections.
     fn simplify_contour(&mut self) -> bool;
 }
 
-/// A trait for determining if a contour is simple and for obtaining a simplified version.
+/// Checks for redundant adjacent vertices and creates a cleaned contour copy.
 pub trait SimpleContour<I: IntNumber> {
-    /// Checks if the contour is already simple, meaning it has no self-intersections
-    /// and meets the minimum complexity required.
+    /// Returns `true` if there are at least three vertices and every pair of
+    /// adjacent edges has a non-zero cross product, including at the closing edge.
     ///
-    /// # Returns
-    ///
-    /// - `true` if the contour is simple.
-    /// - `false` if the contour is complex or does not meet simplicity criteria.
+    /// Consecutive duplicate points and collinear triples return `false`.
+    /// Self-intersections are not checked: a self-intersecting contour can return
+    /// `true` if all its local turns have non-zero cross products.
     fn is_simple(&self) -> bool;
 
-    /// Returns an optional simplified version of the contour.
+    /// Returns a copy with collinear and consecutive duplicate vertices removed.
     ///
-    /// # Returns
-    ///
-    /// - `Some(IntContour)` containing the simplified contour if simplification is possible.
-    /// - `None` if the contour is degenerate or empty.
+    /// Removal repeats until all adjacent edge pairs have non-zero cross products.
+    /// Returns `None` if the input has fewer than three vertices or cleanup leaves
+    /// fewer than three. Does not check or resolve self-intersections.
     fn simplified(&self) -> Option<IntContour<I>>;
 }
 
-/// A trait for determining if a shape, composed of multiple contours, is simple,
-/// and for obtaining a simplified version.
+/// Checks and removes redundant adjacent vertices in a shape's contours.
 pub trait SimpleShape<I: IntNumber> {
-    /// Checks if the shape is simple, meaning all its contours are simple.
+    /// Returns whether every contour passes [`SimpleContour::is_simple`].
     ///
-    /// # Returns
-    ///
-    /// - `true` if all contours in the shape are simple.
-    /// - `false` if any contour is complex.
+    /// An empty shape returns `true`. Does not validate self-intersections,
+    /// winding, or the relationship between the outer boundary and holes.
     fn is_simple(&self) -> bool;
 
-    /// Returns an optional simplified version of the shape.
+    /// Returns a copy with each contour cleaned using [`SimpleContour::simplified`]
+    /// when needed.
     ///
-    /// # Returns
-    ///
-    /// - `Some(IntShape)` containing the simplified shape if simplification is possible.
-    /// - `None` if the shape is degenerate or empty.
+    /// The first contour is treated as the outer boundary. Returns `None` if that
+    /// contour collapses; collapsed later contours are omitted. An empty input
+    /// returns `Some` containing an empty shape.
     fn simplified(&self) -> Option<IntShape<I>>;
 }
 
-/// A trait for determining if a collection of shapes is simple, and for obtaining
-/// a simplified version of the entire collection.
+/// Checks and removes redundant adjacent vertices in a collection of shapes.
 pub trait SimpleShapes<I: IntNumber> {
-    /// Checks if all shapes in the collection are simple.
+    /// Returns whether every shape passes [`SimpleShape::is_simple`].
     ///
-    /// # Returns
-    ///
-    /// - `true` if all shapes are simple.
-    /// - `false` if any shape in the collection is complex.
+    /// An empty collection returns `true`. Does not check self-intersections or
+    /// relationships between shapes.
     fn is_simple(&self) -> bool;
 
-    /// Returns an optional simplified version of the collection.
+    /// Returns cleaned copies of the shapes using [`SimpleShape::simplified`]
+    /// when needed.
     ///
-    /// # Returns
-    ///
-    /// - `IntShapes` the simplified shapes.
+    /// Shapes whose outer boundary collapses are omitted. Already empty shapes
+    /// are preserved; an empty collection returns an empty collection.
     fn simplified(&self) -> IntShapes<I>;
 }
 
@@ -233,6 +239,7 @@ impl<I: IntNumber> SimpleContour<I> for [IntPoint<I>] {
     }
 }
 
+/// Reusable scratch storage for removing collinear and duplicate vertices.
 #[derive(Default)]
 pub struct ContourSimplifier {
     nodes: Vec<Node>,
@@ -240,6 +247,8 @@ pub struct ContourSimplifier {
 }
 
 impl ContourSimplifier {
+    /// Returns a cleaned contour copy with the same behavior as
+    /// [`SimpleContour::simplified`], reusing internal scratch allocations.
     pub fn simplify_contour<I: IntNumber>(&mut self, contour: &[IntPoint<I>]) -> Option<IntContour<I>> {
         let mut n = contour.len();
 
