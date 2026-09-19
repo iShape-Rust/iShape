@@ -204,7 +204,7 @@ fn float_resource_conversion_flattens_shapes_and_preserves_empty_paths() {
             .collect::<Vec<_>>(),
         vec![expected.clone()]
     );
-    let shapes = vec![vec![], vec![path, vec![]], vec![vec![[0.0, 0.0]]]];
+    let shapes = [vec![], vec![path, vec![]], vec![vec![[0.0, 0.0]]]];
     assert_eq!(
         shapes[..]
             .iter_int_paths(&adapter)

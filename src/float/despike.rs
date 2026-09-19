@@ -89,3 +89,36 @@ impl<P: FloatPointCompatible, I: IntNumber> DeSpikeContour<P, I> for FloatFlatCo
         true
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::DeSpikeContour;
+    use crate::flat::float::FloatFlatContoursBuffer;
+    use alloc::vec;
+    use i_float::adapter::FloatPointAdapter;
+    use i_float::float::rect::FloatRect;
+
+    #[test]
+    fn removes_spike_when_quantization_creates_duplicate_tip() {
+        let adapter =
+            FloatPointAdapter::<[f64; 2], i32>::with_scale(FloatRect::new(0.0, 4.0, 0.0, 4.0).unwrap(), 10.0);
+        let mut contour = vec![
+            [0.0, 0.0],
+            [4.0, 0.01],
+            [4.0, 0.02],
+            [2.0, 0.0],
+            [2.0, 2.0],
+            [0.0, 2.0],
+        ];
+        let mut buffer = FloatFlatContoursBuffer::default();
+        buffer.add_contour(&contour);
+        let expected = vec![[0.0, 0.0], [2.0, 0.0], [2.0, 2.0], [0.0, 2.0]];
+
+        assert!(contour.despike_contour(&adapter));
+        assert_eq!(contour, expected);
+        assert!(buffer.despike_contour(&adapter));
+        assert_eq!(buffer.to_contours(), vec![expected]);
+        assert!(!contour.despike_contour(&adapter));
+        assert!(!buffer.despike_contour(&adapter));
+    }
+}

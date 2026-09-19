@@ -6,7 +6,11 @@ use i_shape::float::rect::RectInit;
 fn check_rects<T: FloatNumber>() {
     let empty: Vec<[T; 2]> = vec![];
     assert!(FloatRect::with_path(&empty).unwrap().is_none());
-    assert!(FloatRect::with_paths(&[empty.clone()]).unwrap().is_none());
+    assert!(
+        FloatRect::with_paths(core::slice::from_ref(&empty))
+            .unwrap()
+            .is_none()
+    );
     assert!(
         FloatRect::with_list_of_paths(&[vec![], vec![empty.clone()]])
             .unwrap()
