@@ -102,7 +102,8 @@ mod tests {
         let mut buffer = FloatFlatContoursBuffer::default();
         buffer.add_contour(&contour);
         let original = buffer.clone();
-        let adapter = FloatPointAdapter::<_, i32>::with_scale(FloatRect::new(0.0, 2.0, 0.0, 2.0), 10.0);
+        let adapter =
+            FloatPointAdapter::<_, i32>::with_scale(FloatRect::new(0.0, 2.0, 0.0, 2.0).unwrap(), 10.0);
 
         let changed = buffer.simplify_contour(&adapter);
 

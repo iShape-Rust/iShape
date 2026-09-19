@@ -6,6 +6,11 @@ pub trait DedupContour {
     /// Removes consecutive duplicate points and a duplicated closing point
     /// (if the last point is equal to the first).
     ///
+    /// Also clears degenerate contours that contain only one point after
+    /// consecutive duplicates are removed, including single-point input.
+    /// This does not perform general contour validity checks; two-point and
+    /// collinear contours may remain.
+    ///
     /// Returns `true` if the contour was modified, `false` otherwise.
     fn dedup_contour(&mut self) -> bool;
 }

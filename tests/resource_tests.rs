@@ -189,8 +189,10 @@ fn float_resource_conversion_flattens_shapes_and_preserves_empty_paths() {
     use i_float::float::rect::FloatRect;
     use i_shape::float::adapter::{PathToInt, ResourceToIntIter};
 
-    let adapter =
-        FloatPointAdapter::<[f64; 2], i32>::with_scale(FloatRect::new(-10.0, 10.0, -10.0, 10.0), 2.0);
+    let adapter = FloatPointAdapter::<[f64; 2], i32>::with_scale(
+        FloatRect::new(-10.0, 10.0, -10.0, 10.0).unwrap(),
+        2.0,
+    );
     let path = vec![[1.5, -2.0], [-3.0, 4.5]];
     let expected = vec![IntPoint::new(3, -4), IntPoint::new(-6, 9)];
     // Both conversion traits remain usable, including on unsized slices.
@@ -223,7 +225,8 @@ fn float_resource_conversion_respects_flat_buffer_ranges() {
         points: vec![[1.0_f32, 2.0], [-3.0, 4.0]],
         ranges: vec![1..2, 0..0, 0..2],
     };
-    let adapter = FloatPointAdapter::<_, i16>::with_scale(FloatRect::new(-10.0, 10.0, -10.0, 10.0), 1.0);
+    let adapter =
+        FloatPointAdapter::<_, i16>::with_scale(FloatRect::new(-10.0, 10.0, -10.0, 10.0).unwrap(), 1.0);
     assert_eq!(
         buffer
             .iter_int_paths(&adapter)
